@@ -2,16 +2,17 @@
   require.config({
     paths: {
       'jquery.placeholder': 'lib/jquery.placeholder',
-      tools: 'lib/modal.tools'
+      tools: 'lib/modal.tools',
+      'csrf' : 'model/csrf'
     },
     shim: {
       'jquery.placeholder': ['jquery']
     }
   });
 
-  define(['jquery', "tools", 'jquery.placeholder'], function($, tool, placeholder) {
-    var container, csrfSafeMethod, getCookie, sameOrigin, _showModal;
-    var activityRegister ={}
+  define(['jquery', "tools", 'jquery.placeholder', 'csrf'], function($, tool, placeholder) {
+    var _showModal,activityRegister ={};
+    $('#check-tag').val('');
     jQuery.extend(activityRegister, {
         registerTitle :'',    //注册框标语
         isNOShow : '1',      //是否显示
@@ -19,85 +20,236 @@
         buttonFont : '',
         activityUrl : '',
         initFun : function(){
+            var array= {}, statusV = 0, handler = {};
             $('.biaoyu').text(this.registerTitle);
             this.buttonFont != undefined ? $('#register_submit').text(this.buttonFont) : $('#register_submit').text('立即注册');
-            //cookie
-            getCookie = function(name) {
-                var cookie, cookieValue, cookies, i;
-                cookieValue = null;
-                if (document.cookie && document.cookie !== "") {
-                    cookies = document.cookie.split(";");
-                    i = 0;
-                    while (i < cookies.length) {
-                      cookie = $.trim(cookies[i]);
-                      if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                      }
-                      i++;
-                    }
-                }
-                return cookieValue;
-            };
-            csrfSafeMethod = function(method) {
-                return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-            };
-            sameOrigin = function(url) {
-                var host, origin, protocol, sr_origin;
-                host = document.location.host;
-                protocol = document.location.protocol;
-                sr_origin = "//" + host;
-                origin = protocol + sr_origin;
-                return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
-            };
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                      xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-                    }
-                }
-            });
+
             var activityUrl = this.activityUrl
             $('#goLogin').on('click',function(){
                 window.location.href = '/accounts/login/?next='+activityUrl;
             })
+
+            this.fastTestOne();
         },
-        //图片验证码
-        imgCodeFun : function(){
-            $('#img-code').click(function() {
-                $('#aug-center').find('#id_captcha_1').val('');
-                activityRegister.imgCodeRe();
-                var phoneNumber;
-                phoneNumber = $.trim($("#reg_identifier").val());
-                if (activityRegister.checkMobile(phoneNumber)) {
-                    if (typeof console !== "undefined" && console !== null) {
-                        console.log("Phone number checked, now send the valdiation code");
+        //极验一次验证
+        fastTestOne : function(type){
+            statusV = 1;
+            $.ajax({
+                type: 'POST',
+                url: '/api/geetest/',
+                dataType: 'json',
+                timeout: 5000,
+                data:{
+                    type : 'get'
+                },
+                success: function (data) {
+                    var config = {
+                        gt: data.gt,
+                        challenge: data.challenge,
+                        product: "float",
+                        offline: !data.success
                     }
-                    $('#aug-code,#aug-center').show();
-                    return $('#aug-center').find('#id_captcha_1').val('');
-                }else{
-                    $('#aug-form-row-eroor').text('* 请输入正确的手机号')
+                    $('.captcha-box').show();
+                    handler = function (captchaObj) {
+                        captchaObj.appendTo("#captcha-box");
+                        captchaObj.onSuccess(function () {
+                            array = captchaObj.getValidate();
+                            $('#captcha-status').val('true');
+                            activityRegister.checkCodeIsNoFun();
+                            statusV = 0;
+                        });
+                        captchaObj.onFail(function(){
+                            $('#captcha-status').val(captchaObj.getValidate())
+                        });
+                        captchaObj.onRefresh(function(){
+                            $('#captcha-status').val('');
+                            activityRegister.heckCodeIsNoFun()
+                        })
+                        captchaObj.getValidate();
+                    }
+                    initGeetest(config, handler);
+                    $('#check-tag').val('false');
+                    statusV = 0;
+                },
+                error: function(XMLHttpRequest,status){
+                    $('.captcha-box1').show();$('.captcha-box').hide();
+                    $('#check-tag').val('falses');
+                    $('#img-code').removeClass('button-orange').addClass('buttonDisabled');
+                    $('#id_validate_code').val('');
+                    statusV = 0;
                 }
             });
-            $('#off-form').on('click',function(){   //关闭验证码弹框
-              $('#aug-code,#aug-center').hide();
+        },
+        //极验二次验证
+        fastTestTwo : function(fun){
+            if($('#captcha-status').val() == 'true') {
+                statusV = 1;
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/geetest/',
+                    dataType: 'json',
+                    timeout: 5000,
+                    data: {
+                        type: 'validate',
+                        geetest_validate: array.geetest_validate,
+                        geetest_seccode: array.geetest_seccode,
+                        geetest_challenge: array.geetest_challenge
+                    }
+                }).success(function (data) {
+                    fun();statusV = 0;
+                }).error(function (xhr) {
+                    $('#aug-form-row-eroor').text('图片验证码错误');
+                    $('#img-code').removeClass('button-orange').addClass('buttonDisabled');
+                    $('#id_validate_code').val('');
+                    $('.captcha-box1').show();$('.captcha-box').hide();
+                    $('#check-tag').val('');
+                    statusV = 0;
+                })
+            }else{
+                $('#aug-form-row-eroor').text('图片验证码错误');
+                return;
+            }
+        },
+        checkCodeIsNoFun : function(){
+          if(activityRegister.checkMobile($.trim($("#reg_identifier").val()))){
+                if($('#captcha-status').val() == 'false' || $('#captcha-status').val() == ''){
+                    $('#img-code').removeClass('button-orange').addClass('buttonDisabled');
+                }else{
+                    $('#img-code').removeClass('buttonDisabled').addClass('button-orange');
+                }
+            }else{
+                $('#img-code').removeClass('button-orange').addClass('buttonDisabled');
+            }
+        },
+        imgCodeCheck : function(){
+            $('#registerCode').on('keyup',function() {
+                var getCodeBtn = $('#img-code');
+                if($('#registerCode').val() != ''){
+                    if(activityRegister.checkMobileFun())
+                    {
+                        getCodeBtn.removeClass('buttonDisabled').addClass('button-orange');
+                    }
+                }else{
+                    getCodeBtn.removeClass('button-orange').addClass('buttonDisabled');
+                }
             })
+        },
+        imgCodeFunNew : function(){
+            activityRegister.imgCodeRe('register-modal-form');
+        },
+        checkMobileFun : function(){
+            var checkStatus = false, self = $.trim($('#reg_identifier').val());
+            if(!activityRegister.checkMobile(self)){
+                $('#aug-form-row-eroor').text('请输入正确手机号');
+                checkStatus = false;
+            }else{
+                $('#aug-form-row-eroor').text('');
+                checkStatus = true;
+            }
+            return checkStatus;
+        },
+       checkPwdFun : function(){
+            var registError = $('#aug-form-row-eroor');
+            var checkStatus = false,self = $.trim($('#reg_password').val());
+            if(self == ''){
+               registError.text('请输入密码');
+               checkStatus = false;
+            }else if(self.length < 6){
+               registError.text('密码最少6位');
+               checkStatus = false;
+            }else if(self.length > 20){
+               registError.text('密码最多20位');
+               checkStatus = false;
+            }else{
+               registError.text('');
+               checkStatus = true;
+               statusV = 0;
+            }
+            return checkStatus;
+        },
+        checkCodedFun : function(form,re){
+            var checkStatus = false,str = ''
+            if(re == 're'){
+                var self = $.trim($('#'+form).find('#id_validate_code').val());
+                str = '短信';
+            }
+            else{
+                var self = $.trim($('#'+form).find('#registerCode').val());
+                str = '图片';
+            }
+            if(self == '') {
+                $('#'+form).find('#aug-form-row-eroor').show().text('请输入'+ str +'验证码');
+                checkStatus = false;
+            }else{
+                $('#'+form).find('#aug-form-row-eroor').text('');
+                checkStatus = true;
+            }
+            return checkStatus;
+        },
+        registerMobileKeyUp : function(){
+            //注册手机号验证
+            $('#reg_identifier').on('keyup',function() {
+                activityRegister.checkCodeIsNoFun();
+            })
+        },
+        checkMobile : function(identifier) {  //验证手机号
+          var re = /^1\d{10}$/;
+          return re.test(identifier);
+        },
+        captchaRefresh : function(){   //刷新图片验证码
+            $('.captcha-refresh').click(function() {
+              activityRegister.imgCodeRe();
+            });
+        },
+        registerMobile : function(){
+            activityRegister.checkCodeIsNoFun();
+        },
+        //input验证
+        inputValidateFun : function(){
+            var errorLabel = $('#aug-form-row-eroor');
+            $('#reg_identifier,#id_validate_code').on('keyup',function(){
+              errorLabel.text('')
+            })
+            $('input, textarea').placeholder();
+             //文本框的得到和失去光标
+            var zhi;
+            $('.com-tu').on("focus", function () {
+                var self = $(this)
+                if (self.attr('placeholder')) {
+                  zhi = self.attr('placeholder');
+                }
+                self.attr('placeholder', '');
+            });
+
+            $('.com-tu').on('blur', function () {
+                $(this).attr('placeholder', zhi)
+            })
+        },
+        //刷新验证码
+        imgCodeRe : function(form){
+            url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+            $.getJSON(url, {}, function(json) {
+              $('#'+form).find('input[name="captcha_0"]').val(json.key);
+              $('#'+form).find('img.captcha').attr('src', json.image_url);
+            });
         },
         //发送验证码
         imgCodePost : function(){
-            $('#submit-code-img1').click(function() {
+            $('#img-code').click(function() {
                 var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction;
                 element = $('#img-code');
                 phoneNumber = $.trim($("#reg_identifier").val());
-                captcha_0 = $(this).parents('form').find('#id_captcha_0').val();
-                captcha_1 = $(this).parents('form').find('.captcha').val();
+                captcha_0 = $('#register-modal-form').find('input[name="captcha_0"]').val();
+                captcha_1 = $('#register-modal-form').find('input[name="captcha_1"]').val();
+                if($('#check-tag').val() == 'false'){
+                    datas = 'type=geetest'+'&geetest_validate='+array.geetest_validate+'&geetest_seccode='+array.geetest_seccode+'&geetest_challenge='+array.geetest_challenge;
+                }else{
+                    datas = 'captcha_0='+captcha_0+'&captcha_1='+captcha_1;
+                }
                 $.ajax({
                     url: "/api/phone_validation_code/register/" + phoneNumber + "/",
                     type: "POST",
-                    data: {
-                        captcha_0: captcha_0,
-                        captcha_1: captcha_1
-                    }
+                    data: datas
                 }).success(function() {
                     element.attr('disabled', 'disabled').addClass('buttonDisabled');
                     $('.voice-validate').attr('disabled', 'disabled');
@@ -107,7 +259,7 @@
                     $(element).text('重新获取').removeAttr('disabled').removeClass('buttonDisabled');
                     var result = JSON.parse(xhr.responseText);
                     if (result.type === 'captcha') {
-                        return $("#submit-code-img1").parent().parent().find('.code-img-error').html(result.message);
+                        $('#aug-form-row-eroor').text(result.message)
                     } else {
                         if (xhr.status >= 400) {
                             $('#aug-code,#aug-center').hide();
@@ -136,114 +288,6 @@
                 };
                 timerFunction();
                 return intervalId = setInterval(timerFunction, 1000);
-            });
-        },
-        //刷新验证码
-        imgCodeRe : function(){
-            url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-            $.getJSON(url, {}, function(json) {
-              $('#img-code-form').find('input[name="captcha_0"]').val(json.key);
-              $('#img-code-form').find('img.captcha').attr('src', json.image_url);
-            });
-        },
-        //提交表单
-        registerSubmitFun : function(){
-            $('#register_submit').on('click',function(){
-                if ($(this).hasClass("disabled")) {
-                    return
-                }else{
-                    var errorLabel = $('#aug-form-row-eroor');
-                    if ($('#reg_identifier').val()==''){
-                        errorLabel.text('* 请输入手机号')
-                    }else if (!activityRegister.checkMobile($('#reg_identifier').val())){
-                        errorLabel.text('* 请输入正确的手机号')
-                    }else if ($('#id_validate_code').val()==''){
-                        errorLabel.text('* 请输入验证码')
-                    }else if ($('#reg_password').val()==''){
-                        errorLabel.text('* 请输入密码')
-                    }else if ($('#reg_password').val().length<6){
-                        errorLabel.text('* 密码需要最少6位')
-                    }else if ($('#reg_password').val().length>20){
-                        errorLabel.text('* 密码不能超过20位')
-                    }else if ($('#reg_password2').val()==''){
-                        errorLabel.text('* 请再次输入密码')
-                    }else if ($('#reg_password').val()!=$('#reg_password2').val()){
-                        errorLabel.text('* 密码不一致')
-                    }else{
-                        if($("#agreement").is(':checked')) {
-                            var phoneNumber, pw, code;
-                            phoneNumber = $('#reg_identifier').val();
-                            code = $('#id_validate_code').val();
-                            pw = $('#reg_password').val();
-                            $.ajax({
-                                url: '/accounts/register/ajax/',
-                                type: "POST",
-                                data: {identifier: phoneNumber, validate_code: code, password: pw}
-                            }).done(function () {
-                                if(activityRegister.hasCallBack == true){
-                                    activityRegister.callBack();
-                                }else{
-                                    return location.reload();
-                                }
-                            }).fail(function (xhr) {
-                                var result = JSON.parse(xhr.responseText);
-                                $('#aug-form-row-eroor').text('* ' + result.message.validate_code)
-                            });
-                        }else{
-                           return tool.modalAlert({
-                                title: '温馨提示',
-                                msg: '请查看网利宝注册协议'
-                           });
-                        }
-                    }
-                }
-
-            })
-        },
-        //input验证
-        inputValidateFun : function(){
-            var errorLabel = $('#aug-form-row-eroor');
-            $('#reg_identifier,#id_validate_code').on('keyup',function(){
-              errorLabel.text('')
-            })
-            $('#reg_password').on('keyup',function(){
-              if ($('#reg_password').val().length<6){
-                errorLabel.text('* 密码需要最少6位')
-              }else if ($('#reg_password').val().length>20){
-                errorLabel.text('* 密码不能超过20位')
-              }else{
-                errorLabel.text('')
-              }
-            })
-            $('#reg_password2').on('keyup',function(){
-              if ($('#reg_password').val()!=$('#reg_password2').val()){
-                errorLabel.text('* 密码不一致')
-              }else{
-                errorLabel.text('')
-              }
-            })
-            $('input, textarea').placeholder();
-             //文本框的得到和失去光标
-            var zhi;
-            $('.com-tu').on("focus", function () {
-                var self = $(this)
-                if (self.attr('placeholder')) {
-                  zhi = self.attr('placeholder');
-                }
-                self.attr('placeholder', '');
-            });
-
-            $('.com-tu').on('blur', function () {
-                $(this).attr('placeholder', zhi)
-            })
-        },
-        checkMobile : function(identifier) {  //验证手机号
-          var re = /^1\d{10}$/;
-          return re.test(identifier);
-        },
-        captchaRefresh : function(){   //刷新图片验证码
-            $('.captcha-refresh').click(function() {
-              activityRegister.imgCodeRe();
             });
         },
         //语音验证码
@@ -298,6 +342,63 @@
                 });
             });
         },
+        //提交表单
+        registerSubmitFun : function(){
+            $('#register_submit').on('click',function(){
+                if (statusV == 0) {
+                  var errorLabel = $('#aug-form-row-eroor');
+                  if($('#check-tag').val() == 'false'){
+                        if (activityRegister.checkMobileFun() && activityRegister.checkPwdFun() && activityRegister.checkCodedFun('register-modal-form', 're')) {
+                            if ($("#agreement").is(':checked')) {
+                                errorLabel.text('');statusV = 1;
+                                $('#check-tag').val() == 'falses' ?  activityRegister.submitRegist() : activityRegister.fastTestTwo(activityRegister.submitRegist);
+                            } else {
+                                errorLabel.text('请查看网利宝注册协议');
+                            }
+                        }
+                    }else{
+                        if (activityRegister.checkMobileFun() && activityRegister.checkCodedFun('register-modal-form') && activityRegister.checkPwdFun() && activityRegister.checkCodedFun('register-modal-form', 're')) {
+                            if ($("#agreement").is(':checked')) {
+                                errorLabel.text('');statusV = 1;
+                                activityRegister.submitRegist();
+                            } else {
+                                errorLabel.text('请查看网利宝注册协议');
+                            }
+                        }
+                    }
+                }
+
+            })
+        },
+        submitRegist : function(){
+                var identifier = $('#reg_identifier').val(),
+                    captcha_0 = $('#register-modal-form').find('input[name="captcha_0"]').val(),
+                    captcha_1 = $('#register-modal-form').find('#registerCode').val(),
+                    password = $('#reg_password').val(),
+                    validate_code = $('#id_validate_code').val();
+            $.ajax({
+                url: '/accounts/register/ajax/',
+                type: "POST",
+                data: {
+                    identifier: identifier,
+                    captcha_0: captcha_0,
+                    captcha_1: captcha_1,
+                    password: password,
+                    validate_code: validate_code
+                }
+            }).done(function () {
+                if(activityRegister.hasCallBack == true){
+                    activityRegister.callBack();
+                }else{
+                    return location.reload();
+                }
+
+            }).fail(function (xhr) {
+                var result = JSON.parse(xhr.responseText);
+                $('#aug-form-row-eroor').text('* ' + result.message.validate_code)
+                statusV = 0;
+            });
+        },
         setup : function(options){  //初始化
             this.registerTitle = options.registerTitle;
             this.isNOShow = options.isNOShow;
@@ -308,12 +409,15 @@
 
             if(this.isNOShow == '1'){
                 activityRegister.initFun();
-                activityRegister.imgCodeFun();
+                activityRegister.imgCodeFunNew();
                 activityRegister.imgCodePost();
                 activityRegister.registerSubmitFun();
                 activityRegister.captchaRefresh();
                 activityRegister.voiceValidateFun();
-                activityRegister.inputValidateFun()
+                activityRegister.inputValidateFun();
+                activityRegister.registerMobile();
+                activityRegister.imgCodeCheck();
+                activityRegister.registerMobileKeyUp();
             }else{
                 $('#denglu').hide();
             }
@@ -325,7 +429,6 @@
       return {
         activityRegister : activityRegister
       }
-    this.COMPLEXIFY_BANLIST = '123456|password|12345678|1234|pussy|12345|dragon|qwerty|696969|mustang|letmein|baseball|master|michael|football|shadow|monkey|abc123|pass|fuckme|6969|jordan|harley|ranger|iwantu|jennifer|hunter|fuck|2000|test|batman|trustno1|thomas|tigger|robert|access|love|buster|1234567|soccer|hockey|killer|george|sexy|andrew|charlie|superman|asshole|fuckyou|dallas|jessica|panties|pepper|1111|austin|william|daniel|golfer|summer|heather|hammer|yankees|joshua|maggie|biteme|enter|ashley|thunder|cowboy|silver|richard|fucker|orange|merlin|michelle|corvette|bigdog|cheese|matthew|121212|patrick|martin|freedom|ginger|blowjob|nicole|sparky|yellow|camaro|secret|dick|falcon|taylor|111111|131313|123123|bitch|hello|scooter|please|porsche|guitar|chelsea|black|diamond|nascar|jackson|cameron|654321|computer|amanda|wizard|xxxxxxxx|money|phoenix|mickey|bailey|knight|iceman|tigers|purple|andrea|horny|dakota|aaaaaa|player|sunshine|morgan|starwars|boomer|cowboys|edward|charles|girls|booboo|coffee|xxxxxx|bulldog|ncc1701|rabbit|peanut|john|johnny|gandalf|spanky|winter|brandy|compaq|carlos|tennis|james|mike|brandon|fender|anthony|blowme|ferrari|cookie|chicken|maverick|chicago|joseph|diablo|sexsex|hardcore|666666|willie|welcome|chris|panther|yamaha|justin|banana|driver|marine|angels|fishing|david|maddog|hooters|wilson|butthead|dennis|fucking|captain|bigdick|chester|smokey|xavier|steven|viking|snoopy|blue|eagles|winner|samantha|house|miller|flower|jack|firebird|butter|united|turtle|steelers|tiffany|zxcvbn|tomcat|golf|bond007|bear|tiger|doctor|gateway|gators|angel|junior|thx1138|porno|badboy|debbie|spider|melissa|booger|1212|flyers|fish|porn|matrix|teens|scooby|jason|walter|cumshot|boston|braves|yankee|lover|barney|victor|tucker|princess|mercedes|5150|doggie|zzzzzz|gunner|horney|bubba|2112|fred|johnson|xxxxx|tits|member|boobs|donald|bigdaddy|bronco|penis|voyager|rangers|birdie|trouble|white|topgun|bigtits|bitches|green|super|qazwsx|magic|lakers|rachel|slayer|scott|2222|asdf|video|london|7777|marlboro|srinivas|internet|action|carter|jasper|monster|teresa|jeremy|11111111|bill|crystal|peter|pussies|cock|beer|rocket|theman|oliver|prince|beach|amateur|7777777|muffin|redsox|star|testing|shannon|murphy|frank|hannah|dave|eagle1|11111|mother|nathan|raiders|steve|forever|angela|viper|ou812|jake|lovers|suckit|gregory|buddy|whatever|young|nicholas|lucky|helpme|jackie|monica|midnight|college|baby|cunt|brian|mark|startrek|sierra|leather|232323|4444|beavis|bigcock|happy|sophie|ladies|naughty|giants|booty|blonde|fucked|golden|0|fire|sandra|pookie|packers|einstein|dolphins|chevy|winston|warrior|sammy|slut|8675309|zxcvbnm|nipples|power|victoria|asdfgh|vagina|toyota|travis|hotdog|paris|rock|xxxx|extreme|redskins|erotic|dirty|ford|freddy|arsenal|access14|wolf|nipple|iloveyou|alex|florida|eric|legend|movie|success|rosebud|jaguar|great|cool|cooper|1313|scorpio|mountain|madison|987654|brazil|lauren|japan|naked|squirt|stars|apple|alexis|aaaa|bonnie|peaches|jasmine|kevin|matt|qwertyui|danielle|beaver|4321|4128|runner|swimming|dolphin|gordon|casper|stupid|shit|saturn|gemini|apples|august|3333|canada|blazer|cumming|hunting|kitty|rainbow|112233|arthur|cream|calvin|shaved|surfer|samson|kelly|paul|mine|king|racing|5555|eagle|hentai|newyork|little|redwings|smith|sticky|cocacola|animal|broncos|private|skippy|marvin|blondes|enjoy|girl|apollo|parker|qwert|time|sydney|women|voodoo|magnum|juice|abgrtyu|777777|dreams|maxwell|music|rush2112|russia|scorpion|rebecca|tester|mistress|phantom|billy|6666|albert|111111|11111111|112233|121212|123123|123456|1234567|12345678|131313|232323|654321|666666|696969|777777|7777777|8675309|987654|abcdef|password1|password12|password123|twitter'.split('|');
   });
 }).call(this);
 
