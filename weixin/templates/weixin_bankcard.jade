@@ -27,8 +27,9 @@ html
               .set-bank(data-id='{{card.card_id}}', data-name='{{card.bank_name}}', data-no='{{card.storable_no}}') 待绑定
 
     if user.wanglibaouserprofile.id_is_valid
-      if not is_one
-        .bank-add-btn
+      cardLen = len(p2p_cards)
+      if not is_one and cardLen == 0
+        .bank-add-btn(data-len='{}')
           if recharge
             a(href="/weixin/regist/second/?next=/weixin/account/bankcard/")
               span.btn-icon +

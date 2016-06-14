@@ -42,6 +42,7 @@ import traceback
 # logger = logging.getLogger('wanglibao_reward')
 
 logger = get_task_logger(__name__)
+logger = logging.getLogger('marketing')
 
 
 @app.task
@@ -370,22 +371,43 @@ def calc_broker_commission(product_id):
     :return:
     """
     if not product_id:
+        logger.info('=calc_broker_commission= product_id=[%s] parameter not gived' % (product_id))
         return
 
     product = P2PProduct.objects.filter(id=product_id).first()
+    if not product:
+        logger.info('=calc_broker_commission= product_id=[%s] record not fouond' % (product_id))
+        return
+
+    # 判断P2P产品是否为满标审核后续状态: u'满标已审核', u'还款中', u'已完成'
+    _status = product.status
+    if _status not in [u'满标已审核', u'还款中', u'已完成']:
+        logger.info('=calc_broker_commission= product_id=[%s] [%s] not be commission' % (product_id, _status))
+        return
+
     _method = product.pay_method
     _period = product.period
     if _method.startswith(u"日计息") and _period <= 61 or _period <=2:
+        logger.info('=calc_broker_commission= product_id=[%s] [%s:%s] not be commission' % (product_id, _method, _period))
         return
-    if redpack_backends.commission_exist(product):
-        return
+
+    # Modify by hb on 2016-06-12
+    #if redpack_backends.commission_exist(product):
+    #    return
 
     start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
-    # end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
-    with transaction.atomic():
-        for equity in product.equities.all():
-            redpack_backends.commission(equity.user, product, equity.equity, start)
+    end = timezone.datetime(2016, 7, 31, 15, 59, 59, tzinfo=timezone.utc)
 
+    # Modify by hb on 2016-06-12
+    #with transaction.atomic():
+    #    for equity in product.equities.all():
+    #        redpack_backends.commission(equity.user, product, equity.equity, start)
+    for equity in product.equities.all():
+        first_msg, sec_msg = redpack_backends.commission_one(equity.user, product, equity.equity, start, end)
+        if first_msg:
+           logger.info('=calc_broker_commission= %s' % (first_msg))
+        if sec_msg:
+           logger.info('=calc_broker_commission= %s' % (sec_msg))
 
 @app.task
 def send_income_message_sms():

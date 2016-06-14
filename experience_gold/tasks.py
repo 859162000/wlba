@@ -41,6 +41,10 @@ def experience_repayment_plan():
             amo = ExperienceAmortization.objects.select_for_update().get(pk=amo_tmp.id)
 
             try:
+                # Add by hb on 2016-06-08 : 避免体验金还款重复结算
+                if amo.settled:
+                    continue
+
                 amo.settled = True
                 amo.settlement_time = timezone.now()
                 amo.save()

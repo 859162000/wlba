@@ -1523,7 +1523,7 @@ class GuestCheckView(APIView):
 
 class InnerSysHandler(object):
     def ip_valid(self, request):
-        INNER_IP = ("182.92.179.24", "10.171.37.235")
+        INNER_IP = ("182.92.179.24", "10.171.37.235", '123.57.139.145')
         client_ip = get_client_ip(request)
         return True if client_ip in INNER_IP else False
 
