@@ -537,9 +537,11 @@ class YueLiBaoCheck(APIView):
                     buyer_keeper.php_settle(product.amount_source, description=u'月利宝满标审核')
 
                 # 进行全民淘金数据写入
-                if period >= 3:
-                    calc_php_commission(product_id)
+                try :
+                    calc_php_commission(product_id, period)
                     logger.info(u'period = {}, 全民淘金数据写入: {}\n'.format(period, product_id))
+                except Exception, ex:
+                    logger.exception(u'period = {}, 全民淘金数据写入: {}, except: {}\n'.format(period, product_id, ex))
 
                 ret.update(status=1,
                            msg='success')

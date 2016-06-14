@@ -1523,7 +1523,7 @@ class GuestCheckView(APIView):
 
 class InnerSysHandler(object):
     def ip_valid(self, request):
-        INNER_IP = ("182.92.179.24", "10.171.37.235", '123.57.139.145')
+        INNER_IP = ("182.92.179.24", "10.171.37.235", '123.57.139.145', '10.172.161.122')
         client_ip = get_client_ip(request)
         return True if client_ip in INNER_IP else False
 
@@ -1984,8 +1984,8 @@ class AccessUserExistsApi(APIView):
 
 class UdeskGenerator(object):
     def __init__(self):
-        #self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
-        self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'
+        self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
+        self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'  #测试用
         self.params={
             'nonce': self.create_nonce_str(),
             'timestamp': self.create_timestamp(),
