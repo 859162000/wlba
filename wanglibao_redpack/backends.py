@@ -884,7 +884,7 @@ def commission_one(user, product, equity, start, end):
             first_msg = commission_one_pay_one(first_intro.introduced_by, user, product, 1, _amount['amount__sum'], commission)
 
             # 二级关系佣金计算中止时间：
-            sec_intro_end_time = timezone.datetime(2016, 6, 7, 15, 59, 59, tzinfo=timezone.utc)
+            sec_intro_end_time = timezone.datetime(2016, 6, 7, 16, 00, 00, tzinfo=timezone.utc)
             if first_intro.created_at >= sec_intro_end_time :
                 sec_msg = u'sec_intro: [%s] introduced [%s] 邀请关系已过有效期(%s)，本次投资不结算二级佣金' % (first_intro.introduced_by.id, user.id, first_intro.created_at)
             else:
