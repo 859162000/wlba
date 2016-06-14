@@ -36,7 +36,7 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
 # from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
-from wanglibao_rest.views import (SendValidationCodeView, SendSMSValidationCodeView, SendRegisterValidationCodeView,
+from wanglibao_rest.views import (UDeskLoginAPIView, SendValidationCodeView, SendSMSValidationCodeView, SendRegisterValidationCodeView,
                                   UserExisting, RegisterAPIView, IdValidate, HasValidationAPIView,
                                   WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                                   SendVoiceCodeNewAPIView, YTXVoiceCallbackAPIView, SendVoiceCodeAPIView,
@@ -246,6 +246,7 @@ urlpatterns = patterns(
     url(r'^manual_modify/cancel/', CancelManualModifyPhoneAPI.as_view()),
     url(r'^sms_modify/vali_acc_info/$', SMSModifyPhoneValidateAPI.as_view()),
     url(r'^sms_modify/phone/$', SMSModifyPhoneAPI.as_view()),
+    url(r'^udesk/url/$', UDeskLoginAPIView.as_view()),
 )
 
 urlpatterns += patterns('',
