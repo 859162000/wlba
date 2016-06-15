@@ -347,6 +347,8 @@ class CoopRegister(object):
         # 传递渠道oauth客户端ID时使用的变量名
         self.internal_channel_client_id_key = 'client_id'
         self.channel_access_token_key = 'access_token'
+        # 渠道用户注册时，判断是否显示邀请码时使用的KEY
+        self.is_show_invite_code_key = 'is_show_invite_code'
 
     @property
     def channel_code(self):
@@ -406,9 +408,17 @@ class CoopRegister(object):
             self.request.session[self.internal_channel_user_key] = channel_user
             # logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
 
+        if channel_code:
+            channel = get_channel_record(channel_code)
+            if channel:
+                self.request.session[self.is_show_invite_code_key] = 1
+            else:
+                self.request.session[self.is_show_invite_code_key] = 0
+
     def clear_session(self):
         self.request.session.pop(self.internal_channel_key, None)
         self.request.session.pop(self.internal_channel_user_key, None)
+        self.request.session.pop(self.is_show_invite_code_key, None)
 
     def save_to_introduceby(self, user, invite_code):
         """
