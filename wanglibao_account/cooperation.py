@@ -414,7 +414,7 @@ class CoopRegister(object):
                 is_show_invite_code_value = 1 if channel.is_show_invite_code else 0
                 self.request.session[self.is_show_invite_code_key] = is_show_invite_code_value
             else:
-                self.request.session[self.is_show_invite_code_key] = 0
+                self.request.session[self.is_show_invite_code_key] = 1
 
     def clear_session(self):
         self.request.session.pop(self.internal_channel_key, None)
