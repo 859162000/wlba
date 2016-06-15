@@ -51,8 +51,11 @@ html(style="background: #f5f5f5")
           .password
         input(type='password', name='password', placeholder= '请设置密码',data-icon='wx-input-icon',  autocomplete='off').wx-input-main
         .wx-operation-icon.wx-hide-password.wx-password-operation
-      ptoken = request.session.get('promo_token')
-      if ptoken == 'xmdj2' or ptoken == 'fwh' or ptoken == 'Lespark' or ptoken == 'zypwt' or ptoken == 'blued' or ptoken == 'qmm1' or ptoken == 'bg' or ptoken == 'jkdx' or ptoken == 'jiaxihz'
+      //ptoken = request.session.get('promo_token')
+      //if ptoken == 'xmdj2' or ptoken == 'fwh' or ptoken == 'Lespark' or ptoken == 'zypwt' or ptoken == 'blued' or ptoken == 'qmm1' or ptoken == 'bg' or ptoken == 'jkdx' or ptoken == 'jiaxihz'
+      //    input(type="hidden", name="invite_code")
+      is_show_invite_code = request.session.get('is_show_invite_code')
+      if is_show_invite_code == 0
           input(type="hidden", name="invite_code")
       else
           .wx-input-public
