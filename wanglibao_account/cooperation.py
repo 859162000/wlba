@@ -896,9 +896,9 @@ class RenRenLiCallback(CoopCallback):
         if p2p_record:
             if user_amo.settled:
                 if p2p_record.amotized_amount:
-                    amotized_amount = p2p_record.amotized_amount + user_amo.get_total_amount()
+                    amotized_amount = p2p_record.amotized_amount + user_amo.get_total_amount
                 else:
-                    amotized_amount = user_amo.get_total_amount()
+                    amotized_amount = user_amo.get_total_amount
 
                 P2PRecord.objects.filter(product=user_amo.product,
                                          user_id=user_amo.user_id
