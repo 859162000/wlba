@@ -1,0 +1,119 @@
+- load formatters
+doctype html
+html(style="background: #000")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/jquery.fullpage.min.css?v=2015060303", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_jack_shrimp.css?v=2015060812", rel="stylesheet")
+    body
+        .body_wrap
+            #play.play_music
+            audio#music(loop='loop',style='width:0;height:0;',autoplay='autoplay')
+                source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_jack_shrimp/music.mp3")
+
+            #fullpage
+                .section.section_1
+                    img.img_1(src="/static/imgs/mobile_activity/app_jack_shrimp/section1_img1.png")
+                    .text_wrap
+                        p 火热欧洲杯，好礼转转转<br>激情对决谁是最后王者
+                        img.line(src="/static/imgs/mobile_activity/app_jack_shrimp/section1_line.png")
+                        p!='夹克的虾携手网利宝<br>龙虾+啤酒+花生<span>免费送</span><br>与你激情无昼夜，快享欧洲杯'
+                    img.down(src="/static/imgs/mobile_activity/app_jack_shrimp/down.png")
+
+                .section.section_2
+                    img.title_img(src="/static/imgs/mobile_activity/app_jack_shrimp/section2_title.png")
+                    .dl_wrap
+                        dl
+                            dt
+                                span.ico.ico1
+                                span.text 1、轻松注册
+                            dd!='<span>1、</span>注册网利宝并完成实名认证'
+                        dl
+                            dt
+                                span.ico.ico2
+                                span.text 2、充值到账
+                            dd!='<span>1、</span>充值资金到网利宝帐号'
+                        dl
+                            dt
+                                span.ico.ico3
+                                span.text 3、夹克的虾渠道
+                            dd!='<span>1、</span>新用户单笔首次投资5000元及以上'     
+                        dl
+                            dt
+                                span.ico.ico4
+                                span.text 4、夹克的虾网利宝用户专享套餐
+                            dd!='<span>1、</span>麻辣小龙虾（小号）+ 川味香辣虾 <br><span>1、</span>+ 五香花生 + BUZZ啤酒<br><span>1、</span>价值：196元（含运费）' 
+                    img.down(src="/static/imgs/mobile_activity/app_jack_shrimp/down.png")
+                .section.section_3
+                    img.title_1(src="/static/imgs/mobile_activity/app_jack_shrimp/section3_title1.png")
+                    .dl_wrap
+                        dl
+                            dt.one
+                            dd 关注“夹克的虾”微信公众号
+                        dl
+                            dt.two
+                            dd 在对话框输入“我是vip”
+                        dl
+                            dt.three
+                            dd 点击弹出链接
+                        dl
+                            dt.four
+                            dd 选购专属套餐
+                        dl
+                            dt.five
+                            dd 使用优惠码下单购买
+                    .clear
+                    img.title_2(src="/static/imgs/mobile_activity/app_jack_shrimp/section3_title2.png")
+                    .money_wrap
+                        .money_title 定期理财
+                        img.img(src="/static/imgs/mobile_activity/app_jack_shrimp/section3_img1.png")
+                        dl
+                            dt!='6<span>%</span>—13<span>%</span>'
+                            dd 年化收益率
+                        .clear
+                        p 短期灵活  中期方便  长期优选
+                    img.down(src="/static/imgs/mobile_activity/app_jack_shrimp/down.png")
+
+                .section.section_4
+                    img.title_1(src="/static/imgs/mobile_activity/app_jack_shrimp/section4_title1.png")
+                    .rule_p
+                        p 1.活动时间：即日起至7月11日23:59:59；
+                        p 2.兑换券有效期：即日起至7月15日22:00:00
+                        p 3.用户通过此页面注册为网利宝用户且单笔首次投资5000元及以上即可获得夹克的虾网利宝用户专享套餐（价值196元），此活动为北京用户专享福利，兑换码以站内信以及短信形式通知，敬请留意查收；
+                        p 4.手机号为网利宝唯一账户，本期新用户专享福利为夹克的虾渠道新注册用户专享，套餐数量有限，送完即止；
+                        p 5.活动奖品由夹克的虾提供，产品安全有夹克的虾负责，对海鲜过敏和人体免疫力差的人群，谨慎食用；
+                        p 6.夹克的虾配送时间为10:00至24:00，北京市区五环以内免费配送；
+                        p!='7.活动期间新用户注册即送28888元体验金，体验金专享1天10%年化收益<span class="rule_span">新用户更多福利<img class="span_ico" src="/static/imgs/mobile_activity/app_jack_shrimp/ico.png"></span>'
+                        p 8. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                        p(style="display:none")#ios-show 9. 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。网利宝对此活动享有最终解释权。
+                    .get_now 立即领取
+            .popup_box
+                .main
+                    img.close_popup(src="/static/imgs/mobile_activity/app_jack_shrimp/close_ico.png")
+                    .textairport 新用户更多福利
+                    .popup_button 知道了
+
+            .popup_wrap
+                .main
+                    img.close_popup(src="/static/imgs/mobile_activity/app_jack_shrimp/close_ico.png")
+                    .title_red 新用户更多福利
+                    .rule_wrap
+                        p ① 活动期间新用户注册即送50元红包（满5000元可用，限1月及以上标期，领取之日起7天有效）
+                        p ② 用户首次投资满额送以下红包，红包3月标及以上使用，领取之日15天有效；
+                        p a. 1000元≤首次投资＜5000元，送100元直抵红包（满15000元可直抵使用）
+                        p b. 5000元≤首次投资＜10000元，送150元直抵红包（满20000元可直抵使用）
+                        p c. 10000元≤首次投资，送250元直抵红包（满30000元可直抵使用）
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/js/lib/jquery.min.js?v=2015060305")
+        script(src="/static/js/lib/jquery.fullpage.min.js?v=2015060305")
+        script(src="/static/scripts/mobile_activity/app_jack_shrimp.js?v=2015060806")
+        - csrf_token
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
