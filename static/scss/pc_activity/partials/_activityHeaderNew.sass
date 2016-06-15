@@ -10,7 +10,7 @@
     width: 1100px
     margin: 0 auto
     .denelu-form
-      width: 315px
+      width: 330px
       min-height: 420px
       background: #fff
       float: right
@@ -38,6 +38,20 @@
           margin-left: 10px
         input.tu1
           background: url(/static/imgs/pc_activity/activity_regist.png) -159px 5px no-repeat
+    .captcha-box1
+      .img-code-input
+        border: 1px solid #dedede
+        border-radius: 5px
+        width: 155px
+        float: left
+        input.tu2
+          background: url(/static/imgs/pc_activity/activity_regist.png) -159px -25px no-repeat
+          width: 150px
+          height: 35px
+          line-height: 35px
+          padding-left: 30px
+          border: 0 none
+          margin-left: 10px
     .voice
       .form-control-group
         border: 0 none
@@ -48,7 +62,7 @@
         input.tu2
           background: url(/static/imgs/pc_activity/activity_regist.png) -159px -25px no-repeat
           width: 150px
-        .button-orange
+        .button-orange,.buttonDisabled
           background: #8bc34a
           border: 0 none
           width: 105px
@@ -65,7 +79,6 @@
         line-height: 38px
         border: 1px solid #dedede
         border-radius: 5px
-        margin-top: 14px
         height: 35px
         line-height: 35px
         padding-left: 40px
@@ -98,7 +111,8 @@
     padding-top: 15px
     a
       color: #3ea7eb
-
+.geetest
+  margin: 10px 0 14px
 #aug-center
   height: auto
   position: absolute
@@ -201,3 +215,10 @@
     background: #e7350d
 .xunlei-account
   font-size: 12px
+
+.captcha-box1
+  .captcha
+    width: 105px
+    vertical-align: middle
+    margin-left: 5px
+    height: 35px

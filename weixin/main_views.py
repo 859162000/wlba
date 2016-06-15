@@ -162,7 +162,7 @@ class WXRegister(TemplateView):
 
 class AccountTemplate(TemplateView):
     def get_context_data(self, **kwargs):
-        account_info = getAccountInfo(self.request.user)
+        account_info = getAccountInfo(self.request.user, request_host=self.request.get_host())
         info = getMiscValue("fwh_cfg_info")
         fetch_experience_url = info.get('fetch_experience_url', "").strip()
         fetch_coupon_url = info.get("fetch_coupon_url", "").strip()
