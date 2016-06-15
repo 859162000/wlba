@@ -537,29 +537,105 @@ def php_commission(user, product_id, start):
             #                        earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
             #     income.save()
 
+# Add by hb on 2016-06-12
+def php_commission_one(user, product_id, start, end):
+    """
+    计算全民佣金,千三,取消第二级
+    :param user:
+    :param product:
+    :param equity:
+    :param start:
+    """
+    first_msg = u''
+    sec_msg = u''
 
-def calc_php_commission(product_id):
+    _amount = MonthProduct.objects.filter(user=user, product_id=product_id, created_at__gt=start, created_at__lt=end, cancel_status=False).aggregate(Sum('amount'))
+    if _amount['amount__sum'] and _amount['amount__sum'] > 0:
+        commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
+        commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
+        first_intro = IntroducedBy.objects.filter(user=user).first()
+        if first_intro and first_intro.introduced_by:
+            first_msg = php_commission_one_pay_one(first_intro.introduced_by, user, product_id, 1, _amount['amount__sum'], commission)
+
+            # 二级关系佣金计算中止时间：
+            sec_intro_end_time = timezone.datetime(2016, 6, 7, 16, 00, 00, tzinfo=timezone.utc)
+            if first_intro.created_at >= sec_intro_end_time :
+                sec_msg = u'sec_intro: [%s] introduced [%s] 邀请关系已过有效期(%s)，本次投资不结算二级佣金' % (first_intro.introduced_by.id, user.id, first_intro.created_at)
+            else:
+                sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
+                if sec_intro and sec_intro.introduced_by:
+                    sec_msg = php_commission_one_pay_one(sec_intro.introduced_by, user, product_id, 2, _amount['amount__sum'], commission)
+
+    return first_msg, sec_msg
+
+# Add by hb on 2016-06-12
+def php_commission_one_pay_one(user, invite, product_id, level, amount, earning):
+    try:
+        with transaction.atomic():
+            income, create_flag = PhpIncome.objects.get_or_create(user=user, invite=invite, product_id=product_id,
+                defaults={'level':level, 'amount':amount, 'earning':earning, 'paid':False})
+            income = PhpIncome.objects.select_for_update().get(id=income.id)
+            if income and not income.paid :
+                margin = MarginKeeper(user)
+                if level==1:
+                    desc = u'月利宝一级淘金'
+                elif level==2:
+                    desc = u'月利宝二级淘金'
+                else:
+                    desc = u'月利宝淘金'
+                margin.deposit(earning, description=desc, catalog=u"全民淘金")
+
+                income.order_id = margin.order_id
+                income.paid = True
+                income.save()
+                return u'Success: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product_id, level, amount, earning)
+            # Only for debug by hb on 2016-06-13
+            if income and income.paid:
+                return u'Ignore: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product_id, level, amount, earning)
+            if not income:
+                return u'NotFound: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product_id, level, amount, earning)
+    except Exception, ex:
+        return u'[%s] introduced [%s] in [%s], Except:(%s)' % (user.id, invite.id, product_id, ex)
+
+
+def calc_php_commission(product_id, period):
     """
     这里每次处理一个满标审核后的标, 只写入记录. 短信发送的时候去统计 散标和月利宝的佣金
     参考:　/wanglibao_redpack/backends.py    function calc_broker_commission
     :param product_id:
     :return:
     """
-    if not product_id:
+    if not period or period<3:
+        logger.info('=calc_php_commission= product_id=[%s] period=[%s] not be commission' % (product_id, period))
         return
 
-    if php_commission_exist(product_id):
+    if not product_id:
+        logger.info('=calc_php_commission= product_id=[%s] parameter not gived' % (product_id))
         return
+
+    # Modify by hb on 2016-06-12
+    # if php_commission_exist(product_id):
+    #     return
 
     month_products = MonthProduct.objects.filter(product_id=product_id)
+    if not month_products:
+        logger.info('=calc_php_commission= product_id=[%s] record not fouond' % (product_id))
+        return
     users = set([product.user for product in month_products])
 
     start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
-    # end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
-    with transaction.atomic():
-        for user in users:
-            php_commission(user, product_id, start)
+    end = timezone.datetime(2016, 7, 31, 15, 59, 59, tzinfo=timezone.utc)
 
+    # Modify by hb on 2016-06-12
+    # with transaction.atomic():
+    #     for user in users:
+    #         php_commission(user, product_id, start)
+    for user in users:
+        first_msg, sec_msg = php_commission_one(user, product_id, start, end)
+        if first_msg:
+            logger.info('=calc_php_commission= : %s' % (first_msg))
+        if sec_msg:
+            logger.info('=calc_php_commission= : %s' % (sec_msg))
 
 def get_php_redis_principle(user_id, url=None):
     """
