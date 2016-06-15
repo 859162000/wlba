@@ -89,8 +89,13 @@ class AppActivateScoreImageAPIView(APIView):
             device_type = 'act_score_iso'
 
         size = self.SIZE_MAP[size]
+        # activate_query = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]))
+        # activate = activate_query.filter(Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())).order_by('-priority').first()
+        # if not activate:
+        #     activate = activate_query.filter(Q(is_long_used=True)).order_by('-priority').first()
 
         activate = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).first()
+
         if activate:
             if size == 'img_one':
                 img_url = activate.img_one
@@ -139,8 +144,12 @@ class AppActivateImageAPIView(APIView):
             if device_type == 'android': device_type = 'act_android'
 
         size = self.SIZE_MAP[size]
+        activate_query = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]))
+        activate = activate_query.filter(Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())).order_by('-priority').first()
+        if not activate:
+            activate = activate_query.filter(Q(is_long_used=True)).order_by('-priority').first()
 
-        activate = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).first()
+        # activate = AppActivate.objects.filter(Q(is_used=True), Q(device=self.DEVICE_MAP[device_type]), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).first()
         if activate:
             if size == 'img_one':
                 img_url = activate.img_one
@@ -223,13 +232,13 @@ class AppRepaymentAPIView(APIView):
                     if int(request.get_host().split(':')[1]) > 7000:
                         url = settings.PHP_APP_INDEX_DATA_DEV
                 except Exception, e:
-                    logger_yuelibao.debug(u'in AppRepaymentAPIView, 月利宝地址请求失败!!! exception = {}'.format(e.message))
+                    pass
 
                 try:
                     index_data = get_php_index_data(url, user.id)
                 except Exception, e:
                     index_data = {"yesterdayIncome": 0, "paidIncome": 0, "unPaidIncome": 0}
-                    logger_yuelibao.debug(u'in AppRepaymentAPIView, 月利宝地址请求失败!!! exception = {}'.format(e.message))
+                    logger_yuelibao.debug(u'in AppRepaymentAPIView, get_php_index_data请求失败!!! exception = {}'.format(e.message))
 
                 return Response({
                     'ret_code': 0,
