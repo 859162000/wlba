@@ -411,7 +411,8 @@ class CoopRegister(object):
         if channel_code:
             channel = get_channel_record(channel_code)
             if channel:
-                self.request.session[self.is_show_invite_code_key] = 1
+                is_show_invite_code_value = 1 if channel.is_show_invite_code else 0
+                self.request.session[self.is_show_invite_code_key] = is_show_invite_code_value
             else:
                 self.request.session[self.is_show_invite_code_key] = 0
 
