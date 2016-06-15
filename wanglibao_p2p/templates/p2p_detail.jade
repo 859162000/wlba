@@ -190,7 +190,7 @@ html
               .p2p-detail-list.clearfix
                 h1 {{section_name}}
                 for item_name in section_values
-                  if item_name != '第三方担保机构'
+                  if item_name != '第三方担保机构' and item_name != '第三方合作机构'
                     dl
                       dt.span2.align-left {{item_name}}
                       item_value = section_values[item_name]

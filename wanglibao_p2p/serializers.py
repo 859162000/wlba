@@ -107,7 +107,7 @@ class P2PProductSerializer(ModelSerializerExtended):
                         extra_data[section_key][section_key] = extra_data[section_key][item_key]
                         del extra_data[section_key][item_key]
                     else:
-                        if item_key == u'第三方担保机构':
+                        if item_key == u'第三方担保机构' or item_key == u'第三方合作机构':
                             del extra_data[section_key][item_key]
         except:
             logger.error('parse extra data failed:' + str(value))
