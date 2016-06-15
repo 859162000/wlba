@@ -1726,6 +1726,10 @@ class JiaKeRegister(CoopRegister):
         # 判断是否首次投资
         p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True)
         if p2p_record and not is_ylb_frist_p2p and p2p_record.amount >= 5000:
+            record = WanglibaoRewardJoinRecord.objects.filter(user=user, activity_code='jkdx').first()
+            if record:  #系统已经给该渠道的新用户发奖完毕
+                return
+
             with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='夹克的虾兑换码', is_used=False).first()
                 if not reward:
@@ -1740,6 +1744,16 @@ class JiaKeRegister(CoopRegister):
                     "content": u'【网利科技】夹克的虾兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
+
+                try:
+                    WanglibaoRewardJoinRecord.objects.create(
+                        user=user,
+                        activity_code='jkdx',
+                        remain_chance=0
+                    )
+                except Exception, res:
+                    logger.debug('夹克大虾领奖记录入库失败:%s' % res)
+
                 reward.is_used = True
                 reward.save()
 
