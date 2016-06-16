@@ -459,8 +459,9 @@ def bind_pay_deposit(request):
 
     if len(card_no) > 10 and (not input_phone or not gate_id):
         return {"ret_code":20112, 'message':'信息输入不完整'}
-    if len(card_no) > 10 and Card.objects.filter(user=user).filter(
-            Q(is_bind_kuai=True)|Q(is_bind_yee=True)).count() > 1:
+    if len(card_no) > 10 and Card.objects.filter(user=user).filter(~Q(no=card_no)).\
+            filter( Q(is_bind_kuai=True)|Q(is_bind_yee=True)).count() > 0:
+        # 只允许绑一张
         return {"ret_code":20113, 'message':'为确保账户安全，资金同卡进出，不能再绑卡'}
 
     if gate_id:
