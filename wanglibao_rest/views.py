@@ -71,7 +71,7 @@ import urllib
 from wanglibao_geetest.geetest import GeetestLib
 from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
-from wanglibao.settings import GEETEST_ID, GEETEST_KEY
+from wanglibao.settings import GEETEST_ID, GEETEST_KEY, UDESK_BASE_URL, UDESK_IM_USER_KEY
 from utils import id_validate
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1859,6 +1859,9 @@ class OauthUserRegisterApi(APIView):
                 if response_data['message'] == u'该手机号已经注册':
                     if channel_code == 'renrenli':
                         response_data['ret_code'] = 100
+                    if channel_code == 'tan66':
+                        response_data['status'] = 1
+                        response_data['errmsg'] = u'手机号已经存在'
         else:
             response_data = {
                 'ret_code': 50002,
@@ -1874,6 +1877,11 @@ class OauthUserRegisterApi(APIView):
             response_data['code'] = response_data['ret_code']
             response_data.pop('ret_code')
             response_data['msg'] = response_data['message']
+            response_data.pop('message')
+        elif channel_code == 'tan66':
+            response_data['status'] = response_data['status']
+            response_data.pop('ret_code')
+            response_data['msg'] = response_data['errmsg']
             response_data.pop('message')
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
@@ -1984,8 +1992,7 @@ class AccessUserExistsApi(APIView):
 
 class UdeskGenerator(object):
     def __init__(self):
-        self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
-        self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'  #测试用
+        self.im_user_key = UDESK_IM_USER_KEY
         self.params={
             'nonce': self.create_nonce_str(),
             'timestamp': self.create_timestamp(),
@@ -2007,7 +2014,7 @@ class UdeskGenerator(object):
         return self.params['signature']
 
     def combine_url(self, phone, signature):
-        base_url = 'http://wltest.udesk.cn/im_client?'
+        base_url = UDESK_BASE_URL
         self.get_params = {
             'nonce': self.params['nonce'],
             'timestamp': self.params['timestamp'],

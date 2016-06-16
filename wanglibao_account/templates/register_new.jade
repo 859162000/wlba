@@ -44,8 +44,8 @@ html
                                 button.getCodeBtn.buttonGray(type='button') 获取验证码
                                 .voice(style='display:none')
                                     | 没有收到验证码？请尝试<a href="javascript:void(0)" class="voiceValidate">语音验证</a>
-                            ptoken = request.session.get('promo_token')
-                            if ptoken == 'wdty518'
+                            is_show_invite_code = request.session.get('is_show_invite_code')
+                            if is_show_invite_code == 0
                                 input#invitecode(type="hidden", name="invitecode")
                             else
                                 li.clearfix

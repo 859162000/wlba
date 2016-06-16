@@ -347,6 +347,8 @@ class CoopRegister(object):
         # 传递渠道oauth客户端ID时使用的变量名
         self.internal_channel_client_id_key = 'client_id'
         self.channel_access_token_key = 'access_token'
+        # 渠道用户注册时，判断是否显示邀请码时使用的KEY
+        self.is_show_invite_code_key = 'is_show_invite_code'
 
     @property
     def channel_code(self):
@@ -406,9 +408,18 @@ class CoopRegister(object):
             self.request.session[self.internal_channel_user_key] = channel_user
             # logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
 
+        if channel_code:
+            channel = get_channel_record(channel_code)
+            if channel:
+                is_show_invite_code_value = 1 if channel.is_show_invite_code else 0
+                self.request.session[self.is_show_invite_code_key] = is_show_invite_code_value
+            else:
+                self.request.session[self.is_show_invite_code_key] = 1
+
     def clear_session(self):
         self.request.session.pop(self.internal_channel_key, None)
         self.request.session.pop(self.internal_channel_user_key, None)
+        self.request.session.pop(self.is_show_invite_code_key, None)
 
     def save_to_introduceby(self, user, invite_code):
         """
@@ -1715,6 +1726,10 @@ class JiaKeRegister(CoopRegister):
         # 判断是否首次投资
         p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True)
         if p2p_record and not is_ylb_frist_p2p and p2p_record.amount >= 5000:
+            record = WanglibaoRewardJoinRecord.objects.filter(user=user, activity_code='jkdx').first()
+            if record:  #系统已经给该渠道的新用户发奖完毕
+                return
+
             with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='夹克的虾兑换码', is_used=False).first()
                 if not reward:
@@ -1729,6 +1744,16 @@ class JiaKeRegister(CoopRegister):
                     "content": u'【网利科技】夹克的虾兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
+
+                try:
+                    WanglibaoRewardJoinRecord.objects.create(
+                        user=user,
+                        activity_code='jkdx',
+                        remain_chance=0
+                    )
+                except Exception, res:
+                    logger.debug('夹克大虾领奖记录入库失败:%s' % res)
+
                 reward.is_used = True
                 reward.save()
 
@@ -2682,6 +2707,114 @@ class BiSouYiRegister(BaJinSheRegister):
             binding.save()
 
 
+class TanLiuLiuRegister(BaJinSheRegister):
+    def __init__(self, request):
+        super(TanLiuLiuRegister, self).__init__(request)
+        self.c_code = 'tan66'
+        self.external_channel_client_id_key = 'cid'
+        self.external_channel_phone_key = 'mobile'
+        self.internal_channel_phone_key = 'phone'
+        self.external_channel_sign_key = 'sign'
+        self.internal_channel_sign_key = 'sign'
+        self.channel_content_key = 'content'
+        self.channel_product_id_key = 'product_id'
+        self.channel_username = 'username'
+        self.channel_email = 'email'
+        self.channel_timestamp = 'timestamp'
+
+    def save_to_session(self):
+        if self.request.META.get('CONTENT_TYPE', '').lower().find('application/json') != -1:
+            req_data = json.loads(self.request.body.strip())
+        else:
+            req_data = self.request.REQUEST
+
+        channel_code = self.get_channel_code_from_request()
+        channel_phone = req_data.get(self.external_channel_phone_key, None)
+        sign = req_data.get(self.external_channel_sign_key, None)
+        channel_user = req_data.get(self.external_channel_user_key, None)
+        content = req_data.get(self.channel_content_key, None)
+        client_id = req_data.get(self.external_channel_client_id_key, None)
+        p_id = req_data.get(self.channel_product_id_key, None)
+        username = req_data.get(self.channel_username, None)
+        email = req_data.get(self.channel_email, None)
+        timestamp = req_data.get(self.channel_timestamp, None)
+
+        if not client_id:
+            client_id = self.request.META.get(self.external_channel_client_id_key.upper(), None)
+
+        if not client_id:
+            client_id = self.request.META.get('HTTP_%s' % self.external_channel_client_id_key.upper(), None)
+
+        if not sign:
+            sign = self.request.META.get(self.external_channel_sign_key.upper(), None)
+
+        if not sign:
+            sign = self.request.META.get('HTTP_%s' % self.external_channel_sign_key.upper(), None)
+
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+
+        if channel_phone:
+            self.request.session[self.internal_channel_phone_key] = channel_phone
+
+        if sign:
+            self.request.session[self.internal_channel_sign_key] = sign
+
+        if client_id:
+            self.request.session[self.internal_channel_client_id_key] = client_id
+
+        if content:
+            self.request.session[self.channel_content_key] = content
+
+        if p_id:
+            self.request.session[self.channel_product_id_key] = p_id
+
+        if p_id:
+            self.request.session[self.channel_username] = username
+        
+        if p_id:
+            self.request.session[self.channel_email] = email
+        
+        if p_id:
+            self.request.session[self.channel_timestamp] = timestamp
+
+        logger.info("%s request url[%s] params[%s] client_id[%s] sign[%s]" % (
+            self.c_code, self.request.get_full_path(), req_data, client_id, sign))
+
+    def clear_session(self):
+        super(TanLiuLiuRegister, self).clear_session()
+        self.request.session.pop(self.internal_channel_phone_key, None)
+        self.request.session.pop(self.internal_channel_sign_key, None)
+        self.request.session.pop(self.internal_channel_client_id_key, None)
+        self.request.session.pop(self.channel_content_key, None)
+        self.request.session.pop(self.internal_channel_key, None)
+        self.request.session.pop(self.channel_product_id_key, None)
+        self.request.session.pop(self.channel_username, None)
+        self.request.session.pop(self.channel_email, None)
+        self.request.session.pop(self.channel_timestamp, None)
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        channel_name = self.channel_name
+        channel_account = getattr(user, 'account', '')
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if channel_name and channel_account and len(channel_user) <= bid_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            binding.bid = channel_user or get_uid_for_coop(user.id)
+            binding.extra = channel_account
+            binding.save()
+
+
 class JiaXiHZRegister(CoopRegister):
     def __init__(self, request):
         super(JiaXiHZRegister, self).__init__(request)
@@ -2742,7 +2875,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
-                          BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
+                          BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,TanLiuLiuRegister,
                           JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister, BaoGeRegister, JiaKeRegister]
 
 

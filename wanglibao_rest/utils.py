@@ -377,6 +377,18 @@ def process_bajinshe_register(request, user, phone, client_id, channel_code):
 
     return response_data
 
+def process_tan66_register(request, user, phone, client_id, channel_code):
+    tid = get_uid_for_coop(user.id)
+
+    response_data = {
+        'status': 0,
+        'username': request.POST.get('username'),
+        'usernamep': tid,
+        'regtime': int(time.ctime()),
+    }
+
+    return response_data
+
 
 def process_bajinshe_user_exists(user, introduce_by, phone, sign_is_ok):
     if sign_is_ok:
