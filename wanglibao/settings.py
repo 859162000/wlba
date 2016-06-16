@@ -1479,3 +1479,7 @@ SMTP_SERVER = 'smtp.exmail.qq.com'
 SMTP_USER = 'develop@wanglibank.com'
 SMTP_PASSWORD = 'abc&321'
 
+# 测试开发的可访问IP可都放一起
+VALID_IPS = ['']
+if ENV == ENV_PRODUCTION:
+    VALID_IPS = ['']
