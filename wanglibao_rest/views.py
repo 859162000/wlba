@@ -1859,6 +1859,9 @@ class OauthUserRegisterApi(APIView):
                 if response_data['message'] == u'该手机号已经注册':
                     if channel_code == 'renrenli':
                         response_data['ret_code'] = 100
+                    if channel_code == 'tanliuliu':
+                        response_data['status'] = 1
+                        response_data['errmsg'] = u'手机号已经存在'
         else:
             response_data = {
                 'ret_code': 50002,
@@ -1874,6 +1877,11 @@ class OauthUserRegisterApi(APIView):
             response_data['code'] = response_data['ret_code']
             response_data.pop('ret_code')
             response_data['msg'] = response_data['message']
+            response_data.pop('message')
+        elif channel_code == 'tanliuliu':
+            response_data['status'] = response_data['status']
+            response_data.pop('ret_code')
+            response_data['msg'] = response_data['errmsg']
             response_data.pop('message')
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

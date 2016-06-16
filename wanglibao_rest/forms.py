@@ -18,6 +18,39 @@ class OauthUserRegisterForm(forms.Form):
     client_id = forms.CharField(max_length=50, error_messages={'required': u'client参数是必须的'})
     sign = forms.CharField(max_length=50, error_messages={'required': u'sign参数是必须的'})
     phone = forms.CharField(max_length=11, error_messages={'required': u'phone参数是必须的'})
+    username = forms.CharField(max_length=11, error_messages={'required': u'username参数是必须的'})
+    timestamp = forms.CharField(max_length=11, error_messages={'required': u'timestamp参数是必须的'})
+    email = forms.CharField(max_length=11, error_messages={'required': u'email参数是必须的'}, required=False)
+    
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if not username:
+            raise forms.ValidationError(
+                message=u'无效用户名',
+                code=10003,
+            )
+
+        return username
+    
+    def clean_timestamp(self):
+        timestamp = self.cleaned_data['timestamp']
+        if not timestamp:
+            raise forms.ValidationError(
+                message=u'无效时间戳',
+                code=10003,
+            )
+
+        return timestamp
+    
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not email:
+            raise forms.ValidationError(
+                message=u'无效邮箱',
+                code=10003,
+            )
+
+        return email
 
     def clean_channel_code(self):
         channel_code = self.cleaned_data['channel_code']
@@ -60,6 +93,19 @@ class OauthUserRegisterForm(forms.Form):
         phone = self.cleaned_data['phone']
         sign = self.cleaned_data['sign']
         local_sign = generate_bajinshe_sign(client_id, phone, coop_key)
+        if sign == local_sign:
+            return True
+        else:
+            return False
+        
+    def tanliuliu_sign_check(self, coop_key):
+        client_id = self.cleaned_data['client_id']
+        phone = self.cleaned_data['phone']
+        sign = self.cleaned_data['sign']
+        username = self.cleaned_data['username']
+        timestamp = self.cleaned_data['timestamp']
+        email = self.cleaned_data['email']
+        local_sign = hashlib.md5(str(coop_key)+str(email)+'tanliuliu'+str(phone)+str(timestamp)+str(username)+str(coop_key)).hexdigest()
         if sign == local_sign:
             return True
         else:
