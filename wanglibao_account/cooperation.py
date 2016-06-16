@@ -2710,7 +2710,7 @@ class BiSouYiRegister(BaJinSheRegister):
 class TanLiuLiuRegister(BaJinSheRegister):
     def __init__(self, request):
         super(TanLiuLiuRegister, self).__init__(request)
-        self.c_code = 'tanliuliu'
+        self.c_code = 'tan66'
         self.external_channel_client_id_key = 'cid'
         self.external_channel_phone_key = 'mobile'
         self.internal_channel_phone_key = 'phone'
@@ -2875,7 +2875,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           XunleiVipRegister, JuChengRegister, MaimaiRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
-                          BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
+                          BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,TanLiuLiuRegister
                           JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister, BaoGeRegister, JiaKeRegister]
 
 

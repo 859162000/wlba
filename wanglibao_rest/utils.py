@@ -377,7 +377,7 @@ def process_bajinshe_register(request, user, phone, client_id, channel_code):
 
     return response_data
 
-def process_tanliuliu_register(request, user, phone, client_id, channel_code):
+def process_tan66_register(request, user, phone, client_id, channel_code):
     tid = get_uid_for_coop(user.id)
 
     response_data = {
