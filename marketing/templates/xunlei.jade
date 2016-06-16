@@ -6,7 +6,8 @@ html
         - with '网利宝' as title
         include global/g_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/xunlei.css")
+        link(rel="stylesheet",href="/static/styles/pc_activity/xunlei.css?v=20160614")
+        script(src="https://static.geetest.com/static/tools/gt.js")
     body()
         - csrf_token
         include include/activityTopNew
@@ -162,4 +163,4 @@ html
         include global/g_footer
         include include/tracking
     script.
-        require(['/static/src/pc/xunlei.js?v=20160606'])
+        require(['/static/src/pc/xunlei.js?v=2016061401'])
