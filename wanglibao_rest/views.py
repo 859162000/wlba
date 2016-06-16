@@ -6,6 +6,12 @@ import logging
 import hashlib
 import traceback
 import StringIO
+
+import time
+from decimal import Decimal
+import datetime
+import re
+from rest_framework import renderers
 from rest_framework.views import APIView
 from datetime import datetime as dt
 from django.http import HttpResponse
@@ -17,7 +23,7 @@ from wanglibao_account.models import Binding
 from wanglibao_account.utils import create_user, has_binding_for_bid
 from wanglibao_account.forms import UserRegisterForm
 from wanglibao_account.cooperation import CoopRegister, RenRenLiCallback
-from wanglibao_p2p.models import P2PRecord
+from wanglibao_p2p.models import P2PRecord, P2PEquity
 from wanglibao_oauth2.models import Client
 from .forms import CoopDataDispatchForm
 
@@ -319,3 +325,200 @@ class RenRenLiQueryApi(APIView):
             }
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+
+class TanLiuLiuInvestmentQuery(APIView):
+    """
+    弹66用户投资查询接口
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        channel_name = str(self.request.POST.get('from', None))
+        username = self.request.POST.get('username', None)
+        usernamep = self.request.POST.get('usernamep', None)
+        timestamp = self.request.POST.get('timestamp', None)
+        sign = self.request.POST.get('sign', None)
+        starttime = self.request.POST.get('starttime', None)
+        endtime = self.request.POST.get('endtime', None)
+        coop_key = settings.TANLIULIU_ACCESSKEY
+        if channel_name and username and usernamep and timestamp and sign and starttime and endtime:
+            token = hashlib.md5(str(coop_key)+'tanliuliu'+str(timestamp)+str(username)+str(usernamep)+str(coop_key)).hexdigest()
+            if token == sign:
+                return True
+
+    def post(self, request):
+
+        if self.check_sign():
+
+            page = int(self.request.POST.get('page', 1))
+            page_size = int(self.request.POST.get('pagesize', 10))
+            p2p_list = []
+            ret = dict()
+
+            starttime = self.request.POST.get('starttime', None)
+            endtime = self.request.POST.get('endtime', None)
+            channel_username = self.request.POST.get('username', None)
+            channel_user_uid = self.request.POST.get('usernamep', None)
+
+            bind = Binding.objects.filter((Q(btype=u'tan66')) & (Q(bid=channel_username) | Q(bid=channel_user_uid))).first()
+            if not bind:
+                ret = {
+                    'status': 1,
+                    'errmsg': u"用户不存在"
+                }
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+            p2ps = P2PEquity.objects.filter(user=bind.user & Q(created_at__gte=starttime) & Q(created_at__lte=endtime))
+
+            ret['total'] = p2ps.count()
+
+            # 获取总页数, 和页数不对处理
+            com_page = len(p2ps) / page_size + 1
+
+            if page > com_page:
+                page = com_page
+            if page < 1:
+                page = 1
+
+            # 获取到对应的页数的所有用户
+            if len(p2ps) / page_size >= page:
+                p2ps = p2ps[(page - 1) * page_size: page * page_size]
+            else:
+                p2ps = p2ps[(page - 1) * page_size:]
+
+            for p2p in p2ps:
+                p2pproduct = p2p.product
+
+                reward = Decimal.from_float(0).quantize(Decimal('0.0000'), 'ROUND_DOWN')
+                if p2pproduct.activity:
+                    reward = p2pproduct.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
+
+                rate = p2pproduct.expected_earning_rate + float(reward * 100)
+
+                rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'))
+
+                matches = re.search(u'日计息', p2pproduct.pay_method)
+                if matches and matches.group():
+                    p_type = 0
+                else:
+                    p_type = 1
+
+                p2p_dict = dict()
+                p2p_dict['oid'] = p2p.id
+                p2p_dict['bid'] = p2pproduct.id
+                p2p_dict['title'] = p2pproduct.name
+                p2p_dict['url'] = "https://{}/p2p/detail/{}".format(request.get_host(), p2pproduct.id)
+                p2p_dict['amount'] = p2p.equity
+                p2p_dict['investtime'] = p2p.created_at
+                p2p_dict['period'] = p2pproduct.period
+                p2p_dict['unit'] = p_type
+                p2p_dict['rate'] = rate
+
+                p2p_list.append(p2p_dict)
+
+            ret['list'] = p2p_list
+            ret['status'] = 0
+            ret['username'] = self.request.POST.get('username', None)
+            ret['usernamep'] = self.request.POST.get('usernamep', None)
+            ret['level'] = 0
+
+        else:
+            ret = {
+                'status': 1,
+                'errmsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+class TanLiuLiuAllUserInvestmentQuery(APIView):
+    """
+    弹66用户投资查询接口
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        channel_name = str(self.request.POST.get('from', None))
+        username = self.request.POST.get('username', None)
+        usernamep = self.request.POST.get('usernamep', None)
+        timestamp = self.request.POST.get('timestamp', None)
+        sign = self.request.POST.get('sign', None)
+        starttime = self.request.POST.get('starttime', None)
+        endtime = self.request.POST.get('endtime', None)
+        if channel_name and username and usernamep and timestamp and sign and starttime and endtime:
+            from hashlib import md5
+            sign = md5(md5(t).hexdigest() + settings.XICAI_CLIENT_SECRET).hexdigest()
+            if token == sign:
+                return True
+
+    def post(self, request):
+
+        if self.check_sign():
+
+            page = int(self.request.POST.get('page', 1))
+            page_size = int(self.request.POST.get('pagesize', 10))
+            p2p_list = []
+            ret = dict()
+
+            starttime = self.request.POST.get('starttime', None)
+            endtime = self.request.POST.get('endtime', None)
+
+            binds = Binding.objects.filter((Q(btype=u'tan66')) & Q(created_at__gte=starttime) & Q(created_at__lte=endtime))
+            users = [b.user for b in binds]
+            p2ps = P2PEquity.objects.filter(user__in=users)
+
+            ret['total'] = p2ps.count()
+
+            # 获取总页数, 和页数不对处理
+            com_page = len(p2ps) / page_size + 1
+
+            if page > com_page:
+                page = com_page
+            if page < 1:
+                page = 1
+
+            # 获取到对应的页数的所有用户
+            if len(p2ps) / page_size >= page:
+                p2ps = p2ps[(page - 1) * page_size: page * page_size]
+            else:
+                p2ps = p2ps[(page - 1) * page_size:]
+
+            for p2p in p2ps:
+                p2pproduct = p2p.product
+
+                reward = Decimal.from_float(0).quantize(Decimal('0.0000'), 'ROUND_DOWN')
+                if p2pproduct.activity:
+                    reward = p2pproduct.activity.rule.rule_amount.quantize(Decimal('0.0000'), 'ROUND_DOWN')
+
+                rate = p2pproduct.expected_earning_rate + float(reward * 100)
+
+                rate = Decimal.from_float(rate / 100).quantize(Decimal('0.0000'))
+
+                matches = re.search(u'日计息', p2pproduct.pay_method)
+                if matches and matches.group():
+                    p_type = 0
+                else:
+                    p_type = 1
+
+                p2p_dict = dict()
+                p2p_dict['oid'] = p2p.id
+                p2p_dict['bid'] = p2pproduct.id
+                p2p_dict['title'] = p2pproduct.name
+                p2p_dict['url'] = "https://{}/p2p/detail/{}".format(request.get_host(), p2pproduct.id)
+                p2p_dict['amount'] = p2p.equity
+                p2p_dict['investtime'] = p2p.created_at
+                p2p_dict['period'] = p2pproduct.period
+                p2p_dict['unit'] = p_type
+                p2p_dict['rate'] = rate
+
+                p2p_list.append(p2p_dict)
+
+            ret['list'] = p2p_list
+            ret['status'] = 0
+            ret['username'] = self.request.POST.get('username', None)
+            ret['usernamep'] = self.request.POST.get('usernamep', None)
+            ret['level'] = 0
+
+        else:
+            ret = {
+                'status': 1,
+                'errmsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
