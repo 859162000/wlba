@@ -239,7 +239,7 @@ class RenRenLiQueryApi(APIView):
                                     'Data': u'无效订单号',
                                 }
                         elif bid:
-                            binding = Binding.objects.filter(btype=client.channel.code, bid=bid).first()
+                            binding = Binding.objects.filter(channel=client.channel, bid=bid).first()
                             if binding:
                                 if start_time:
                                     start_time = dt.fromtimestamp(float(start_time[:10]))

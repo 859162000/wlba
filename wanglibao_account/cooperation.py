@@ -893,22 +893,25 @@ class RenRenLiCallback(CoopCallback):
         p2p_record = P2PRecord.objects.filter(product=user_amo.product,
                                               user_id=user_amo.user_id
                                               ).order_by('create_time').last()
-        if p2p_record:
-            if user_amo.settled:
-                if p2p_record.amotized_amount:
-                    amotized_amount = p2p_record.amotized_amount + user_amo.get_total_amount
-                else:
-                    amotized_amount = user_amo.get_total_amount
-
-                P2PRecord.objects.filter(product=user_amo.product,
-                                         user_id=user_amo.user_id
-                                         ).update(back_last_date=user_amo.term_date,
-                                                  amotized_amount=amotized_amount)
-            else:
-                if user_amo.term == user_amo.terms:
-                    P2PRecord.objects.filter(product=user_amo.product,
-                                             user_id=user_amo.user_id
-                                             ).update(invest_end_time=user_amo.term_date)
+        if p2p_record and user_amo.term == 1 and not user_amo.settled:
+            # if user_amo.settled:
+            #     if p2p_record.amotized_amount:
+            #         amotized_amount = p2p_record.amotized_amount + user_amo.get_total_amount
+            #     else:
+            #         amotized_amount = user_amo.get_total_amount
+            #
+            #     P2PRecord.objects.filter(product=user_amo.product,
+            #                              user_id=user_amo.user_id
+            #                              ).update(back_last_date=user_amo.term_date,
+            #                                       amotized_amount=amotized_amount)
+            # else:
+            user_id = user_amo.user_id
+            product = user_amo.product
+            p2p_equity = P2PEquity.objects.filter(product=product, user_id=user_id).first()
+            if p2p_equity and p2p_equity.confirm:
+                P2PRecord.objects.filter(product=product,
+                                         user_id=user_id
+                                         ).update(invest_end_time=p2p_equity.confirm_at)
 
     def purchase_call_back(self, user_id, order_id):
         super(RenRenLiCallback, self).purchase_call_back(user_id, order_id)
