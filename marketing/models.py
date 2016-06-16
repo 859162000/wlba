@@ -152,6 +152,7 @@ class Channels(models.Model):
     start_at = models.DateTimeField(u'合作开始时间', blank=True, null=True, help_text=u'*可为空')
     end_at = models.DateTimeField(u'合作结束时间', blank=True, null=True, help_text=u'*可为空')
     is_abandoned = models.BooleanField(u'是否废弃', default=False)
+    is_show_invite_code = models.BooleanField(u'是否显示邀请码', default=False, help_text=u'页面注册时，显示邀请码输入一项')
 
     class Meta:
         verbose_name_plural = u"渠道"
