@@ -1803,7 +1803,7 @@ class OauthUserRegisterApi(APIView):
         channel_code = request.GET.get('promo_token')
         if channel_code:
             data = request.session
-            form = OauthUserRegisterForm(data)
+            form = OauthUserRegisterForm(data, request=request)
             if form.is_valid():
                 channel_code = form.cleaned_data['channel_code']
                 coop_key_str = '%s_COOP_KEY' % channel_code.upper()
@@ -1878,10 +1878,15 @@ class OauthUserRegisterApi(APIView):
             response_data.pop('ret_code')
             response_data['msg'] = response_data['message']
             response_data.pop('message')
-        elif channel_code == 'tanliuliu':
-            response_data['status'] = response_data['status']
+        elif channel_code == 'tan66':
+            ret_code = response_data['ret_code']
+            if ret_code == 10000:
+                response_data['code'] = 0
+            else:
+                response_data['code'] = 0
             response_data.pop('ret_code')
-            response_data['msg'] = response_data['errmsg']
+
+            response_data['errmsg'] = response_data['message']
             response_data.pop('message')
 
         return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')

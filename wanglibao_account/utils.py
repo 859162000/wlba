@@ -36,7 +36,7 @@ from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_rest.utils import get_current_utc_timestamp
 from report.crypto import Aes
-from common.tools import FileObject
+from wanglibao_common.tools import FileObject
 from wanglibao_account.models import IdVerification
 from wanglibao_account.backends import check_age_for_id
 
