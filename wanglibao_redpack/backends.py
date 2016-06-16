@@ -61,10 +61,14 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
         # 检测是否有配置不使用理财券的产品id, 如果有且符合条件,则返回空理财券列表
         p2p_ids = Misc.objects.filter(key='no_coupons_p2p_ids').first()
         if p2p_ids:
-            p2p_ids_value = p2p_ids.value
-            no_coupons_p2p_ids = [int(p2pid) for p2pid in p2p_ids_value.split(',') if p2pid != '']
-            if int(product_id) in no_coupons_p2p_ids:
-                return {"ret_code": 0, "packages": packages}
+            try:
+                p2p_ids_value = p2p_ids.value
+                no_coupons_p2p_ids = [int(p2pid) for p2pid in p2p_ids_value.split(',') if p2pid != '']
+                if int(product_id) in no_coupons_p2p_ids:
+                    return {"ret_code": 0, "packages": packages}
+            except Exception:
+                logger.exception('misc error, product ids')
+                pass
 
         try:
             product = P2PProduct.objects.filter(pk=product_id).values('id', 'period', 'types_id', 'pay_method').first()
