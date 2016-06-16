@@ -1095,6 +1095,9 @@ else:
 WLB_FOR_DOUWANWANG_KEY = '1992'
 DOUWANWANG_CALL_BACK_URL = 'http://mall.366dw.com/interface/reflection'
 
+#弹66 accesskey
+TANLIULIU_ACCESSKEY = f405cd3212e7
+
 #西财
 XICAI_TOKEN_URL = 'http://api.csai.cn/oauth2/access_token2'
 XICAI_CREATE_P2P_URL = 'http://api.csai.cn/api/create_p2p'

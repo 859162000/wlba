@@ -706,7 +706,7 @@ class TanLiuLiuInvestmentQuery(APIView):
         endtime = self.request.POST.get('endtime', None)
         if channel_name and username and usernamep and timestamp and sign and starttime and endtime:
             from hashlib import md5
-            sign = md5(md5(t).hexdigest() + settings.XICAI_CLIENT_SECRET).hexdigest()
+            sign = md5(md5(t).hexdigest() + settings.TANLIULIU_ACCESSKEY).hexdigest()
             if token == sign:
                 return True
 
@@ -719,18 +719,10 @@ class TanLiuLiuInvestmentQuery(APIView):
             p2p_list = []
             ret = dict()
 
-            start_date = self.request.POST.get('starttime', None)
-            end_date = self.request.POST.get('endtime', None)
+            starttime = self.request.POST.get('starttime', None)
+            endtime = self.request.POST.get('endtime', None)
             channel_username = self.request.POST.get('username', None)
             channel_user_uid = self.request.POST.get('usernamep', None)
-
-            if not start_date:
-                start_date = '1970-01-01'
-            start = str_to_float(start_date)
-            if end_date:
-                end = str_to_float(end_date)
-            else:
-                end = time.time()
 
             bind = Binding.objects.filter((Q(btype=u'tan66')) & (Q(bid=channel_username) | Q(bid=channel_user_uid))).first()
             if not bind:
@@ -739,7 +731,7 @@ class TanLiuLiuInvestmentQuery(APIView):
                     'errmsg': u"用户不存在"
                 }
                 return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
-            p2ps = P2PEquity.objects.filter(user=bind.user)
+            p2ps = P2PEquity.objects.filter(user=bind.user & Q(created_at__gte=starttime) & Q(created_at__lte=endtime))
 
             ret['total'] = p2ps.count()
 
