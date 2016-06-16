@@ -893,11 +893,10 @@ class RenRenLiCallback(CoopCallback):
         user_id = user_amo.user_id
         product = user_amo.product
         p2p_records = P2PRecord.objects.filter(product=product, user_id=user_id)
-        if p2p_records.exists() and user_amo.term == 1 and not user_amo.settled:
-            invest_end_time = p2p_records.order_by('create_time').last().create_time
+        if p2p_records.exists() and not user_amo.settled and user_amo.term == user_amo.terms:
             P2PRecord.objects.filter(product=product,
                                      user_id=user_id
-                                     ).update(invest_end_time=invest_end_time)
+                                     ).update(invest_end_time=user_amo.term_date)
 
     def purchase_call_back(self, user_id, order_id):
         super(RenRenLiCallback, self).purchase_call_back(user_id, order_id)
