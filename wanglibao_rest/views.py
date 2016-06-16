@@ -71,7 +71,7 @@ import urllib
 from wanglibao_geetest.geetest import GeetestLib
 from .forms import OauthUserRegisterForm, AccessUserExistsForm
 from wanglibao_profile.forms import ActivityUserInfoForm
-from wanglibao.settings import GEETEST_ID, GEETEST_KEY
+from wanglibao.settings import GEETEST_ID, GEETEST_KEY, UDESK_BASE_URL, UDESK_IM_USER_KEY
 from utils import id_validate
 
 logger = logging.getLogger('wanglibao_rest')
@@ -1523,7 +1523,7 @@ class GuestCheckView(APIView):
 
 class InnerSysHandler(object):
     def ip_valid(self, request):
-        INNER_IP = ("182.92.179.24", "10.171.37.235", '123.57.139.145')
+        INNER_IP = ("182.92.179.24", "10.171.37.235", '123.57.139.145', '10.172.161.122')
         client_ip = get_client_ip(request)
         return True if client_ip in INNER_IP else False
 
@@ -1992,8 +1992,7 @@ class AccessUserExistsApi(APIView):
 
 class UdeskGenerator(object):
     def __init__(self):
-        #self.im_user_key = 'fcb28ea056dc7bd1371dcfcfd4b33540'
-        self.im_user_key = '46d2baae119e5ab4eb217d39227b0cea'
+        self.im_user_key = UDESK_IM_USER_KEY
         self.params={
             'nonce': self.create_nonce_str(),
             'timestamp': self.create_timestamp(),
@@ -2015,7 +2014,7 @@ class UdeskGenerator(object):
         return self.params['signature']
 
     def combine_url(self, phone, signature):
-        base_url = 'http://wltest.udesk.cn/im_client?'
+        base_url = UDESK_BASE_URL
         self.get_params = {
             'nonce': self.params['nonce'],
             'timestamp': self.params['timestamp'],

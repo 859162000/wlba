@@ -1458,6 +1458,15 @@ elif ENV == ENV_STAGING:
 elif ENV == ENV_DEV:
     SITE_URL = 'http://127.0.0.1:8000'
 
+#Udesk 配置信息
+if ENV == ENV_PRODUCTION:
+    UDESK_IM_USER_KEY = 'fcb28ea056dc7bd1371dcfcfd4b33540'
+    UDESK_BASE_URL = 'http://wanglibao.udesk.cn/im_client?'
+else:
+    UDESK_IM_USER_KEY = '46d2baae119e5ab4eb217d39227b0cea'
+    UDESK_BASE_URL = 'http://wltest.udesk.cn/im_client?'
+
+
 #极验验证 KEY及ID设置
 GEETEST_ID = 'bd59bf5a6833bab697fbc2bcc1f962d7'
 GEETEST_KEY = '5956b4295f85efaa686e281ed08497d2'

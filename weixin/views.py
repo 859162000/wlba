@@ -129,6 +129,7 @@ class WeixinJoinView(View):
         # account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
         weixin_account = WeixinAccounts.getByOriginalId(account_key)
         account = weixin_account.db_account
+        # logger.debug(account_key + "============" + account.app_id+"=============="+account.token)
         try:
             check_signature(
                 account.token,

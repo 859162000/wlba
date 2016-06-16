@@ -347,6 +347,8 @@ class CoopRegister(object):
         # 传递渠道oauth客户端ID时使用的变量名
         self.internal_channel_client_id_key = 'client_id'
         self.channel_access_token_key = 'access_token'
+        # 渠道用户注册时，判断是否显示邀请码时使用的KEY
+        self.is_show_invite_code_key = 'is_show_invite_code'
 
     @property
     def channel_code(self):
@@ -406,9 +408,18 @@ class CoopRegister(object):
             self.request.session[self.internal_channel_user_key] = channel_user
             # logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
 
+        if channel_code:
+            channel = get_channel_record(channel_code)
+            if channel:
+                is_show_invite_code_value = 1 if channel.is_show_invite_code else 0
+                self.request.session[self.is_show_invite_code_key] = is_show_invite_code_value
+            else:
+                self.request.session[self.is_show_invite_code_key] = 1
+
     def clear_session(self):
         self.request.session.pop(self.internal_channel_key, None)
         self.request.session.pop(self.internal_channel_user_key, None)
+        self.request.session.pop(self.is_show_invite_code_key, None)
 
     def save_to_introduceby(self, user, invite_code):
         """
@@ -1705,7 +1716,7 @@ class XiaoMeiRegister(CoopRegister):
 
 class JiaKeRegister(CoopRegister):
     def __init__(self, request):
-        super(XiaoMeiRegister, self).__init__(request)
+        super(JiaKeRegister, self).__init__(request)
         self.c_code = 'jkdx'
         self.invite_code = 'jkdx'
         self.token = 'jkdx'
@@ -1715,6 +1726,10 @@ class JiaKeRegister(CoopRegister):
         # 判断是否首次投资
         p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True)
         if p2p_record and not is_ylb_frist_p2p and p2p_record.amount >= 5000:
+            record = WanglibaoRewardJoinRecord.objects.filter(user=user, activity_code='jkdx').first()
+            if record:  #系统已经给该渠道的新用户发奖完毕
+                return
+
             with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(type='夹克的虾兑换码', is_used=False).first()
                 if not reward:
@@ -1729,6 +1744,16 @@ class JiaKeRegister(CoopRegister):
                     "content": u'【网利科技】夹克的虾兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
+
+                try:
+                    WanglibaoRewardJoinRecord.objects.create(
+                        user=user,
+                        activity_code='jkdx',
+                        remain_chance=0
+                    )
+                except Exception, res:
+                    logger.debug('夹克大虾领奖记录入库失败:%s' % res)
+
                 reward.is_used = True
                 reward.save()
 
@@ -2851,7 +2876,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
                           BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
-                          JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister, BaoGeRegister]
+                          JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister, BaoGeRegister, JiaKeRegister]
 
 
 # ######################第三方用户查询#####################

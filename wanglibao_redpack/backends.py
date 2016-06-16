@@ -17,6 +17,7 @@ import logging
 import decimal
 from django.utils import timezone
 from django.db.models import Sum
+from django.db import transaction
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, InterestHike, Income
 from wanglibao_p2p.models import P2PRecord, P2PProduct, P2PEquity
 from marketing import helper
@@ -862,6 +863,59 @@ def commission(user, product, equity, start):
             #                     earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
             #     income.save()
 
+# Add by hb on 2016-06-12
+def commission_one(user, product, equity, start, end):
+    """
+    计算全民佣金,千三,取消第二级
+    :param user:
+    :param product:
+    :param equity:
+    :param start:
+    """
+    first_msg = u''
+    sec_msg = u''
+
+    _amount = P2PRecord.objects.filter(user=user, product=product, create_time__gt=start, create_time__lt=end).aggregate(Sum('amount'))
+    if _amount['amount__sum'] and _amount['amount__sum'] <= equity:
+        commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
+        commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
+        first_intro = IntroducedBy.objects.filter(user=user).first()
+        if first_intro and first_intro.introduced_by:
+            first_msg = commission_one_pay_one(first_intro.introduced_by, user, product, 1, _amount['amount__sum'], commission)
+
+            # 二级关系佣金计算中止时间：
+            sec_intro_end_time = timezone.datetime(2016, 6, 7, 16, 00, 00, tzinfo=timezone.utc)
+            if first_intro.created_at >= sec_intro_end_time :
+                sec_msg = u'sec_intro: [%s] introduced [%s] 邀请关系已过有效期(%s)，本次投资不结算二级佣金' % (first_intro.introduced_by.id, user.id, first_intro.created_at)
+            else:
+                sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
+                if sec_intro and sec_intro.introduced_by:
+                    sec_msg = commission_one_pay_one(sec_intro.introduced_by, user, product, 2, _amount['amount__sum'], commission)
+
+    return first_msg, sec_msg
+
+# Add by hb on 2016-06-12
+def commission_one_pay_one(user, invite, product, level, amount, earning):
+    try:
+        with transaction.atomic():
+            income, create_flag = Income.objects.get_or_create(user=user, invite=invite, product=product,
+                defaults={'level':level, 'amount':amount, 'earning':earning, 'paid':False})
+            income = Income.objects.select_for_update().get(id=income.id)
+            if income and not income.paid :
+                margin = MarginKeeper(user)
+                margin.deposit(earning, catalog=u"全民淘金")
+
+                income.order_id = margin.order_id
+                income.paid = True
+                income.save()
+                return u'Success: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product, level, amount, earning)
+            # Only for debug by hb on 2016-06-13
+            if income and income.paid:
+                return u'Ignore: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product, level, amount, earning)
+            if not income:
+                return u'NotFound: [%s] introduced [%s] in [%s], level:%s, amount:%s, earning:%s' % (user.id, invite.id, product, level, amount, earning)
+    except Exception, ex:
+        return u'[%s] introduced [%s] in [%s], Except:(%s)' % (user.id, invite.id, product, ex)
 
 def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at):
     if auto and auto_days > 0:

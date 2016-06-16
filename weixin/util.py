@@ -188,7 +188,7 @@ def createInvite(friend_phone, user):
     if profile.user != user:
         InviteRelation.objects.get_or_create(user=user, inviter=profile.user)
 
-def getAccountInfo(user):
+def getAccountInfo(user, request_host=None):
 
     p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
         u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
@@ -217,9 +217,9 @@ def getAccountInfo(user):
     # 增加从PHP项目来的月利宝待收本金
     try:
         from wanglibao_margin.php_utils import get_php_redis_principle
-        url = 'https://' + self.request.get_host() + settings.PHP_UNPAID_PRINCIPLE_BASE
+        url = 'https://' + request_host + settings.PHP_UNPAID_PRINCIPLE_BASE
         try:
-            if int(self.request.get_host().split(':')[1]) > 7000:
+            if int(request_host.split(':')[1]) > 7000:
                 url = settings.PHP_APP_INDEX_DATA_DEV
         except Exception, e:
             pass

@@ -256,7 +256,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
           wx.ready(function(){
               var host = location.protocol+"//"+location.host,
                   shareName = '夹克的虾携手网利宝0元请您吃麻小',
-                  shareImg = host + '/static/imgs/mobile_activity/app_jack_shrimp/300*300.jpg',
+                  shareImg = host + '/static/imgs/mobile_activity/app_jack_shrimp/300*300.png',
                   shareLink = host + '/activity/app_jack_shrimp/?promo_token=jkdx',
                   shareMainTit = '夹克的虾携手网利宝0元请您吃麻小',
                   shareBody = '网利宝与您激情无昼夜 快享欧洲杯';
@@ -281,6 +281,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                   imgUrl: shareImg
               })
           })
+
 
 
       wlb.ready({
@@ -367,13 +368,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
       })
       $('.close_popup,.popup_button').click(function(){
         $('.popup_wrap,.popup_box').hide();
-
-
+        $('.popup_wrap,.popup_box').hide();
       });
 
       $('.rule_span').click(function(){
           $('.popup_wrap').show();
       })
+
+
 
 
 

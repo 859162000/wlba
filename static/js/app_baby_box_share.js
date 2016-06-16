@@ -41,8 +41,8 @@ $(function(){
 
     //设置cookie
     //分享
-    var url='https://wltest.wanglibao.com/activity/app_baby_box/android/?promo_token=bg';//获取当前的网页
-    var imgsrc= 'https://wltest.wanglibao.com/static/imgs/mobile_activity/app_baby_box/300*300.jpg';
+    var url='https://www.wanglibao.com/activity/app_baby_box/android/?promo_token=bg';//获取当前的网页
+    var imgsrc= 'https://www.wanglibao.com/static/imgs/mobile_activity/app_baby_box/300*300.jpg';
     var title = '网利宝免费萌娃礼 只为爱升温！';
     var desc = '最好的爱 只为予你';
 
@@ -55,6 +55,7 @@ $(function(){
     $.cookie('share_zone_wx', title);
     $.cookie('share_text_wb', title);
     $.cookie('share_copy_text', url);
+
 
     //点击分享事件
     $('#share_btn').on('click',function(){
