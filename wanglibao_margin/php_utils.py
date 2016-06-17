@@ -842,8 +842,8 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
     device_type = _decide_device(device_type)
 
     # 如果使用了加息券, 散标不能重复使用. 但是月利宝可以重复使用
+    packages = {"available": []}
     if status == "available":
-        packages = {"available": []}
         # 红包
         # 包括大于这个周期的红包和等于这个周期的红包. 如 period=3, period_type='month' 和 period=3, period_type='month_gte'
         # 还有天数大于这个周期月的也可以使用
@@ -853,6 +853,10 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
                     Q(redpack__event__period__lte=period, redpack__event__period_type='month_gte') |
                     Q(redpack__event__period=period*30, redpack__event__period_type='day') |
                     Q(redpack__event__period__lte=period*30, redpack__event__period_type='day_gte') |
+                    # 增加月及以下类型
+                    Q(redpack__event__period__gte=period, redpack__event__period_type='month_lte') |
+                    # 增加日及以下类型
+                    Q(redpack__event__period__gte=period*30, redpack__event__period_type='day_lte') |
                     # 不限制时间的优惠券
                     Q(Q(redpack__event__period=0)))\
             .exclude(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount',
@@ -895,6 +899,10 @@ def php_redpacks(user, device_type, period=0, status='available', app_version=''
                         Q(redpack__event__period__lte=period, redpack__event__period_type='month_gte') |
                         Q(redpack__event__period=period*30, redpack__event__period_type='day') |
                         Q(redpack__event__period__lte=period*30, redpack__event__period_type='day_gte') |
+                        # 增加月及以下类型
+                        Q(redpack__event__period__gte=period, redpack__event__period_type='month_lte') |
+                        # 增加日及以下类型
+                        Q(redpack__event__period__gte=period*30, redpack__event__period_type='day_lte') |
                         Q(Q(redpack__event__period=0)))\
                 .filter(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount',
                                                                           'redpack__event__unavailable_at')
