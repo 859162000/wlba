@@ -2479,35 +2479,34 @@ class BaJinSheRegister(CoopRegister):
     def register_call_back(self, user):
         client_id = self.channel_client_id
         logger.info("user[%s] enter register_call_back with client_id[%s]" % (user.id, client_id))
-        if client_id:
-            try:
-                base_data = generate_coop_base_data('register')
-                act_data = {
-                    'client_id': client_id,
-                    'bid': self.channel_user,
-                    'phone': user.wanglibaouserprofile.phone,
-                    'btype': self.channel_code,
-                    'user_id': user.id,
-                    'access_token': getattr(user, 'access_token', ''),
-                    'account': getattr(user, 'account', '') or self.channel_account,
-                }
-                data = dict(base_data, **act_data)
+        try:
+            base_data = generate_coop_base_data('register')
+            act_data = {
+                'client_id': client_id,
+                'bid': self.channel_user,
+                'phone': user.wanglibaouserprofile.phone,
+                'btype': self.channel_code,
+                'user_id': user.id,
+                'access_token': getattr(user, 'access_token', ''),
+                'account': getattr(user, 'account', '') or self.channel_account,
+            }
+            data = dict(base_data, **act_data)
 
-                s = requests.Session()
-                s.mount('https://', MyHttpsAdapter(max_retries=5))
-                res = s.post(url=self.call_back_url,
-                             data=data,
-                             verify=False)
+            s = requests.Session()
+            s.mount('https://', MyHttpsAdapter(max_retries=5))
+            res = s.post(url=self.call_back_url,
+                         data=data,
+                         verify=False)
 
-                if res.status_code == 200:
-                    result = res.json()
-                    logger.info("register_call_back connected return [%s]" % result)
-                else:
-                    logger.info("%s connected status code[%s]" % (self.call_back_url, res.status_code))
-            except Exception, e:
-                logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
+            if res.status_code == 200:
+                result = res.json()
+                logger.info("register_call_back connected return [%s]" % result)
             else:
-                logger.info("user[%s] register_call_back response result: %s" % (user.id, res.text))
+                logger.info("%s connected status code[%s]" % (self.call_back_url, res.status_code))
+        except Exception, e:
+            logger.info("user[%s] register_call_back raise error: %s" % (user.id, e))
+        else:
+            logger.info("user[%s] register_call_back response result: %s" % (user.id, res.text))
 
     def purchase_call_back(self, user, order_id):
         channel = get_user_channel_record(user.id)
