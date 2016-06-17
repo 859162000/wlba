@@ -16,6 +16,7 @@ from wanglibao_redis.backend import redis_backend
 from django.utils import timezone
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
+from wanglibao_common.tools import utc_to_local_timestamp
 from marketing.models import IntroducedBy
 from wanglibao_account.models import Binding
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -373,6 +374,20 @@ def process_bajinshe_register(request, user, phone, client_id, channel_code):
         'user_id': tid,
         'invitation_code': channel_code,
         'ext': '',
+    }
+
+    return response_data
+
+
+def process_tan66_register(request, user, phone, client_id, channel_code):
+    tid = get_uid_for_coop(user.id)
+
+    response_data = {
+        'ret_code': 10000,
+        'message': 'success',
+        'username': request.session.get('channel_account', ''),
+        'usernamep': tid,
+        'regtime': utc_to_local_timestamp(user.date_joined),
     }
 
     return response_data

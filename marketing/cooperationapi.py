@@ -688,5 +688,3 @@ class XunleiP2PbyUser(APIView):
             my_project.append(obj)
         result.update(my_project=my_project)
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
-
-

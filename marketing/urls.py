@@ -98,6 +98,7 @@ urlpatterns = patterns(
     url(r'^open_day_review/$', HMDP2PListView.as_view(template_name="open_day_review.jade", p2p_list_url_name="p2p_list")),
     url(r'^center_film_ticket/$', TemplateView.as_view(template_name="center_film_ticket.jade")),
     url(r'^six_billion/(?P<template>\w+)/$', SixBillionView.as_view(), name="six_billion"),
+    url(r'^car_house_loan/$', TemplateView.as_view(template_name="car_house_loan.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
