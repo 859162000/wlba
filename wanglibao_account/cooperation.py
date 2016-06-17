@@ -438,8 +438,7 @@ class Tan66Register(CoopRegister):
             binding = Binding()
             binding.user = user
             binding.channel = self.channel
-            if self.bid:
-                binding.bid = self.bid or get_uid_for_coop(user.id)
+            binding.bid = self.bid or get_uid_for_coop(user.id)
             if self.account:
                 binding.b_account = self.account
             binding.save()
