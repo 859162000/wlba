@@ -1485,6 +1485,6 @@ SMTP_USER = 'develop@wanglibank.com'
 SMTP_PASSWORD = 'abc&321'
 
 # 测试开发的可访问IP可都放一起
-VALID_IPS = ['']
+VALID_IPS = ['182.18.19.162', '211.157.168.138', '123.57.146.238', '101.200.149.172']
 if ENV == ENV_PRODUCTION:
     VALID_IPS = ['']

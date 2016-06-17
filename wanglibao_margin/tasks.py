@@ -136,7 +136,6 @@ def buy_mall_product(token=None, amount_source=None, payback_source=None, user=N
     :return:
     """
     product = MonthProduct.objects.filter(token=token).first()
-    logger.debug('in buy_mall_product, token = {}'.format(token))
 
     if not product:
         return
