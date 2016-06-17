@@ -29,7 +29,6 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_pay.util import fmt_two_amount
 from wanglibao_redpack.backends import _decide_device, get_start_end_time, REDPACK_RULE, stamp, _calc_deduct
 from wanglibao_redpack.models import PhpIncome, RedPackRecord, RedPackEvent, RedPack
-from wanglibao_activity import backends as activity_backends
 
 logger = logging.getLogger('wanglibao_margin')
 
@@ -303,9 +302,6 @@ class PhpMarginKeeper(MarginKeeper):
             record = self.tracer(catalog, amount, margin.margin, description,
                                  freeze_before=freeze_before, freeze_after=margin.freeze, margin_before=margin_before)
 
-            # 满标审核时检测活动规则
-            activity_backends.check_activity(self.user, 'p2p_audit', 'all', 0, 0)
-
             return record
 
     def php_amortize(self, refund_id, user, catalog, amount, description,
@@ -338,14 +334,6 @@ class PhpMarginKeeper(MarginKeeper):
                     return 1
                 except Exception, e:
                     print e
-
-            # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
-            try:
-                activity_backends.check_activity(user, 'repaid', 'pc', amount)
-            except Exception, e:
-                logger.debug("check activity on repaid, user: {}, principal: {}, e = {}".format(
-                    user, amount, e.message
-                ))
 
     def php_amortize_detail(self, category, principal, interest, t0_interest, coupon_interest, platform_interest,
                             refund_id, savepoint=True):
@@ -428,7 +416,7 @@ class PhpMarginKeeper(MarginKeeper):
                     self.tracer(u"加息券收益", coupon_interest, margin.margin,
                                 description, refund_id, margin_before=margin_before)
             else:
-                raise ValidationError(u'请输入正常状态的并入渠道代码')
+                raise ValidationError(u'请传入正确的月利宝还款类型')
             margin.save()
 
 
