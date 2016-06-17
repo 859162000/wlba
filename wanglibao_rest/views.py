@@ -1881,9 +1881,9 @@ class OauthUserRegisterApi(APIView):
         elif channel_code == 'tan66':
             ret_code = response_data['ret_code']
             if ret_code == 10000:
-                response_data['code'] = 0
+                response_data['status'] = 0
             else:
-                response_data['code'] = 0
+                response_data['status'] = 1
             response_data.pop('ret_code')
 
             response_data['errmsg'] = response_data['message']

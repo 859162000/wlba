@@ -359,6 +359,10 @@ class CoopRegister(object):
         """
         return self.request.session.get(self.internal_channel_key, None)
 
+    @property
+    def channel_account(self):
+        return self.request.session.get(self.internal_channel_account_key, '')
+
     def get_channel_code_from_request(self):
         return self.request.GET.get(self.external_channel_key, None)
 
@@ -2469,7 +2473,7 @@ class BaJinSheRegister(CoopRegister):
                     'btype': self.channel_code,
                     'user_id': user.id,
                     'access_token': getattr(user, 'access_token', ''),
-                    'account': getattr(user, 'account', ''),
+                    'account': getattr(user, 'account', '') or self.channel_account,
                 }
                 data = dict(base_data, **act_data)
 
@@ -2718,10 +2722,6 @@ class TanLiuLiuRegister(BaJinSheRegister):
         self.external_channel_sign_key = 'sign'
         self.external_channel_client_id_key = 'cid'
         self.external_channel_phone_key = 'mobile'
-
-    @property
-    def channel_account(self):
-        return self.request.session.get(self.internal_channel_account_key, None)
 
     @property
     def channel_user(self):
