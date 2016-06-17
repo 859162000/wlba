@@ -146,7 +146,7 @@ def _process_scene_record(w_user, scene_str):
     sr.create_time = int(time.time())
     sr.save()
 
-def bindUser(w_user, user, new_registed=False):
+def bindUser(w_user, user):
     is_first_bind = False
     if w_user.user:
         if w_user.user.id==user.id:
@@ -169,7 +169,6 @@ def bindUser(w_user, user, new_registed=False):
     bind_ok.apply_async(kwargs={
         "openid": w_user.openid,
         "is_first_bind":is_first_bind,
-        "new_registed":new_registed,
     },
                         queue='celery01'
                         )
@@ -181,12 +180,6 @@ def unbindUser(w_user, user):
     w_user.save()
     _process_record(w_user, user, 'unbind', "解除绑定")
 
-from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_invite.models import InviteRelation
-def createInvite(friend_phone, user):
-    profile = WanglibaoUserProfile.objects.filter(phone=friend_phone).first()
-    if profile.user != user:
-        InviteRelation.objects.get_or_create(user=user, inviter=profile.user)
 
 def getAccountInfo(user, request_host=None):
 

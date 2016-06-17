@@ -18,7 +18,7 @@ from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 
 
 @app.task
-def bind_ok(openid, is_first_bind, new_registed=False):
+def bind_ok(openid, is_first_bind):
     weixin_user = WeixinUser.objects.get(openid=openid)
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
     user = weixin_user.user
@@ -41,9 +41,6 @@ def bind_ok(openid, is_first_bind, new_registed=False):
                 "time": now_str,
             })
         }, queue='celery02')
-    from wanglibao_invite.tasks import processShareInviteDailyReward
-    processShareInviteDailyReward.apply_async(
-            kwargs={'openid': openid, 'user_id': user.id, "new_registed": new_registed})
 
 
 @app.task
