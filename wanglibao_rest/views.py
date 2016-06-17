@@ -1859,7 +1859,7 @@ class OauthUserRegisterApi(APIView):
                 if response_data['message'] == u'该手机号已经注册':
                     if channel_code == 'renrenli':
                         response_data['ret_code'] = 100
-                    if channel_code == 'tanliuliu':
+                    if channel_code == 'tan66':
                         response_data['status'] = 1
                         response_data['errmsg'] = u'手机号已经存在'
         else:

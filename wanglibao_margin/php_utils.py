@@ -16,6 +16,7 @@ from django.db.models import Sum, Q
 from django.utils import timezone
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import BasePermission
 from user_agents import parse
 
 from marketing.models import IntroducedBy
@@ -45,6 +46,32 @@ def set_cookie(response, key, value, hours_expire=1, domain=settings.SESSION_COO
     """
     expires = datetime.datetime.now() + datetime.timedelta(hours=hours_expire)
     response.set_cookie(key, value, expires=expires, domain=domain)
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+
+    logger.info('ip = {}'.format(ip))
+
+    return ip
+
+
+class IPValidPermissions(BasePermission):
+    """
+    限定的ip才能访问月利宝接口, # 由于需要月利宝管理后台去调用审核,流标,还款等操作,是不需要验证登录的
+    """
+
+    def has_permission(self, request, view):
+        valid_ips = settings.VALID_IPS
+        ip = get_client_ip(request)
+        if ip in valid_ips:
+            return True
+        else:
+            return False
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):

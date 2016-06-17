@@ -1095,6 +1095,7 @@ else:
 WLB_FOR_DOUWANWANG_KEY = '1992'
 DOUWANWANG_CALL_BACK_URL = 'http://mall.366dw.com/interface/reflection'
 
+
 #西财
 XICAI_TOKEN_URL = 'http://api.csai.cn/oauth2/access_token2'
 XICAI_CREATE_P2P_URL = 'http://api.csai.cn/api/create_p2p'
@@ -1483,3 +1484,7 @@ SMTP_SERVER = 'smtp.exmail.qq.com'
 SMTP_USER = 'develop@wanglibank.com'
 SMTP_PASSWORD = 'abc&321'
 
+# 测试开发的可访问IP可都放一起
+VALID_IPS = ['']
+if ENV == ENV_PRODUCTION:
+    VALID_IPS = ['']
