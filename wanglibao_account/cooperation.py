@@ -1748,6 +1748,8 @@ class JiaKeRegister(CoopRegister):
                         activity_code='jkdx',
                         remain_chance=0
                     )
+                    reward.is_used = True
+                    reward.save()
             except Exception, res:
                 logger.debug('夹克大虾领奖记录入库失败:%s' % res)
             else:
@@ -1762,8 +1764,6 @@ class JiaKeRegister(CoopRegister):
                     "content": u'【网利科技】夹克的虾兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
-                reward.is_used = True
-                reward.save()
 
     def purchase_call_back_yuelibao(self, user, order_id):
         # 判断是否首次投资
@@ -1783,6 +1783,8 @@ class JiaKeRegister(CoopRegister):
                             activity_code='jkdx',
                             remain_chance=0
                     )
+                    reward.is_used = True
+                    reward.save()
             except Exception, res:
                 logger.debug('夹克大虾领奖记录入库失败:%s' % res)
             else:
@@ -1797,8 +1799,6 @@ class JiaKeRegister(CoopRegister):
                     "content": u'【网利科技】夹克的虾兑换码:%s' % (reward.content,),
                     "mtype": "activity"
                 })
-                reward.is_used = True
-                reward.save()
 
 
 class ZhongYingRegister(CoopRegister):
