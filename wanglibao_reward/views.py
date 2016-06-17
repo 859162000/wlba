@@ -3450,7 +3450,7 @@ class ZhongYingAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        p2p_record = get_first_purchase_record(request.user.id, True)
+        p2p_record, is_first_ylb = get_first_purchase_record(request.user.id, True)
 
         if not p2p_record:
             json_to_response = {
@@ -3492,7 +3492,7 @@ class XiaoMeiAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        p2p_record = get_first_purchase_record(request.user.id, True)
+        p2p_record, is_first_ylb = get_first_purchase_record(request.user.id, True)
 
         if not p2p_record:
             json_to_response = {
@@ -3578,7 +3578,7 @@ class JiaKeAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        p2p_record = get_first_purchase_record(request.user.id, True)
+        p2p_record, is_first_ylb = get_first_purchase_record(request.user.id, True)
 
         if not p2p_record:
             json_to_response = {
