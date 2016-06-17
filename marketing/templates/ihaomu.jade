@@ -1,0 +1,12 @@
+- load formatters
+doctype html
+html(style="background: #000")
+    head
+        title 网利宝
+        include include/app_head
+        link(rel="stylesheet",href="/static/styles/pc_activity/ihaomu.css?v=2016061601")
+    body
+        .er_img(style='width:100%; position:relative; height:100vh; display:block;')
+            .bg(style='width:100%; height: 100%; display:block;')
+            img(src='/static/imgs/pc_activity/ihaomu/er_18FAE04EEEC4D6D4A2643DA855858981.jpg' style='position: absolute; left:50%; top:50%; margin:-200px 0 0 -140px; display:block;')
+        - csrf_token
