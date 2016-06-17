@@ -1263,8 +1263,8 @@ else:
 # 人人利
 RENRENLI_CHANNEL_CODE = 'renrenli'
 if ENV == ENV_PRODUCTION:
-    RENRENLI_CLIENT_ID = '1cc240d8b17af86270f0a029237424'
-    RENRENLI_COOP_KEY = ''
+    RENRENLI_CLIENT_ID = '4b27778ebf92d1484fbda99d152eb0'
+    RENRENLI_COOP_KEY = 'wanglibaorrl'
 else:
     RENRENLI_CLIENT_ID = '1cc240d8b17af86270f0a029237424'
     RENRENLI_COOP_KEY = 'wanglibaorrl'
@@ -1293,6 +1293,13 @@ if ENV == ENV_PRODUCTION:
     JXHZ_CALL_BACK_URL = 'http://service.jiaxihezi.com/rest/v1/invest'
 else:
     JXHZ_CALL_BACK_URL = 'http://service.jiaxihezi.com/test/v1/invest'
+
+
+# 弹溜溜
+if ENV == ENV_PRODUCTION:
+    TAN66_COOP_KEY = '142fb7fb4835'
+else:
+    TAN66_COOP_KEY = 'f405cd3212e7'
 
 
 # 对第三方回调做IP鉴权所信任的IP列表
@@ -1477,3 +1484,7 @@ SMTP_SERVER = 'smtp.exmail.qq.com'
 SMTP_USER = 'develop@wanglibank.com'
 SMTP_PASSWORD = 'abc&321'
 
+# 测试开发的可访问IP可都放一起
+VALID_IPS = ['182.18.19.162', '211.157.168.138', '123.57.146.238', '101.200.149.172']
+if ENV == ENV_PRODUCTION:
+    VALID_IPS = ['']
