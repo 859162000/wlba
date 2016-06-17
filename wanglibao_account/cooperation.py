@@ -1767,7 +1767,7 @@ class JiaKeRegister(CoopRegister):
 
     def purchase_call_back_yuelibao(self, user, order_id):
         # 判断是否首次投资
-        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True)
+        p2p_record, is_ylb_frist_p2p = is_first_purchase(user.id, order_id, get_or_ylb=True, is_ylb=True)
         if p2p_record and is_ylb_frist_p2p and p2p_record.amount >= 5000:
             record = WanglibaoRewardJoinRecord.objects.filter(user=user, activity_code='jkdx').first()
             if record:  #系统已经给该渠道的新用户发奖完毕
