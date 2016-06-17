@@ -264,12 +264,14 @@ def get_first_month_record(user_id, start_at=None, end_at=None):
     if start_at and end_at:
         month_record = MonthProduct.objects.filter(user_id=user_id,
                                                    trade_status='PAID',
+                                                   cancel_status=False,
                                                    created_at__gte=start_at,
                                                    created_at__lt=end_at
                                                    ).order_by('created_at').first()
     else:
         month_record = MonthProduct.objects.filter(user_id=user_id,
-                                                   trade_status='PAID'
+                                                   trade_status='PAID',
+                                                   cancel_status=False,
                                                    ).order_by('created_at').first()
 
     # FixMe，为了向前兼容，对象参数做了映射，后期参数或者流程改动需注意此处更改
@@ -2754,7 +2756,9 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           YZCJRegister, RockFinanceRegister, BaJinSheRegister,
                           RenRenLiRegister, XunleiMobileRegister, XingMeiRegister,
                           BiSouYiRegister, HappyMonkeyRegister, KongGangRegister,
-                          JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister, BaoGeRegister, JiaKeRegister]
+                          JiaXiHZRegister, ZhongYingRegister, XiaoMeiRegister,
+                          BaoGeRegister, JiaKeRegister]
+
 
 
 # ######################第三方用户查询#####################
