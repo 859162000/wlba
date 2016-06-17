@@ -97,7 +97,7 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                     request = urllib2.Request("")
                     try:
                         logger.info(u"=遍历渠道= CoopRegister.process_for_purchase : {}, {}".
-                                     format(user, product.id))
+                                    format(user, product.id))
                         CoopRegister(request).process_for_purchase_yuelibao(user, product.id)
                     except Exception, e:
                         logger.debug(u"=遍历渠道= CoopRegister.process_for_purchase Except:{}".format(e))
