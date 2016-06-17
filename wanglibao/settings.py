@@ -502,11 +502,13 @@ else:
 
 # 人人利渠道
 WLB_FOR_RENRENLI_KEY = '2007'
-RENRENLI_ACCOUNT_NAME = 'zlo_YNPrX'
-RENRENLI_ACCOUNT_PWD = 'zlopwd_S2G5TSwZ'
 if ENV == ENV_PRODUCTION:
+    RENRENLI_ACCOUNT_NAME = 'zlo_YNPrX'
+    RENRENLI_ACCOUNT_PWD = 'zlopwd_S2G5TSwZ'
     RENRENLI_PURCHASE_PUSH_URL = 'http://openapi.renrenlee.com/zlo/getp2pinfo/getsubscribe/'
 else:
+    RENRENLI_ACCOUNT_NAME = 'zlo_RrNuG'
+    RENRENLI_ACCOUNT_PWD = 'zlopwd_ZAQ5bzRa'
     RENRENLI_PURCHASE_PUSH_URL = 'http://openapi.amoydao.com/zlo/getp2pinfo/getsubscribe/'
 
 
