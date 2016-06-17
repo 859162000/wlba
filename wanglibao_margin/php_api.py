@@ -157,7 +157,7 @@ class GetUserMallAmount(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = (IPValidPermissions, )
+    permission_classes = ()
 
     def get(self, request):
         user = self.request.user
@@ -392,7 +392,6 @@ class MallProductBuy(APIView):
                 red_packet_type=red_packet_type,
             )
             device = utils.split_ua(self.request)
-            logger.info('going to buy_mall_product !!!')
 
             buy_mall_product.apply_async(kwargs={'token': token, 'amount_source': amount_source,
                                                  'payback_source': payback_source, 'user': user_id,
@@ -640,7 +639,7 @@ class YueLiBaoRefund(APIView):
         ret = dict()
 
         args = request.POST.get('args')
-        logger.info('in YueLiBaoRefund request data = {}'.format(request.DATA))
+        logger.info('in YueLiBaoRefund!')
 
         try:
             with transaction.atomic(savepoint=True):

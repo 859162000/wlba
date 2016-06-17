@@ -55,7 +55,7 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
 
-    logger.info('ip = {}'.format(ip))
+    logger.info('with IPValidPermissions, ip = {}'.format(ip))
 
     return ip
 
@@ -68,7 +68,7 @@ class IPValidPermissions(BasePermission):
     def has_permission(self, request, view):
         valid_ips = settings.VALID_IPS
         ip = get_client_ip(request)
-        if ip in valid_ips:
+        if ip in valid_ips or '192.168.' in ip:
             return True
         else:
             return False
