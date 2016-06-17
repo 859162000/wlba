@@ -5,6 +5,7 @@ import re
 import time
 import pytz
 import base64
+from user_agents import parse
 from datetime import datetime as dt
 from Crypto.Cipher import AES
 from django.conf import settings
@@ -175,3 +176,23 @@ def parase_form_error(form):
     }
 
     return response_data
+
+
+def utype_is_mobile(request):
+    is_mobile = False
+    ua = request.META.get('HTTP_USER_AGENT', '')
+    if ua:
+        # 网利APP客户端类型判断
+        device_list = ['android', 'iphone']
+        user_agent = ua.lower()
+        for device in device_list:
+            match = re.search(device, user_agent)
+            if match and match.group():
+                return True
+
+        # 通用客户端设备类型判断
+        user_agent = parse(ua)
+        if user_agent.is_mobile:
+            is_mobile = True
+
+    return is_mobile

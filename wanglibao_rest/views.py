@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from datetime import datetime as dt
 from django.http import HttpResponse
 from django.conf import settings
-from common.tools import utc_to_local_timestamp, timestamp_to_utc, detect_identifier_type
+from common.tools import utc_to_local_timestamp, timestamp_to_utc, utype_is_mobile
 from common.utils import get_product_period_type
 from marketing.models import Channels
 from marketing.forms import ChannelForm
@@ -340,6 +340,7 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
         channel_code = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, None)
         starttime = self.request.POST.get('starttime', None)
         endtime = self.request.POST.get('endtime', None)
+        channel_account = self.request.POST.get('username', None)
         channel_user_uid = self.request.POST.get('usernamep', None)
         if channel_code and starttime and endtime:
             channel = get_channel_record(channel_code)
@@ -363,11 +364,14 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
                             p2p_dict['bid'] = p2p_product.id
                             p2p_dict['title'] = p2p_product.name
 
+                            if utype_is_mobile(request):
+                                p2p_dict['url'] = settings.WLB_URL + p2p_product.get_h5_url
+                            else:
+                                p2p_dict['url'] = settings.WLB_URL + p2p_product.get_pc_url
 
-                            p2p_dict['url'] = settings.WLB_URL + p2p_product.get_h5_url
                             p2p_dict['amount'] = float(p2p_record.amount),
-                            p2p_dict['investtime'] = p2p.created_at
-                            p2p_dict['period'] = p2pproduct.period
+                            p2p_dict['investtime'] = utc_to_local_timestamp(p2p_record.created_at)
+                            p2p_dict['period'] = p2p_product.period
                             p2p_dict['unit'] = p_type
                             p2p_dict['rate'] = rate
 
@@ -375,7 +379,7 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
 
                         ret['list'] = p2p_list
                         ret['status'] = 0
-                        ret['username'] = self.request.POST.get('username', None)
+                        ret['username'] = channel_account
                         ret['usernamep'] = self.request.POST.get('usernamep', None)
                         ret['level'] = 0
                     else:

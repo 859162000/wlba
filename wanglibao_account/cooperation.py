@@ -423,12 +423,18 @@ class WangLiBaoRegister(CoopRegister):
         self.save_to_access_token(user)
 
 
+class Tan66Register(CoopRegister):
+    def __init__(self, *args, **kwargs):
+        super(Tan66Register, self).__init__(*args, **kwargs)
+
+
 # 注册第三方通道
 coop_register_processor = {
     'bajinshe': 'BaJinSheRegister',
     'renrenli': 'RenRenLiRegister',
     'bisouyi': 'BiSouYiRegister',
     'wanglibao': 'WangLiBaoRegister',
+    'tan66': 'Tan66Register',
 }
 
 
