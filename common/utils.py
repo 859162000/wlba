@@ -20,6 +20,15 @@ def product_period_to_days(pay_method, period):
     return period
 
 
+def get_product_period_type(pay_method):
+    if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+        period_type = 1
+    else:
+        period_type = 2
+
+    return period_type
+
+
 def get_bajinshe_access_token(order_id):
     access_token = None
     message = None

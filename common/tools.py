@@ -69,6 +69,16 @@ def str_to_utc(dt_str, _format='%Y-%m-%d %H:%M:%S'):
     return utc_dt
 
 
+def timestamp_to_utc(timestamp, _format='%Y-%m-%d %H:%M:%S'):
+    """
+    将字符串转换成UTC时间
+    """
+    local_time = time.localtime(int(timestamp))
+    time_str = time.strftime(_format, local_time)
+    utc_dt = str_to_utc(time_str)
+    return utc_dt
+
+
 class Aes(object):
 
     def __init__(self):

@@ -552,8 +552,13 @@ if ENV == ENV_PRODUCTION:
 else:
     WLB_URL = 'https://staging.wanglibao.com'
 
-#弹66 accesskey
-TANLIULIU_ACCESSKEY = f405cd3212e7
+
+# 弹溜溜
+if ENV == ENV_PRODUCTION:
+    TAN66_COOP_KEY = '142fb7fb4835'
+else:
+    TAN66_COOP_KEY = 'f405cd3212e7'
+
 
 # 产品推送渠道列表
 if ENV in (ENV_PRODUCTION, ENV_PREPRODUCTION):
