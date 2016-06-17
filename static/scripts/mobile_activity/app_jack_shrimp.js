@@ -351,13 +351,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                             window.location.href = '/weixin/regist/?promo_token=jkdx&next=/activity/app_jack_shrimp/?promo_token=jkdx'
                         }else if(data.ret_code=='1002'){
                             window.location.href = '/weixin/list/?promo_token=jkdx'
-                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
+                        }else if(data.ret_code=='1001'||data.ret_code=='1003'||data.ret_code=='1004'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
-                        }else{
-                            $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
-                            $('.popup_box').show();
                         }
+                    },error:function(){
+                        $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                        $('.popup_box').show();
                     }
                 })
             })
