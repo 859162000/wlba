@@ -3450,14 +3450,7 @@ class ZhongYingAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购').order_by('create_time').first()
-        month_product_record = MonthProduct.objects.filter(user_id=request.user.id).first()
-        if not p2p_record:
-            p2p_record = month_product_record
-            if month_product_record:
-                p2p_record.create_time = month_product_record.created_at
-        if p2p_record and month_product_record and month_product_record.created_at < p2p_record.create_time:
-            p2p_record = month_product_record
+        p2p_record = get_first_purchase_record(request.user.id, True)
 
         if not p2p_record:
             json_to_response = {
@@ -3499,14 +3492,7 @@ class XiaoMeiAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购').order_by('create_time').first()
-        month_product_record = MonthProduct.objects.filter(user_id=request.user.id).first()
-        if not p2p_record:
-            p2p_record = month_product_record
-            if month_product_record:
-                p2p_record.create_time = month_product_record.created_at
-        if p2p_record and month_product_record and month_product_record.created_at < p2p_record.create_time:
-            p2p_record = month_product_record
+        p2p_record = get_first_purchase_record(request.user.id, True)
 
         if not p2p_record:
             json_to_response = {
@@ -3549,14 +3535,7 @@ class BaoGeAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购').order_by('create_time').first()
-        month_product_record = MonthProduct.objects.filter(user_id=request.user.id).first()
-        if not p2p_record:
-            p2p_record = month_product_record
-            if month_product_record:
-                p2p_record.create_time = month_product_record.created_at
-        if p2p_record and month_product_record and month_product_record.created_at < p2p_record.create_time:
-            p2p_record = month_product_record
+        p2p_record = get_first_purchase_record(request.user.id, True)
 
         if not p2p_record:
             json_to_response = {
