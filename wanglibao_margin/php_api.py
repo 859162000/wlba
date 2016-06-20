@@ -644,6 +644,7 @@ class YueLiBaoRefund(APIView):
         try:
             with transaction.atomic(savepoint=True):
                 for arg in eval(args):
+                    logger.info('aaaaa = {}'.format(arg))
                     user = User.objects.get(pk=arg['userId'])
 
                     margin_record = MarginRecord.objects.filter(
@@ -683,6 +684,7 @@ class YueLiBaoRefund(APIView):
         except Exception, e:
             ret.update(status=0,
                        msg=e.message)
+        logger.info('!!!!!!!! refund return = {}'.format(ret))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
