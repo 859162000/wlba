@@ -176,7 +176,7 @@ class GetUserAddress(APIView):
 
     def get(self, request):
 
-        user_id = request.get('user_id', None)
+        user_id = request.GET.get('user_id', None)
         user_id = user_id or self.request.user.pk
         ret = get_addresses(user_id)
 
