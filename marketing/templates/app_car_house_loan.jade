@@ -1,0 +1,29 @@
+- load formatters
+- load mathfilters
+doctype html
+html(style="background: #f4f4f4")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_car_house_loan.css?v=2015051702", rel="stylesheet")
+        - csrf_token
+    body
+        input(type='hidden',value='{{user.is_authenticated}}')#authenticated
+        .body_wrap.clear
+            .banner
+                .section.section_1
+
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src='/static/js/lib/swiper_new_min.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_car_house_loan.js?v=2015051307")
+
+        //script.
+        //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+        //        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+        //        ios = ipad || iphone;
+        //    if (ios) {
+        //        document.getElementById('ios-show').style.display = 'block';
+            }
