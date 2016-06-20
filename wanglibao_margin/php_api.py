@@ -526,7 +526,7 @@ class YueLiBaoCheck(APIView):
                         continue
                     if product.settle_status:
                         logger.info(u'该条记录已审核: product = {}, 这是重复请求, product_id = {}'.
-                                    format(product.id), product_id)
+                                    format(product.id, product_id))
                         continue
                     product.settle_status = True
                     product.save()
@@ -537,7 +537,7 @@ class YueLiBaoCheck(APIView):
                     buyer_keeper.php_settle(product.amount_source, description=u'月利宝满标审核')
 
                 # 进行全民淘金数据写入
-                try :
+                try:
                     calc_php_commission(product_id, period)
                     logger.info(u'period = {}, 全民淘金数据写入: {}\n'.format(period, product_id))
                 except Exception, ex:
