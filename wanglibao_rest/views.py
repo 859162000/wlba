@@ -360,21 +360,22 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
                             rate = p2p_product.get_p2p_rate
                             p_type = get_product_period_type(p2p_product.pay_method)
 
-                            p2p_dict = dict()
-                            p2p_dict['oid'] = p2p_record.order_id
-                            p2p_dict['bid'] = p2p_product.id
-                            p2p_dict['title'] = p2p_product.name
-
                             if utype_is_mobile(request):
-                                p2p_dict['url'] = settings.WLB_URL + p2p_product.get_h5_url
+                                p2p_detail_url = settings.WLB_URL + p2p_product.get_h5_url
                             else:
-                                p2p_dict['url'] = settings.WLB_URL + p2p_product.get_pc_url
+                                p2p_detail_url = settings.WLB_URL + p2p_product.get_pc_url
 
-                            p2p_dict['amount'] = float(p2p_record.amount),
-                            p2p_dict['investtime'] = utc_to_local_timestamp(p2p_record.create_time)
-                            p2p_dict['period'] = p2p_product.period
-                            p2p_dict['unit'] = p_type
-                            p2p_dict['rate'] = rate
+                            p2p_dict = {
+                                'oid': p2p_record.order_id,
+                                'bid': p2p_product.id,
+                                'title': p2p_product.name,
+                                'amount': float(p2p_record.amount),
+                                'investtime': utc_to_local_timestamp(p2p_record.create_time),
+                                'period': p2p_product.period,
+                                'unit': p_type,
+                                'rate': rate,
+                                'url': p2p_detail_url,
+                            }
                             p2p_list.append(p2p_dict)
 
                         id_is_valid = 1 if user.wanglibaouserprofile.id_is_valid else 0
