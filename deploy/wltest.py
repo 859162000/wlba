@@ -56,7 +56,7 @@ def check_out():
     else:
         with cd("wanglibao-backend"):
             # Add by hb on 2016-06-13
-            run('git reset --hard HEAD')
+            run('git reset --hard HEAD~3')
             run('git clean -f -d')
             with settings(warn_only=True):
                 result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
@@ -87,6 +87,7 @@ def deploy_web_action():
     with cd(env.deploy_path):
         run("git checkout wanglibao/settings.py")
         with settings(warn_only=True):
+            run('git reset --hard HEAD~3')
             result = run('git show-ref --verify --quiet refs/heads/%s' % env.branch)
             if result.return_code > 0:
                 run('git fetch origin %s:%s' % (env.branch, env.branch))

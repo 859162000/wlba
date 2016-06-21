@@ -54,8 +54,6 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
 
-    logger.info('with IPValidPermissions, ip = {}'.format(ip))
-
     return ip
 
 
@@ -70,6 +68,7 @@ class IPValidPermissions(BasePermission):
         if ip in valid_ips or '192.168.' in ip:
             return True
         else:
+            logger.error('In IPValidPermissions, invalid ip = {}\n'.format(ip))
             return False
 
 

@@ -526,7 +526,7 @@ class YueLiBaoCheck(APIView):
                         continue
                     if product.settle_status:
                         logger.info(u'该条记录已审核: product = {}, 这是重复请求, product_id = {}'.
-                                    format(product.id), product_id)
+                                    format(product.id, product_id))
                         continue
                     product.settle_status = True
                     product.save()
@@ -537,7 +537,7 @@ class YueLiBaoCheck(APIView):
                     buyer_keeper.php_settle(product.amount_source, description=u'月利宝满标审核')
 
                 # 进行全民淘金数据写入
-                try :
+                try:
                     calc_php_commission(product_id, period)
                     logger.info(u'period = {}, 全民淘金数据写入: {}\n'.format(period, product_id))
                 except Exception, ex:
@@ -644,7 +644,7 @@ class YueLiBaoRefund(APIView):
         try:
             with transaction.atomic(savepoint=True):
                 for arg in eval(args):
-                    user = User.objects.get(pk=arg['userId'])
+                    user = User.objects.filter(pk=arg['userId']).first()
 
                     margin_record = MarginRecord.objects.filter(
                         # # (Q(catalog=u'月利宝本金入账') | Q(catalog=u'债转本金入账')) &
@@ -674,15 +674,18 @@ class YueLiBaoRefund(APIView):
                         except Exception, e:
                             ret.update(status=0,
                                        msg=e.message)
-                            logger.debug('in YueLiBaoRefund error = {}\n'.format(e.message))
+                            logger.debug('in YueLiBaoRefund, refund_id = {}, userId = {}, error = {}\n'.format(
+                                    arg['refundId'], arg['userId'], e.message))
                             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
                 ret.update(status=1,
                            msg=msg_list)
 
         except Exception, e:
+            logger.exception('in YueLiBaoRefund, error = {}\n'.format(e.message))
             ret.update(status=0,
                        msg=e.message)
+        logger.info('refund processed, return = {}\n'.format(ret))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
