@@ -347,7 +347,6 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
             if channel:
                 if check_tan66_sign(request):
                     p2p_list = []
-                    ret = dict()
                     binding = Binding.objects.filter(channel=channel,
                                                      bid=channel_user_uid).select_related('user').first()
                     if binding:
@@ -372,7 +371,7 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
                                 p2p_dict['url'] = settings.WLB_URL + p2p_product.get_pc_url
 
                             p2p_dict['amount'] = float(p2p_record.amount),
-                            p2p_dict['investtime'] = utc_to_local_timestamp(p2p_record.created_at)
+                            p2p_dict['investtime'] = utc_to_local_timestamp(p2p_record.create_time)
                             p2p_dict['period'] = p2p_product.period
                             p2p_dict['unit'] = p_type
                             p2p_dict['rate'] = rate
