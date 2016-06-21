@@ -382,6 +382,7 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
                         ret['username'] = channel_account
                         ret['usernamep'] = self.request.POST.get('usernamep', None)
                         ret['level'] = 0
+                        ret['errmsg'] = 'success'
                     else:
                         ret = {
                             'status': 1,
