@@ -674,13 +674,15 @@ class YueLiBaoRefund(APIView):
                         except Exception, e:
                             ret.update(status=0,
                                        msg=e.message)
-                            logger.debug('in YueLiBaoRefund error = {}\n'.format(e.message))
+                            logger.debug('in YueLiBaoRefund, refund_id = {}, userId = {}, error = {}\n'.format(
+                                    arg['refundId'], arg['userId'], e.message))
                             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
                 ret.update(status=1,
                            msg=msg_list)
 
         except Exception, e:
+            logger.exception('in YueLiBaoRefund, error = {}\n'.format(e.message))
             ret.update(status=0,
                        msg=e.message)
         logger.info('refund processed, return = {}\n'.format(ret))
