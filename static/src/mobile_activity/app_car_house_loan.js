@@ -151,4 +151,34 @@
     $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
         $('.popup_box').hide();
     });
+
+    var speed = 100;//速度
+    var time = "";//创建一个定时器
+      $(function () {
+        $(".choujiang").click(function() {//触发事件
+          //$("#msgBox").fadeOut();
+          doIt(1,1)//直接传入初始化参数，防止再次点击位置不对
+        });
+      });
+      function doIt(t,i){//执行循环主方法
+        time = setInterval(function () {
+          i++;
+          if (i > 8) {i = 1;t++;}
+          $(".cj").removeClass("cur");
+          $("#cj"+i).addClass("cur");
+          getLb(t,i);
+        }, speed);
+      }
+      function getLb(t,i){//中奖之后的处理
+        console.log(t);
+        console.log(i);
+        if (t == 3) {
+          if (i == 1) {//此处的i为设定的中奖位置，也可用ajax去请求获得
+            clearInterval(time);
+            //$("#msgBox").fadeIn().find("#text").html("恭喜你中奖了:第"+i+"！");
+          }
+        }
+      }
+
+
 })(org);

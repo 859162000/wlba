@@ -12,9 +12,64 @@ html(style="background: #f4f4f4")
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
         .body_wrap.clear
-            .banner
-                .section.section_1
+            .section.section_1
+                .banner
+                    img(src='/static/imgs/mobile_activity/app_car_house_loan/banner_1.png')
+                    .banner_text
+                        span 活动时间：2016年6月28日—7月4日
 
+                .big_title “车房”专享福利大放送
+                .small_title 活动时间：2016年6月13日-6月19日
+                .insert_text
+                    span 车房贷推荐：
+                    a(href="#") 更多>>
+                dl
+                    dt 活动期间购买 “好车盈”和“好房赚”两款专属产品，
+                    dd 单笔投资≥1000元可获得一次抽奖机会。
+            .section.section_2
+                .big_title 当前抽奖机会：1
+                .horn
+                    img(src='/static/imgs/mobile_activity/app_car_house_loan/horn_icon.png')
+                    span 186****1234获得1.8%加息券
+                #container
+                    .table
+                      .tr
+                        .td.first_td
+                          div#cj1.cj.cur
+                              .big_text!='0.8<span>％</span>'
+                              .small_text 加息券
+                        .td
+                          div#cj2.cj
+                              .big_text!='1<span>％</span>'
+                              .small_text 加息券
+                        .td
+                          div#cj3.cj
+                              .big_text!='1.8<span>％</span>'
+                              .small_text 加息券
+                      .tr
+                        .td.first_td
+                          div#cj8.cj
+                              .big_text!='1.2<span>％</span>'
+                              .small_text 加息券
+                        .td.choujiang_td
+                          span.choujiang 马上抽奖
+                        .td
+                          div#cj4.cj
+                              .big_text!='1<span>年</span>'
+                              .small_text 迅雷会员
+                      .tr
+                        .td.first_td
+                          div#cj7.cj
+                              .big_text!='1<span>%</span>'
+                              .small_text 加息券
+                        .td
+                          div#cj6.cj
+                              .big_text!='1.5<span>%</span>'
+                              .small_text 加息券
+                        .td
+                          div#cj5.cj
+                              .big_text!='2<span>%</span>'
+                              .small_text 加息券
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper_new_min.js')
         script(src="/static/scripts/component/webview.js")
