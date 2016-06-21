@@ -644,7 +644,7 @@ class YueLiBaoRefund(APIView):
         try:
             with transaction.atomic(savepoint=True):
                 for arg in eval(args):
-                    user = User.objects.get(pk=arg['userId'])
+                    user = User.objects.filter(pk=arg['userId']).first()
 
                     margin_record = MarginRecord.objects.filter(
                         # # (Q(catalog=u'月利宝本金入账') | Q(catalog=u'债转本金入账')) &
