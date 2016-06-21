@@ -31,8 +31,7 @@ env.branch = "channel_center"
 env.environment = 'ENV_ALPHA'
 
 env.redis_server = "192.168.20.233"
-# env.mq_server = "192.168.20.233"
-env.mq_server = "192.168.20.247"
+env.mq_server = "192.168.20.233"
 
 
 @roles("git_server")
