@@ -106,6 +106,7 @@ def deploy_web_action():
             run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
             run("fab config:'wanglibao/settings.py','192.168.1.242','192.168.20.247'")
             run("fab config:'wanglibao/settings.py','staging.wanglibao.com','wltest.wanglibao.com'")
+            run("fab config:'wanglibao/settings.py','qdtest.wanglibao.com','alpha-channel.wanglibao.com'")
             if hostname == "UBT020247":
                 print yellow("syncdb")
                 run("python manage.py syncdb --noinput")
