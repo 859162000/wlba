@@ -348,11 +348,13 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
                 if check_tan66_sign(request):
                     p2p_list = []
                     ret = dict()
-                    bind = Binding.objects.filter(channel=channel, bid=channel_user_uid).first()
-                    if bind:
+                    binding = Binding.objects.filter(channel=channel,
+                                                     bid=channel_user_uid).select_related('user').first()
+                    if binding:
                         starttime = timestamp_to_utc(starttime)
                         endtime = timestamp_to_utc(endtime)
-                        p2p_records = P2PRecord.objects.filter(user=bind.user, create_time__gte=starttime,
+                        user = binding.user
+                        p2p_records = P2PRecord.objects.filter(user=user, create_time__gte=starttime,
                                                                create_time__lte=endtime)
                         for p2p_record in p2p_records:
                             p2p_product = p2p_record.product
@@ -374,15 +376,17 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
                             p2p_dict['period'] = p2p_product.period
                             p2p_dict['unit'] = p_type
                             p2p_dict['rate'] = rate
-
                             p2p_list.append(p2p_dict)
 
-                        ret['list'] = p2p_list
-                        ret['status'] = 0
-                        ret['username'] = channel_account
-                        ret['usernamep'] = self.request.POST.get('usernamep', None)
-                        ret['level'] = 0
-                        ret['errmsg'] = 'success'
+                        id_is_valid = 1 if user.wanglibaouserprofile.id_is_valid else 0
+                        ret = {
+                            'list': p2p_list,
+                            'status': 0,
+                            'username': channel_account,
+                            'usernamep': self.request.POST.get('usernamep', None),
+                            'errmsg': 'success',
+                            'level': id_is_valid
+                        }
                     else:
                         ret = {
                             'status': 1,
