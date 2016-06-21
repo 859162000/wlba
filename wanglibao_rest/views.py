@@ -352,8 +352,8 @@ class TanLiuLiuInvestmentQueryAPi(APIView):
                     if bind:
                         starttime = timestamp_to_utc(starttime)
                         endtime = timestamp_to_utc(endtime)
-                        p2p_records = P2PRecord.objects.filter(user=bind.user, created_at__gte=starttime,
-                                                               created_at__lte=endtime)
+                        p2p_records = P2PRecord.objects.filter(user=bind.user, create_time__gte=starttime,
+                                                               create_time__lte=endtime)
                         for p2p_record in p2p_records:
                             p2p_product = p2p_record.product
                             rate = p2p_product.get_p2p_rate
