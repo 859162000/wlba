@@ -232,6 +232,11 @@ class PayCallback(View):
     def dispatch(self, request, *args, **kwargs):
         return super(PayCallback, self).dispatch(request, *args, **kwargs)
 
+class BaoProxyPayCompleteView(TemplateView):
+    template_name = 'pay_complete.jade'
+
+    def post(self, request, *args, **kwargs):
+
 
 class YeeProxyPayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
