@@ -866,6 +866,7 @@ class RewardDistributer(object):
         self.kwargs = kwargs
         self.Processor = {
             #KongGangRewardDistributer:('kgyx',),
+            CheFangDaiDistributer()
         }
 
     @property
@@ -885,6 +886,186 @@ class RewardDistributer(object):
         for processor in self.processors:
             processor(self.request, self.kwargs).distribute()
 
+class CheFangDaiDistributer(RewardDistributer):
+    def __init__(self, request, kwargs):
+        super(CheFangDaiDistributer, self).__init__(request, kwargs)
+        self.amount = kwargs['amount']
+        self.order_id = kwargs['order_id']
+        self.user = kwargs['user']
+        self.token = 'cfd'
+        self.create_time = kwargs['create_time']
+        self.request = request
+        self.product = kwargs['product']
+
+    @method_decorator(transaction.atomic)
+    def distribute(self):
+        try:
+            if self.product.filter(Q(name__contains = '好车盈') | Q(name__contains = '好房赚')) and self.amount>=1000:
+                WanglibaoActivityReward.objects.create(
+                        activity='cfd',
+                        order_id=self.order_id,
+                        user=self.user,
+                        p2p_amount=self.amount,
+                        has_sent=False,
+                        left_times=1,
+                        join_times=1)
+
+        except Exception:
+            logger.debug('user:%s, order_id:%s,p2p_amount:%s,人人都爱车房贷发奖报错', self.user.id, self.order_id, self.amount)
+            
+class CheFangDaiAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(CheFangDaiAPIView, self).__init__()
+
+    def get_redpack_event(self, p2p_amount):
+        """获取加息券"""
+        event = None
+        if p2p_amount>=100 and p2p_amount<10000:
+            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券0.8%')
+        
+        if p2p_amount>=30000 and p2p_amount<50000:
+            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
+        
+        if p2p_amount>=30000 and p2p_amount<80000:
+            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
+            
+        if p2p_amount>=80000 and p2p_amount<150000:
+            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.2%')
+        
+        if p2p_amount>=150000 and p2p_amount<300000:
+            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.5%')
+            
+        if p2p_amount>=200000 and p2p_amount<300000:
+            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.8%')
+        
+        if p2p_amount>=300000:
+            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券2.0%')
+        return event
+    
+    def post(self, request):
+        rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
+        rewards_list = {}
+        if rewards:
+            for res in rewards:
+                #好运榜数据
+                res_content = []
+                seconds =(datetime.datetime.now()-datetime.datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
+                res_content.append(res.user.wanglibaouserprofile.phone)
+                res_content.append(seconds)
+                if res.reward:
+                    res_content.append(res.reward.name)
+                else:
+                    res_content.append(res.redpack_event.name)
+            rewards_list['luck_list'] = res_content
+            
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'您还没有登陆',
+                'rewards_list': rewards_list
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        key = 'chefangdai'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    start_time = activity['start_time']
+                    end_time = activity['end_time']
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now >= end_time:
+            message = u'活动还未开始,请耐心等待'
+            if now >= end_time:
+                message = u'活动已结束，感谢参与'
+            json_to_response = {
+                'ret_code': 1001,
+                'message': message
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        try:
+            message = self.distribute(request.user, start_time, end_time)
+        except Exception, ex:
+            message = u'系统忙，请稍后重试'
+            logger.debug('Exception in distribute: %s' % ex)
+        logger.debug('message:%s' % (message, ))
+        if message != '':
+            json_to_response = {
+                'ret_code': 1001,
+                'message': message
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        user_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='cfd', has_sent=False)
+        count = user_reward.count()
+        reward_record = user_reward.first()
+        logger.debug("reward_record:%s" % (reward_record,))
+        if reward_record == None:
+            json_to_response = {
+                'ret_code': 1002,
+                'message': u'您暂时没有抽奖机会'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        redpack_event = self.get_redpack_event(reward_record.p2p_amount)
+        send_msg = ''
+        try:
+            with transaction.atomic():
+                if reward_record.p2p_amount>=10000 and reward_record.p2p_amount<30000:
+                    #满足条件发迅雷会员
+                    reward = Reward.objects.select_for_update().filter(type='1年迅雷白金会员', is_used=False).first()
+                    if reward:
+                        reward.is_used = True
+                        reward.save()
+                        reward_record.reward = reward
+                        send_msg = u'恭喜您获得一年迅雷会员，请在站内信中进行查看，感谢您的参与'
+                    else:
+                        pass
+                else:
+                    #满足条件发加息券
+                    redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
+                    reward_record.redpack_event = redpack_event
+                    send_msg = u'恭喜您获得%s加息券，已经存入您的账户，请登录网利宝账户进行查看，感谢您的参与' % redpack_event.name
+
+                reward_record.has_sent = True
+                reward_record.left_time = 0
+                reward_record.save()
+        except Exception:
+            reward_record.has_sent = False
+            reward_record.save()
+        else:
+            logger.debug('人人都爱车房贷user_phone:%s' % (request.user.wanglibaouserprofile.phone,))
+            send_messages.apply_async(kwargs={
+                "phones": [request.user.wanglibaouserprofile.phone, ],
+                "messages": [send_msg, ],
+            })
+
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": request.user.id,
+                "title": u"人人都爱车房贷",
+                "content": send_msg,
+                "mtype": "activity"
+            })
+            
+            mes = u'当前您拥有%s次抽奖机会' % count
+            json_to_response = {
+                'ret_code': 0,
+                'message': mes,
+                'rewards_list': rewards_list
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 class KongGangRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
