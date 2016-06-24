@@ -239,11 +239,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '网利宝携手小美到家0元请你做美容！',
-			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300*300.jpg',
-			shareLink = host + '/activity/app_pretty_reach_home/?promo_token=xmdj2',
-			shareMainTit = '网利宝携手小美到家0元请你做美容！',
-			shareBody = '召唤素颜美肌，赶紧来领！';
+			shareName = '“车房贷”福利专享大放送',
+			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+			shareLink = host + '/activity/app_car_house_loan/?promo_token=xmdj2',
+			shareMainTit = '“车房贷”福利专享大放送',
+			shareBody = '平台专用车库对质押车7*24小时监管（附图），标准资产更放心！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -253,7 +253,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝携手小美到家0元请你做美容！',
+			title: '“车房贷”福利专享大放送',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -266,11 +266,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		})
 	})
 
-
     var login = false;
     wlb.ready({
         app: function (mixins) {
-            mixins.shareData({title: '网利宝携手小美到家0元请你做美容！', content: '召唤素颜美肌，赶紧来领！'});
+            mixins.shareData({title: '“车房贷”福利专享大放送', content: '平台专用车库对质押车7*24小时监管（附图），标准资产更放心！'});
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -348,27 +347,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }
     })
 
-    $('.slideDown_button').on('click',function(){
-        var ele = $('.slideDown_box');
-        var curHeight = ele.height();
-        var autoHeight = ele.css('height', 'auto').height();
-        if (!ele.hasClass('down')){
-            $('.slideDown_button').addClass('open');
-            ele.height(curHeight).animate({height: autoHeight},500,function(){
-                ele.addClass('down');
-
-            });
-        }else{
-            $('.section_5_box p span').removeClass('open');
-            ele.height(curHeight).animate({height: 0},500,function(){
-                ele.removeClass('down');
-
-            });
-        }
-    });
-
-    $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
-        $('.popup_box').hide();
+    $('.popup_wrap .close_ico').click(function(){
+        $('.popup_wrap').hide();
     });
 
     var speed = 100;//速度
@@ -398,6 +378,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
           }
         }
       }
+
+    var swiper_1 = new Swiper('.swiper1', {
+		pagination : '.pagination1',
+		slidesPerView: 'auto',
+        centeredSlides: true,
+        paginationClickable: true,
+        spaceBetween: 10,
+		autoHeight: false
+	});
+
 
 
 })(org);
