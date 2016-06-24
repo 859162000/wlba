@@ -88,7 +88,7 @@ from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_account.forms import verify_captcha, BiSouYiRegisterForm
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.tasks import common_callback_for_post
-from common.tools import MyHttpsAdapter
+from wanglibao_common.tools import MyHttpsAdapter
 
 import requests
 

@@ -66,6 +66,10 @@
                 //        $('.popup_box').show();
                 //    }
                 //}
+                $('.luck_title_wrap dl dt').text(data.message);
+                for(var i=0;i<data.rewards_list.luck_list.length;i++){
+                    alert(data.rewards_list.luck_list[i][1]);
+                }
             }
         })
 

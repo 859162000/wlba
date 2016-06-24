@@ -21,7 +21,7 @@ from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginReco
 from wanglibao_margin.tasks import buy_month_product, assignment_buy, buy_mall_product
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
     calc_php_commission, php_redpacks, send_redpacks, php_redpack_restore, CsrfExemptSessionAuthentication, \
-    get_addresses, get_mall_locked_amount
+    get_addresses, get_mall_locked_amount, IPValidPermissions
 from wanglibao_account import message as inside_message
 from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -41,7 +41,7 @@ class GetUserInfo(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     def get(self, request):
 
@@ -101,7 +101,7 @@ class GetMarginInfo(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     def get(self, request):
 
@@ -172,11 +172,12 @@ class GetUserAddress(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     def get(self, request):
 
-        user_id = self.request.user.pk
+        user_id = request.GET.get('user_id', None)
+        user_id = user_id or self.request.user.pk
         ret = get_addresses(user_id)
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
@@ -189,7 +190,7 @@ class SendInsideMessage(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -220,7 +221,7 @@ class SendMessages(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -265,7 +266,7 @@ class CheckTradePassword(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     def post(self, request):
         user_id = self.request.POST.get('userId')
@@ -287,7 +288,7 @@ class CheckAppTradePassword(PHPDecryptParmsAPIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     def post(self, request):
         trade_password = self.params.get('trade_pwd', "").strip()
@@ -308,7 +309,7 @@ class YueLiBaoBuy(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -358,7 +359,7 @@ class MallProductBuy(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -391,7 +392,6 @@ class MallProductBuy(APIView):
                 red_packet_type=red_packet_type,
             )
             device = utils.split_ua(self.request)
-            logger.info('going to buy_mall_product !!!')
 
             buy_mall_product.apply_async(kwargs={'token': token, 'amount_source': amount_source,
                                                  'payback_source': payback_source, 'user': user_id,
@@ -411,7 +411,7 @@ class YueLiBaoBuyFail(APIView):
     http://xxxxxx.com/php/yue/fail/
     :return: status = 1  成功, status = 0 失败 .
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -472,7 +472,7 @@ class YueLiBaoBuyStatus(APIView):
     http://xxxxxx.com/php/yue/status/
     :return: status = 1  成功, status = 0 失败 .
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -502,7 +502,7 @@ class YueLiBaoCheck(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -526,7 +526,7 @@ class YueLiBaoCheck(APIView):
                         continue
                     if product.settle_status:
                         logger.info(u'该条记录已审核: product = {}, 这是重复请求, product_id = {}'.
-                                    format(product.id), product_id)
+                                    format(product.id, product_id))
                         continue
                     product.settle_status = True
                     product.save()
@@ -537,7 +537,7 @@ class YueLiBaoCheck(APIView):
                     buyer_keeper.php_settle(product.amount_source, description=u'月利宝满标审核')
 
                 # 进行全民淘金数据写入
-                try :
+                try:
                     calc_php_commission(product_id, period)
                     logger.info(u'period = {}, 全民淘金数据写入: {}\n'.format(period, product_id))
                 except Exception, ex:
@@ -559,7 +559,7 @@ class YueLiBaoCancel(APIView):
     返回数据格式：json 外层 status = 1 API 成功, 里层status = 1 当个订单返回成功.
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -630,7 +630,7 @@ class YueLiBaoRefund(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -639,12 +639,12 @@ class YueLiBaoRefund(APIView):
         ret = dict()
 
         args = request.POST.get('args')
-        logger.info('in YueLiBaoRefund request data = {}'.format(request.DATA))
+        logger.info('in YueLiBaoRefund!')
 
         try:
             with transaction.atomic(savepoint=True):
                 for arg in eval(args):
-                    user = User.objects.get(pk=arg['userId'])
+                    user = User.objects.filter(pk=arg['userId']).first()
 
                     margin_record = MarginRecord.objects.filter(
                         # # (Q(catalog=u'月利宝本金入账') | Q(catalog=u'债转本金入账')) &
@@ -674,15 +674,18 @@ class YueLiBaoRefund(APIView):
                         except Exception, e:
                             ret.update(status=0,
                                        msg=e.message)
-                            logger.debug('in YueLiBaoRefund error = {}\n'.format(e.message))
+                            logger.debug('in YueLiBaoRefund, refund_id = {}, userId = {}, error = {}\n'.format(
+                                    arg['refundId'], arg['userId'], e.message))
                             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
                 ret.update(status=1,
                            msg=msg_list)
 
         except Exception, e:
+            logger.exception('in YueLiBaoRefund, error = {}\n'.format(e.message))
             ret.update(status=0,
                        msg=e.message)
+        logger.info('refund processed, return = {}\n'.format(ret))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
@@ -693,7 +696,7 @@ class AssignmentOfClaimsBuy(APIView):
     返回数据格式：json
     :return:
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -749,7 +752,7 @@ class AssignmentBuyStatus(APIView):
     http://xxxxxx.com/php/yue/status/
     :return: status = 1  成功, status = 0 失败 .
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -780,7 +783,7 @@ class AssignmentBuyFail(APIView):
     http://xxxxxx.com/php/assignment/fail/
     :return: status = 1  成功, status = 0 失败 .
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -834,7 +837,7 @@ class GetRedPacks(APIView):
     period = int()
     :return: status = 1  成功, status = 0 失败 .
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -874,7 +877,7 @@ class GetIOSRedPacks(APIView):
     period = int()
     :return: status = 1  成功, status = 0 失败 .
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     @csrf_exempt
     def post(self, request):
@@ -914,7 +917,7 @@ class GetAjaxRedPacks(APIView):
     period = int()
     :return: status = 1  成功, status = 0 失败 .
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
 
     @csrf_exempt
@@ -956,7 +959,7 @@ class SendRedPacks(APIView):
     http://xxxxxx.com/php/redpacks/send/
     :return: status = 1  成功, status = 0 失败 .
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     def post(self, request):
 
@@ -979,7 +982,7 @@ class GetAPPUser(APIView):
     http://xxxxxx.com/php/app/user/get/
     :return: status = 1  成功, status = 0 失败 .
     """
-    permission_classes = ()
+    permission_classes = (IPValidPermissions, )
 
     def get(self, request):
 
