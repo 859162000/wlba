@@ -457,7 +457,7 @@ class YueLiBaoBuyFail(APIView):
 
                     # 增加回退红包接口
                     php_redpack_restore(product.id, product_id, product.amount, user)
-                    logger.info('purchase failed and restore red_pack. month_product_id = {},\n'.format(product_id))
+                    logger.info('purchase failed and restore red_pack. token = {},\n'.format(token))
 
             ret.update(status=1,
                        msg='success')
