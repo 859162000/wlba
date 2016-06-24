@@ -866,7 +866,7 @@ class RewardDistributer(object):
         self.kwargs = kwargs
         self.Processor = {
             #KongGangRewardDistributer:('kgyx',),
-            CheFangDaiDistributer()
+            CheFangDaiDistributer:(),
         }
 
     @property
@@ -893,14 +893,13 @@ class CheFangDaiDistributer(RewardDistributer):
         self.order_id = kwargs['order_id']
         self.user = kwargs['user']
         self.token = 'cfd'
-        self.create_time = kwargs['create_time']
         self.request = request
         self.product = kwargs['product']
 
     @method_decorator(transaction.atomic)
     def distribute(self):
         try:
-            if self.product.filter(Q(name__contains = '好车盈') | Q(name__contains = '好房赚')) and self.amount>=1000:
+            if (self.product.name.find('好房贷')>=0 & self.product.name.find('好车盈')>=0) | self.amount>=1000:
                 WanglibaoActivityReward.objects.create(
                         activity='cfd',
                         order_id=self.order_id,
@@ -995,18 +994,18 @@ class CheFangDaiAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        try:
-            message = self.distribute(request.user, start_time, end_time)
-        except Exception, ex:
-            message = u'系统忙，请稍后重试'
-            logger.debug('Exception in distribute: %s' % ex)
-        logger.debug('message:%s' % (message, ))
-        if message != '':
-            json_to_response = {
-                'ret_code': 1001,
-                'message': message
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        #try:
+            #message = self.distribute(request.user, start_time, end_time)
+        #except Exception, ex:
+            #message = u'系统忙，请稍后重试'
+            #logger.debug('Exception in distribute: %s' % ex)
+        #logger.debug('message:%s' % (message, ))
+        #if message != '':
+            #json_to_response = {
+                #'ret_code': 1001,
+                #'message': message
+            #}
+            #return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         user_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='cfd', has_sent=False)
         count = user_reward.count()
