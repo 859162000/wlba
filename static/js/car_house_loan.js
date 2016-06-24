@@ -49,6 +49,26 @@
                 }
             });
 
+        $.ajax({
+            url: '/api/activity/chefangdai/',
+            type: 'post',
+            success: function (data) {
+                //if(data.ret_code=='1000'){
+                //    window.location.href = '/accounts/login/?promo_token=sy&next=/activity/august_phone/?promo_token=sy'
+                //}else if(data.ret_code=='1'||data.ret_code=='1001'||data.ret_code=='1002'){
+                //    $('.popup_box .main .textairport').text(''+data.message+'');
+                //    $('.popup_box').show();
+                //}else if(data.ret_code=='0'){
+                //    if(data.tag=='标记成功'){
+                //        window.location.href = '/p2p/list/?promo_token=sy'
+                //    }else{
+                //        $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                //        $('.popup_box').show();
+                //    }
+                //}
+            }
+        })
+
         var speed = 100;//速度
         var time = "";//创建一个定时器
           $(function () {
