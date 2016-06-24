@@ -486,13 +486,13 @@ class YueLiBaoBuyStatus(APIView):
         product = MonthProduct.objects.filter(token=token).first()
 
         if not product:
-            ret.update(status=-1, msg='trade does not exist!')
+            ret.update(status=0, msg='trade does not exist!')
         elif product.trade_status == 'NEW':
             ret.update(status=1, msg='processing!')
         elif product.trade_status == 'PAID' and not product.cancel_status:
             ret.update(status=2, msg='success!')
         elif product.trade_status == 'PAID' and product.cancel_status:
-            ret.update(status=3, msg='canceled!')
+            ret.update(status=0, msg='canceled!')
         else:
             ret.update(status=0,
                        msg='pay failed!')
