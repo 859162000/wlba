@@ -26,7 +26,7 @@ from marketing.models import LoginAccessToken
 from django.conf import settings
 from wanglibao_profile.models import USER_TYPE
 from report.crypto import Aes
-from common.tools import StrQuote
+from wanglibao_common.tools import StrQuote
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
