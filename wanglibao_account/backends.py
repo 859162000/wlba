@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db.models import Sum
 from wanglibao_account.models import IdVerification, UserSource
 from wanglibao_redpack.models import Income, PhpIncome
-from common.tools import MyHttpsAdapter
+from wanglibao_common.tools import MyHttpsAdapter
 
 
 logger = logging.getLogger("wanglibao_account")

@@ -164,6 +164,11 @@ html
                         span.span8-omega
                           if user.is_authenticated
                             a.submit-button.span12.button-primary.button-middle.invest#stop(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                            .notes-fonts
+                                i
+                                | 理财非存款，投资需谨慎（
+                                a(href="/security/") 详情
+                                | ）
                           else
                             a.submit-bu-20150818.span12.button-primary.button-middle.invest(href='/accounts/login/?next=/p2p/detail/{{p2p.id}}') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
                             .notes-fonts
@@ -190,7 +195,7 @@ html
               .p2p-detail-list.clearfix
                 h1 {{section_name}}
                 for item_name in section_values
-                  if item_name != '第三方担保机构' and item_name != '第三方合作机构'
+                  if item_name != '第三方担保机构'
                     dl
                       dt.span2.align-left {{item_name}}
                       item_value = section_values[item_name]

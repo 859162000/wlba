@@ -1294,6 +1294,13 @@ else:
     JXHZ_CALL_BACK_URL = 'http://service.jiaxihezi.com/test/v1/invest'
 
 
+# 弹溜溜
+if ENV == ENV_PRODUCTION:
+    TAN66_COOP_KEY = '142fb7fb4835'
+else:
+    TAN66_COOP_KEY = 'f405cd3212e7'
+
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
