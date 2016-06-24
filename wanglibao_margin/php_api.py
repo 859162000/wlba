@@ -336,6 +336,8 @@ class YueLiBaoBuy(APIView):
                 amount=amount,
                 amount_source=amount_source,
                 red_packet=red_packet,
+                cancel_status=False,
+                trade_status='NEW',
                 red_packet_type=red_packet_type,
             )
             device = utils.split_ua(self.request)
@@ -487,8 +489,10 @@ class YueLiBaoBuyStatus(APIView):
             ret.update(status=-1, msg='trade does not exist!')
         elif product.trade_status == 'NEW':
             ret.update(status=1, msg='processing!')
-        elif product.trade_status == 'PAID':
+        elif product.trade_status == 'PAID' and not product.cancel_status:
             ret.update(status=2, msg='success!')
+        elif product.trade_status == 'PAID' and product.cancel_status:
+            ret.update(status=3, msg='canceled!')
         else:
             ret.update(status=0,
                        msg='pay failed!')
