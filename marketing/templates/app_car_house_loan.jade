@@ -1,7 +1,7 @@
 - load formatters
 - load mathfilters
 doctype html
-html(style="background: #f4f4f4")
+html(style="background: #f5f5f5")
     head
         title 网利宝
         include include/app_head
@@ -16,10 +16,10 @@ html(style="background: #f4f4f4")
                 .banner
                     img(src='/static/imgs/mobile_activity/app_car_house_loan/banner_1.png')
                     .banner_text
-                        span 活动时间：2016年6月28日—7月4日
+                        span 活动时间：2016年6月27日—7月3日
 
                 .big_title “车房”专享福利大放送
-                .small_title 活动时间：2016年6月13日-6月19日
+                .small_title 活动时间：2016年6月27日-7月3日
                 .insert_text
                     span 车房贷推荐：
                     a(href="#") 更多>>
@@ -168,11 +168,75 @@ html(style="background: #f4f4f4")
                         dl
                             dt 精准评估
                             dd 内部询价和第三方专业评估相结合
-
-script(src='/static/src/mobile/lib/weixin/wx.js')
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_car_house_loan/section6_icon2.png')
+                        dl
+                            dt 质押率低
+                            dd 一般不超过评估价7成
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_car_house_loan/section6_icon3.png')
+                        dl
+                            dt 快速处置
+                            dd 合作机构优先回购
+                .text_p!='平台还额外设立<span>金盾计划</span>，在招商银行开设独立账户存储专项资金，专门收购线上逾期或违约的不良债权，维护投资用户的权益。'
+            .section_7
+                .big_title 抵质押物的评估和处置
+                .big_title_line
+                .section7_main
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_car_house_loan/section7_icon1.png')
+                        dl
+                            dt 档案监管
+                            dd 风控部统一管理
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_car_house_loan/section7_icon2.png')
+                        dl
+                            dt 催收制度
+                            dd 提前七天提醒返还本息
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_car_house_loan/section7_icon3.png')
+                        dl
+                            dt 黑名单制度
+                            dd 根据回款情况，<br>及时淘汰不良信用客户
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_car_house_loan/section7_icon4.png')
+                        dl
+                            dt 抵质押物监管
+                            dd!='<span class="one">车:</span> <span class="two">GPS每日定位追踪</span>'
+                            dd!='<span class="one">房:</span> <span class="two">不定期暗访监督还款记录定期查询涉案信息</span>'
+            .section_8
+                .big_title 质押车监管
+                .big_title_line
+                .section8_main
+                    .swiper-container.swiper1
+                        .swiper-wrapper
+                          .swiper-slide
+                              img(src='/static/imgs/mobile_activity/app_car_house_loan/section8_img1.png')
+                          .swiper-slide
+                              img(src='/static/imgs/mobile_activity/app_car_house_loan/section8_img2.png')
+                          .swiper-slide
+                              img(src='/static/imgs/mobile_activity/app_car_house_loan/section8_img3.png')
+                          .swiper-slide
+                              img(src='/static/imgs/mobile_activity/app_car_house_loan/section8_img4.png')
+                          .swiper-slide
+                              img(src='/static/imgs/mobile_activity/app_car_house_loan/section8_img5.png')
+                          .swiper-slide
+                              img(src='/static/imgs/mobile_activity/app_car_house_loan/section8_img6.png')
+                    .pagination.pagination1
+                    .section8_text 质押车停放在平台专用车库，由专人监管，并进行7*24小时摄像监管
+                    .section8_text2 2014年8月以来，平台还布局了木材、珠宝、物流货运等其他产业，不仅获取优质资产的渠道稳定，还服务了近 2000 家中小企业。2016年5月末，交易额已破60亿，用户规模超160万。
+            .popup_wrap(style='display:none')
+                .popup_box
+                    img.close_ico(src='/static/imgs/mobile_activity/app_car_house_loan/close.png')
+                    p.popup_text 恭喜获得1.8%加息券
+                    dl
+                        dt 您暂时还没有抽奖机会哦~
+                        dd 马上投资指定产品，获得更多抽奖机会！
+                        .popup_button 继续抽奖
+        script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper_new_min.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_car_house_loan.js?v=2015051307")
+        script(src="/static/scripts/mobile_activity/app_car_house_loan.js?v=2016062201")
 
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
