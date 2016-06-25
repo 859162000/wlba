@@ -1053,51 +1053,6 @@ class CheFangDaiAPIView(APIView):
                 'rewards_list': rewards_list
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        
-class CheFangDaiProductAPIView(APIView):
-    permission_classes = ()
-
-    def __init__(self):
-        super(CheFangDaiProductAPIView, self).__init__()
-        
-    def post(self, request):
-        p2p_products = []
-
-        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
-
-        show_slider = False
-        if p2p_done_list:
-            show_slider = True
-            p2p_earning = sorted(p2p_done_list, key=lambda x: (-x['expected_earning_rate_total'], x['available_amount']))
-            p2p_period = sorted(p2p_done_list, key=lambda x: (x['period_days'], x['available_amount']))
-            p2p_amount = sorted(p2p_done_list, key=itemgetter('completion_rate'), reverse=True)
-        else:
-            p2p_earning = p2p_period = p2p_amount = []
-
-        p2p_products.extend(p2p_done_list)
-        p2p_products.extend(p2p_full_list)
-        p2p_products.extend(p2p_repayment_list)
-        p2p_products.extend(p2p_finished_list)
-
-        limit = 10
-        paginator = Paginator(p2p_products, limit)
-        page = self.request.GET.get('page')
-
-        try:
-            p2p_products = paginator.page(page)
-        except PageNotAnInteger:
-            p2p_products = paginator.page(1)
-        except Exception:
-            p2p_products = paginator.page(paginator.num_pages)
-
-        return {
-            'p2p_products': p2p_products,
-            'p2p_earning': p2p_earning[:5],
-            'p2p_period': p2p_period[:5],
-            'p2p_amount': p2p_amount[:5],
-            'show_slider': show_slider,
-            'announcements': AnnouncementP2P
-        }
 
 class KongGangRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):

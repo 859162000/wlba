@@ -70,6 +70,9 @@ from wanglibao_reward.models import WanglibaoActivityReward
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
 
+from wanglibao_p2p.common import get_p2p_list
+from operator import itemgetter
+
 import re
 import sys
 import time
@@ -2430,6 +2433,151 @@ class AppLotteryTemplate(TemplateView):
         return super(AppLotteryTemplate, self).dispatch(request, *args, **kwargs)
 
 
+class CheFangDaiProductView(TemplateView):
+    template_name = 'car_house_loan.jade'
+
+    def get_context_data(self, **kwargs):
+        key = 'chefangdai'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    start_time = activity['start_time']
+                    end_time = activity['end_time']
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now >= end_time:
+            message = u'活动还未开始,请耐心等待'
+            if now >= end_time:
+                message = u'活动已结束，感谢参与'
+            json_to_response = {
+                'ret_code': 1001,
+                'message': message
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
+        rewards_list = {}
+        if rewards:
+            for res in rewards:
+                #好运榜数据
+                res_content = []
+                seconds =(datetime.now()-datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
+                res_content.append(res.user.wanglibaouserprofile.phone)
+                res_content.append(seconds)
+                if res.reward:
+                    res_content.append(res.reward.content)
+                else:
+                    res_content.append(res.redpack_event.name)
+            rewards_list['luck_list'] = res_content
+        if not self.request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'您还没有登陆',
+                'rewards_list': rewards_list
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        p2p_products = []
+        haofang = P2PProduct.objects.filter(name__contains='好房').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
+        haoche = P2PProduct.objects.filter(name__contains='好车').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
+        
+        from wanglibao_redis.backend import redis_backend
+        cache_backend = redis_backend()
+        
+        if haofang:
+            p2p_products.extend(cache_backend.get_p2p_list_from_objects([haofang]))
+        if haoche:
+            p2p_products.extend(cache_backend.get_p2p_list_from_objects([haoche]))
+        
+        count = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='cfd', has_sent=False).count()
+        
+        return {
+            'p2p_products': p2p_products,
+            'rewards_list': rewards_list,
+            'count': count,
+        }
+    
+class CheFangDaiProductAPPView(TemplateView):
+    template_name = 'app_car_house_loan.jade'
+
+    def get_context_data(self, **kwargs):
+        key = 'chefangdai'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    start_time = activity['start_time']
+                    end_time = activity['end_time']
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now >= end_time:
+            message = u'活动还未开始,请耐心等待'
+            if now >= end_time:
+                message = u'活动已结束，感谢参与'
+            json_to_response = {
+                'ret_code': 1001,
+                'message': message
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
+        rewards_list = {}
+        if rewards:
+            for res in rewards:
+                #好运榜数据
+                res_content = []
+                seconds =(datetime.now()-datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
+                res_content.append(res.user.wanglibaouserprofile.phone)
+                res_content.append(seconds)
+                if res.reward:
+                    res_content.append(res.reward.content)
+                else:
+                    res_content.append(res.redpack_event.name)
+            rewards_list['luck_list'] = res_content
+        if not self.request.user.is_authenticated():
+            json_to_response = {
+                'ret_code': 1000,
+                'message': u'您还没有登陆',
+                'rewards_list': rewards_list
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        p2p_products = []
+        haofang = P2PProduct.objects.filter(name__contains='好房').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
+        haoche = P2PProduct.objects.filter(name__contains='好车').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
+        
+        from wanglibao_redis.backend import redis_backend
+        cache_backend = redis_backend()
+        
+        if haofang:
+            p2p_products.extend(cache_backend.get_p2p_list_from_objects([haofang]))
+        if haoche:
+            p2p_products.extend(cache_backend.get_p2p_list_from_objects([haoche]))
+        
+        count = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='cfd', has_sent=False).count()
+        
+        return {
+            'p2p_products': p2p_products,
+            'rewards_list': rewards_list,
+            'count': count,
+        }
 
 class NoConfigException(Exception):
     def __init__(self, conf):

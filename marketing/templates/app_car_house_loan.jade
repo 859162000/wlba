@@ -24,6 +24,112 @@ html(style="background: #f5f5f5")
                     span 车房贷推荐：
                     a(href="#") 更多>>
                 dl
+                
+                
+                
+                    .row
+                      .span8
+                        for product in p2p_products
+                          status = product['display_status']
+                          .panel-p2p-product
+                            .shadow-inner
+                              .panel-title-bar
+                                if product.category == '票据'
+                                  .bill-icon.di 票
+                                elif product.warrant_company
+                                  .warrant-icon.di 担
+                                a(href="/p2p/detail/{{product.id}}")
+                                  if product.category == '新手标'
+                                      .new-user.mt12
+                                  else
+                                      if product.is_app_exclusive
+                                          .app-icon.mt9
+                                  | {{product.name}}
+                              .panel-content
+                                //if product.is_taojin
+                                  .goldIcon
+                                .row
+                                  .span2.align-center
+                                    p
+                                      em {{product.total_amount | money_format_int}}
+                                    p 融资金额(元)
+                                  .span2.align-center
+                                    p
+                                      em {{product.period}}
+                                      span.font-l {{product.pay_method|period_unit}}
+                                    p 还款期限
+                                  .span3.align-center
+                                    p
+                                      earning_rate = str(product['expected_earning_rate'])
+                                      em.highlight {{earning_rate}}
+                                      span.highlight.font-m %
+                                      if product.activity
+                                        em.highlight +
+                                        span.xunlei-vip-rate(title="{{product.activity.activity_name}}") {{product.activity.activity_rule_percent_text}}%
+                                          span.xunlei-vip-tip(title="{{product.activity.activity_name}}") {{product.activity.activity_name}}
+                                    p 年化收益
+                                  .span2.align-center
+                                    p
+                                      amount = product['total_amount'] - product['ordered_amount']
+                                      em {{amount | money_format_int}}
+                                    p 可投资金额(元)
+                                  .span3-omega.align-right
+                                    p
+                                      if status == '抢购中'
+                                        a.button-home(href="/p2p/detail/{{product.id}}/")
+                                          span.icon-p2p-home.purcharsing
+                                          {{status}}
+                                      else
+                                        a.button-home-disabled(href="javascript:void(0)", disabled)
+                                          if status == '已还款'
+                                            span.icon-p2p-home.finished
+                                          elif status == '还款中'
+                                            span.icon-p2p-home.payment
+                                          else
+                                            span.icon-p2p-home.audit
+              
+                                          {{status}}
+              
+                                    if status == '抢购中'
+                                      p(data-role="countdown", data-left="{{product.end_time | timedelta_now}}", data-target="#counter_{{product.id}}") 剩余：
+                                        span(id="counter_{{product.id}}") {{product.end_time | timedelta_now_day }}
+                                    else
+                                      p
+              
+                              .panel-p2p--footer
+                                .row
+                                  .span4
+                                    span 进度：
+                                    .progress-container
+                                      percent = float(product['ordered_amount']) / product['total_amount'] * 100
+                                      if status == '抢购中' or status == '满标审核'
+                                        .progress-indicator(style="width:{{percent | percentage}}")
+                                      else
+                                        .progress-indicator(style="width:{{percent | percentage}}")
+              
+                                    if status == '抢购中' or status == '满标审核'
+                                      span.highlight &nbsp;&nbsp; {{percent | percentage}}
+                                    else
+                                      span &nbsp;&nbsp; {{percent | percentage}}
+              
+                                  .span4.align-left
+              
+              
+                                  .span4-omega.align-right
+                                    span 还款方式: &nbsp;&nbsp;
+                                    span.d3-text {{product.display_payback_method}}
+                              if status == '还款中'
+                                .panel-p2p-stamp
+                              if status == '已还款'
+                                .panel-p2p-finished
+                          .space-vertical-sm
+                        .row
+                
+                
+                
+                
+                
+                
                     dt 活动期间购买 “好车盈”和“好房赚”两款专属产品，
                     dd 单笔投资≥1000元可获得一次抽奖机会。
             .section.section_2

@@ -3,7 +3,7 @@ from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
                             ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
                             OpenHouseApiView, MaiMaiView, ShieldPlanView, ShieldPlanH5View, HMDP2PListView, \
-                            SixBillionView, ThunderBindingQueryApi
+                            SixBillionView, ThunderBindingQueryApi, CheFangDaiProductView, CheFangDaiProductAPPView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -106,6 +106,8 @@ urlpatterns = patterns(
     url(r'^xunlei_treasure/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='', template_name="xunlei.jade")),
     url(r'^shield_plan/$', ShieldPlanView.as_view()),
     url(r'^ihaomu/$', TemplateView.as_view(template_name="ihaomu.jade")),
+    url(r"^chefangdai/$", CheFangDaiProductView.as_view()),
+    url(r"^chefangdaiapp/$", CheFangDaiProductAPPView.as_view()),
 )
 
 # app URL
