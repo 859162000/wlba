@@ -84,7 +84,7 @@
                                         $('.popup_button').click(function(){
                                             mixins.jumpToManageMoney();
                                         });
-                                        $('.choujiang').click(function(){
+                                        $('.choujiang').bind('click',function(){
                                             $('.popup_wrap').show();
                                         })
                                         ranking_list(data.rewards_list);
@@ -97,7 +97,7 @@
                                         $('.popup_button').click(function(){
                                             mixins.loginApp({refresh:1, url:'/activity/chefangdaiapp/'});
                                         });
-                                        $('.choujiang').click(function(){
+                                        $('.choujiang').bind('click',function(){
                                             $('.popup_wrap').show();
                                         })
                                         ranking_list(data.rewards_list);
@@ -109,7 +109,7 @@
                                         $('.popup_button').click(function(){
                                              mixins.loginApp({refresh:1, url:'/activity/chefangdaiapp/'});
                                         });
-                                        $('.choujiang').click(function(){
+                                        $('.choujiang').bind('click',function(){
                                             $('.popup_wrap').show();
                                         })
                                     }
@@ -123,7 +123,7 @@
                                             var time = "";//创建一个定时器
 
 
-                                                $(".choujiang").click(function() {//触发事件
+                                                $(".choujiang").bind('click',function(){//触发事件
                                                   org.ajax({
                                                     url: '/api/activity/chefangdai/',
                                                     type: 'post',
@@ -162,13 +162,21 @@
                                                     $('.popup_wrap').show();
 
                                                     $('.popup_button').click(function(){
-                                                        $('.popup_wrap ').hide();
                                                         app_car_house_loan();
+                                                        $('.popup_wrap ').hide();
+                                                        $(".choujiang").unbind('click');
+
+                                                    });
+                                                    $('.popup_wrap .close_ico').click(function(){
+                                                        app_car_house_loan();
+                                                        $(".choujiang").unbind('click');
+                                                        $('.popup_wrap ').hide();
                                                     });
                                                   }
                                                 }
                                               }
                                         }
+
 
 
                                     }
@@ -249,7 +257,7 @@
         $('.popup_button').click(function(){
             window.location.href = '/weixin/list/'
         });
-        $('.choujiang').click(function(){
+        $('.choujiang').bind('click',function(){
             $('.popup_wrap').show();
         })
     }
@@ -263,7 +271,7 @@
         $('.popup_button').click(function(){
             window.location.href = '/weixin/regist/?next=/activity/chefangdaiapp/'
         });
-        $('.choujiang').click(function(){
+        $('.choujiang').bind('click',function(){
             $('.popup_wrap').show();
         })
     }
@@ -303,17 +311,18 @@
 
             var speed = 100;//速度
             var time = "";//创建一个定时器
+            $('.popup_text').text(data_text);
 
-
-                $(".choujiang").click(function() {//触发事件
+                $(".choujiang").bind('click',function(){//触发事件
                   org.ajax({
                     url: '/api/activity/chefangdai/',
                     type: 'post',
                     success: function (data) {
                         if (data.ret_code == '0') {
-                            $('.popup_text').text(data.content);
+
                         }else{
-                            $('.popup_text').text('网络错误');
+                            car_house_loan();
+
                         }
                     }
                   })
@@ -342,9 +351,16 @@
                     $('.popup_button').text('继续抽奖');
                     $('.popup_wrap').show();
 
-                    $('.popup_button').click(function(){
-                        $('.popup_wrap ').hide();
+                    $('.popup_wrap .close_ico').click(function(){
                         car_house_loan();
+                        $(".choujiang").unbind('click');
+                        $('.popup_wrap ').hide();
+                    });
+                    $('.popup_button').click(function(){
+
+                        car_house_loan();
+                        $(".choujiang").unbind('click');
+                        $('.popup_wrap ').hide();
                     });
                   }
                 }
