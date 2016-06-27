@@ -55,22 +55,38 @@
                 type: 'post',
                 success: function (data) {
                     if(data.ret_code=='1002') {
+                        $('.luck_title_denglu').hide();
                         $('.luck_title_wrap dl dt').text(data.message);
+                        $('.luck_title_wrap').show();
+
                         no_choujiang();
                         ranking_list(data.rewards_list);
                     }
                     if(data.ret_code=='1000') {
+                    //未登陆
+                        $('.luck_title_wrap').hide();
+                        $('.luck_title_denglu').show();
+
                         no_denglu();
                         ranking_list(data.rewards_list);
                     }
                     if(data.ret_code=='1001') {
+                    //活动结束
+                        $('.luck_title_denglu').hide();
                         $('.luck_title_wrap dl dt').text(data.message);
                         $('.luck_title_wrap dl dd').hide();
+                        $('.luck_title_wrap').show();
+
                         no_denglu();
+                        ranking_list(data.rewards_list);
                     }
                     if(data.ret_code=='0') {
+                        $('.luck_title_denglu').hide();
                         $('.luck_title_wrap dl dt').text(data.message);
+                        $('.luck_title_wrap dl dd').show();
+                        $('.luck_title_wrap').show();
                         choujiang(data.content,data.result_no);
+                        ranking_list(data.rewards_list);
                     }
 
                 }
@@ -79,7 +95,6 @@
         car_house_loan();
 
         function no_choujiang(){
-            $('.luck_title_wrap').show();
             $('.popup_wrap dl dt').text('您暂时还没有抽奖机会哦~');
             $('.popup_wrap dl dd').text('马上投资指定产品，获得更多抽奖机会！！');
             $('.popup_wrap dl').show();
@@ -95,7 +110,6 @@
 
         function no_denglu(){
             $('.popup_text').hide();
-
             $('.popup_wrap dl dt').text('您还未登陆！');
             $('.popup_wrap dl dd').text('请登录后查看抽奖机会！');
             $('.popup_wrap dl').show();
@@ -109,28 +123,50 @@
         }
 
 
+        var this_time;
         function ranking_list(json){
 
             if(json.luck_list.length>0){
                 var rankingList = [];
                 var json_one;
-                for(var i=0; i<8; i++){
-                    json_one = json.luck_list[i];
+                if(json.luck_list.length>7){
+                    for(var i=0; i<7; i++){
+                        json_one = json.luck_list[i];
 
-                    var this_time = json_one.time;
-                    if(this_time>='86400'){
-                        this_time = parseInt(this_time/86400)+'天'
-                    }else if(this_time>='3600'){
-                        this_time = parseInt(this_time/3600)+'小时'
-                    }else if(this_time>='60'){
-                        this_time = parseInt(this_time/60)+'分'
-                    }else{
-                        this_time = parseInt(this_time)+'秒'
+                        this_time = json_one.time;
+                        if(this_time>='86400'){
+                            this_time = parseInt(this_time/86400)+'天'
+                        }else if(this_time>='3600'){
+                            this_time = parseInt(this_time/3600)+'小时'
+                        }else if(this_time>='60'){
+                            this_time = parseInt(this_time/60)+'分'
+                        }else{
+                            this_time = parseInt(this_time)+'秒'
+                        }
+
+                        rankingList.push(['<li><span class="one">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span><span class="two">'+json_one.name+'</span><span class="three">'+this_time+'前</span>'].join(''));
+
                     }
+                }else{
+                    for(var i=0; i<json.luck_list.length; i++){
+                        json_one = json.luck_list[i];
 
-                    rankingList.push(['<li><span class="one">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span><span class="two">'+json_one.name+'</span><span class="three">'+this_time+'前</span>'].join(''));
+                        this_time = json_one.time;
+                        if(this_time>='86400'){
+                            this_time = parseInt(this_time/86400)+'天'
+                        }else if(this_time>='3600'){
+                            this_time = parseInt(this_time/3600)+'小时'
+                        }else if(this_time>='60'){
+                            this_time = parseInt(this_time/60)+'分'
+                        }else{
+                            this_time = parseInt(this_time)+'秒'
+                        }
 
+                        rankingList.push(['<li><span class="one">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span><span class="two">'+json_one.name+'</span><span class="three">'+this_time+'前</span>'].join(''));
+
+                    }
                 }
+
                 $('.ranking_list').html(rankingList.join(''));
                 $('.ranking').show();
             }else{
