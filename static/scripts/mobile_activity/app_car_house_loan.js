@@ -528,8 +528,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 $('.popup_text').text(data_text).show();
                 $('.popup_button').text('继续抽奖');
                 $('.popup_wrap').show();
+                car_house_loan();
                 $('.popup_button').click(function(){
-                    car_house_loan();
                     $('.popup_wrap ').hide();
 
                 });
