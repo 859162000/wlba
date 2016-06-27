@@ -55,22 +55,38 @@
                 type: 'post',
                 success: function (data) {
                     if(data.ret_code=='1002') {
+                        $('.luck_title_denglu').hide();
                         $('.luck_title_wrap dl dt').text(data.message);
+                        $('.luck_title_wrap').show();
+
                         no_choujiang();
                         ranking_list(data.rewards_list);
                     }
                     if(data.ret_code=='1000') {
+                    //未登陆
+                        $('.luck_title_wrap').hide();
+                        $('.luck_title_denglu').show();
+
                         no_denglu();
                         ranking_list(data.rewards_list);
                     }
                     if(data.ret_code=='1001') {
+                    //活动结束
+                        $('.luck_title_denglu').hide();
                         $('.luck_title_wrap dl dt').text(data.message);
                         $('.luck_title_wrap dl dd').hide();
+                        $('.luck_title_wrap').show();
+
                         no_denglu();
+                        ranking_list(data.rewards_list);
                     }
                     if(data.ret_code=='0') {
+                        $('.luck_title_denglu').hide();
                         $('.luck_title_wrap dl dt').text(data.message);
+                        $('.luck_title_wrap dl dd').show();
+                        $('.luck_title_wrap').show();
                         choujiang(data.content,data.result_no);
+                        ranking_list(data.rewards_list);
                     }
 
                 }
