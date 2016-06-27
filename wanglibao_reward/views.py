@@ -951,7 +951,7 @@ class CheFangDaiAPIView(APIView):
             for res in rewards:
                 #好运榜数据
                 res_content = {}
-                seconds =(datetime.now()-datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
+                seconds =(datetime.datetime.now()-datetime.datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
                 res_content['phone']=res.user.wanglibaouserprofile.phone
                 res_content['time']=seconds
                 if res.reward:
