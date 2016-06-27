@@ -2467,17 +2467,19 @@ class CheFangDaiProductView(TemplateView):
         rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
         rewards_list = {}
         if rewards:
+            res_list = []
             for res in rewards:
                 #好运榜数据
-                res_content = []
+                res_content = {}
                 seconds =(datetime.now()-datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
-                res_content.append(res.user.wanglibaouserprofile.phone)
-                res_content.append(seconds)
+                res_content['phone']=res.user.wanglibaouserprofile.phone
+                res_content['time']=seconds
                 if res.reward:
-                    res_content.append(res.reward.content)
+                    res_content['name']=res.reward.content
                 else:
-                    res_content.append(res.redpack_event.name)
-            rewards_list['luck_list'] = res_content
+                    res_content['name']=res.redpack_event.name
+                res_list.append(res_content)
+            rewards_list['luck_list'] = res_list
         if not self.request.user.is_authenticated():
             json_to_response = {
                 'ret_code': 1000,
@@ -2540,17 +2542,19 @@ class CheFangDaiProductAPPView(TemplateView):
         rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
         rewards_list = {}
         if rewards:
+            res_list = []
             for res in rewards:
                 #好运榜数据
-                res_content = []
+                res_content = {}
                 seconds =(datetime.now()-datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
-                res_content.append(res.user.wanglibaouserprofile.phone)
-                res_content.append(seconds)
+                res_content['phone']=res.user.wanglibaouserprofile.phone
+                res_content['time']=seconds
                 if res.reward:
-                    res_content.append(res.reward.content)
+                    res_content['name']=res.reward.content
                 else:
-                    res_content.append(res.redpack_event.name)
-            rewards_list['luck_list'] = res_content
+                    res_content['name']=res.redpack_event.name
+                res_list.append(res_content)
+            rewards_list['luck_list'] = res_list
         if not self.request.user.is_authenticated():
             json_to_response = {
                 'ret_code': 1000,
