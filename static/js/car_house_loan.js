@@ -114,7 +114,7 @@
             if(json.luck_list.length>0){
                 var rankingList = [];
                 var json_one;
-                for(var i=0; i<json.luck_list.length; i++){
+                for(var i=0; i<8; i++){
                     json_one = json.luck_list[i];
 
                     var this_time = json_one.time;
