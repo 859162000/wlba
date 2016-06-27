@@ -922,7 +922,7 @@ class CheFangDaiUserInfoAPIView(APIView):
         """获取加息券"""
         event = None
         result_no = 0
-        if p2p_amount>=100 and p2p_amount<10000:
+        if p2p_amount>=1000 and p2p_amount<10000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券0.8%')
             result_no = 1
         if p2p_amount>=30000 and p2p_amount<50000:
@@ -1008,10 +1008,12 @@ class CheFangDaiUserInfoAPIView(APIView):
                 'rewards_list': rewards_list
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        redpack_event, result_no = self.get_redpack_event(reward_record.p2p_amount)
         count = user_reward.count()
         mes = u'当前您拥有%s次抽奖机会' % count
         json_to_response = {
              'ret_code': 0,
+             'result_no': result_no,
              'message': mes, #拥有抽奖机会次数
              'rewards_list': rewards_list #好运榜
          }
@@ -1027,9 +1029,11 @@ class CheFangDaiAPIView(APIView):
         """获取加息券"""
         event = None
         result_no = 0
-        if p2p_amount>=100 and p2p_amount<10000:
+        if p2p_amount>=1000 and p2p_amount<10000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券0.8%')
             result_no = 1
+        if p2p_amount>=10000 and p2p_amount<30000:
+            result_no = 0
         if p2p_amount>=30000 and p2p_amount<50000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
             result_no = 2
