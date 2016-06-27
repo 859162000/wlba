@@ -108,6 +108,7 @@ urlpatterns = patterns(
     url(r'^ihaomu/$', TemplateView.as_view(template_name="ihaomu.jade")),
     url(r"^chefangdai/$", CheFangDaiProductView.as_view()),
     url(r"^chefangdaiapp/$", CheFangDaiProductAPPView.as_view()),
+    
 )
 
 # app URL
