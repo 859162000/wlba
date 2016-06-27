@@ -295,7 +295,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1002') {
-                                        $('.luck_title_wrap dl dt').text(data.message);
+                                        $('.section_2 .big_title').text(data.message);
                                         $('.luck_title_wrap').show();
                                         $('.popup_wrap dl').show();
                                         $('.popup_text').hide();
@@ -309,6 +309,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                         ranking_list(data.rewards_list);
                                     }
                                     if(data.ret_code=='1000') {
+                                        $('.section_2 .big_title').text(data.message);
                                         $('.popup_text').hide();
                                         $('.popup_wrap dl').show();
                                         $('.popup_button').text('马上去');
@@ -321,8 +322,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                         ranking_list(data.rewards_list);
                                     }
                                     if(data.ret_code=='1001') {
-                                        $('.luck_title_wrap dl dt').text(data.message);
-                                        $('.luck_title_wrap dl dd').hide();
+                                        $('.section_2 .big_title').text(data.message);
                                         $('.popup_wrap dl').show();
                                         $('.popup_button').text('马上去');
                                         $('.popup_button').click(function(){
@@ -334,7 +334,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                     }
                                     if(data.ret_code=='0') {
 
-                                        $('.luck_title_wrap dl dt').text(data.message);
+
+                                            $('.section_2 .big_title').text(data.message);
                                             var speed = 100;//速度
                                             var time = "";//创建一个定时器
                                               $(function () {
@@ -392,6 +393,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     login = true;
                     connect(data)
 
+
                 }
 
             })
@@ -410,23 +412,24 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             type: 'post',
             success: function (data) {
                 if(data.ret_code=='1002') {
-                    $('.luck_title_wrap dl dt').text(data.message);
+                     $('.section_2 .big_title').text(data.message);
                     no_choujiang();
                     ranking_list(data.rewards_list);
                 }
                 if(data.ret_code=='1000') {
+                     $('.section_2 .big_title').text(data.message);
                     no_denglu();
                     ranking_list(data.rewards_list);
                 }
                 if(data.ret_code=='1001') {
-                    $('.luck_title_wrap dl dt').text(data.message);
-                    $('.luck_title_wrap dl dd').hide();
+                     $('.section_2 .big_title').text(data.message);
                     no_denglu();
                 }
                 if(data.ret_code=='0') {
-                    $('.luck_title_wrap dl dt').text(data.message);
+                     $('.section_2 .big_title').text(data.message);
                     choujiang(data.content,data.result_no);
                 }
+
 
             }
         })
