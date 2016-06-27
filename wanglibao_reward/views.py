@@ -1104,7 +1104,6 @@ class CheFangDaiAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         user_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='cfd', has_sent=False)
-        count = user_reward.count()
         reward_record = user_reward.first()
         logger.debug("reward_record:%s" % (reward_record,))
         if reward_record == None:
@@ -1158,7 +1157,7 @@ class CheFangDaiAPIView(APIView):
                 "content": send_msg,
                 "mtype": "activity"
             })
-            
+            count = user_reward.count() - 1
             mes = u'当前您拥有%s次抽奖机会' % count
             json_to_response = {
                 'ret_code': 0,
