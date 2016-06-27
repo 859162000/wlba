@@ -6,7 +6,7 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/car_house_loan.css?v=2016062401")
+        link(rel="stylesheet",href="/static/styles/pc_activity/car_house_loan.css?v=2016062701")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
@@ -122,38 +122,17 @@ html.no-js(lang="en-gb")
                             dl
                                 dt 当前拥有1次抽奖机会
                                 dd!='投资指定产品，获得更多抽奖机会<a href="/p2p/list/">马上去</a>'
-
+                        .luck_title_denglu
+                            p 您还未登陆
+                            a(href='/accounts/login/?next=/activity/chefangdai/') 马上登陆
+                        .no_ranking 暂无中奖记录
                         .ranking
                             .ranking_title 好运榜
                             ul.ranking_list
-                                li
-                                    span.one 186****1234
-                                    span.two 获得 1.8%加息券
-                                    span.three 13秒前
-                                li
-                                    span.one 186****1234
-                                    span.two 获得 1.8%加息券
-                                    span.three 13秒前
-                                li
-                                    span.one 186****1234
-                                    span.two 获得 1.8%加息券
-                                    span.three 13秒前
-                                li
-                                    span.one 186****1234
-                                    span.two 获得 1.8%加息券
-                                    span.three 13秒前
-                                li
-                                    span.one 186****1234
-                                    span.two 获得 1.8%加息券
-                                    span.three 13秒前
-                                li
-                                    span.one 186****1234
-                                    span.two 获得 1.8%加息券
-                                    span.three 13秒前
-                                li
-                                    span.one 186****1234
-                                    span.two 获得 1.8%加息券
-                                    span.three 13秒前
+                                //li
+                                //    span.one 186****1234
+                                //    span.two 获得 1.8%加息券
+                                //    span.three 13秒前
                     .clear
                     .rule_wrap
                         dl
@@ -268,12 +247,12 @@ html.no-js(lang="en-gb")
                 .popup_bg
                 .popup_box
                     img.close_ico(src='/static/imgs/mobile_activity/app_car_house_loan/close.png')
-                    p.popup_text 恭喜获得1.8%加息券
+                    p.popup_text
                     dl
-                        dt 您暂时还没有抽奖机会哦~
-                        dd 马上投资指定产品，获得更多抽奖机会！
+                        dt
+                        dd
                         .popup_button 继续抽奖
         include global/g_footer
 script.
-    require(['/static/js/car_house_loan.js?v=2016061601'])
+    require(['/static/js/car_house_loan.js?v=2016062701'])
 
