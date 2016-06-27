@@ -16,10 +16,10 @@ html(style="background: #f5f5f5")
                 .banner
                     img(src='/static/imgs/mobile_activity/app_car_house_loan/banner_1.png')
                     .banner_text
-                        span 活动时间：2016年6月27日—7月3日
+                        span 活动时间：2016年6月29日—7月5日
 
                 .big_title “车房”专享福利大放送
-                .small_title 活动时间：2016年6月27日-7月3日
+                .small_title 活动时间：2016年6月29日-7月5日
                 .insert_text
                     span 车房贷推荐：
                     a(href="#") 更多>>
@@ -65,8 +65,8 @@ html(style="background: #f5f5f5")
                             em.section-hui {{product.period}}
                             |{{product.pay_method|period_unit}}
                           .time-tit 投资期限
-                        //.body-num
-                        //    span {{product.total_amount | money_format_int}}
+                        .body-num
+                            span {{product.total_amount | money_format_int}}
 
                       .body-right
                         if btnClass == 'btn-blue'
@@ -294,7 +294,7 @@ html(style="background: #f5f5f5")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper_new_min.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_car_house_loan.js?v=2016062701")
+        script(src="/static/scripts/mobile_activity/app_car_house_loan.js?v=2016062703")
 
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,

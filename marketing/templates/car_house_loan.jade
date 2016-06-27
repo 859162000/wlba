@@ -14,12 +14,12 @@ html.no-js(lang="en-gb")
             .banner
                 .banner_main
                     .text_1 走进优质资产系列专题之
-                    .text_2 活动时间：2016年6月27日—7月3日
+                    .text_2 活动时间：2016年6月29日—7月5日
             .section.section_white.section_1
                 .section_main
                     .big_title “车房” 专享福利大放送
                     .big_title_line
-                    .small_title 活动时间：2016年6月27日—7月3日
+                    .small_title 活动时间：2016年6月29日—7月5日
                     .project_title
                         span 车房贷推荐：
                         a(href='/p2p/list/') 更多>>
@@ -31,7 +31,7 @@ html.no-js(lang="en-gb")
                                 earning_rate = str(product['expected_earning_rate'])
                                 .add_num {{earning_rate}}
                                     if product.activity
-                                        span.xunlei-vip-rate(title="{{product.activity.activity_name}}") + {{product.activity.activity_rule_percent_text}}%
+                                        span.xunlei-vip-rate(title="{{product.activity.activity_name}}")％ + {{product.activity.activity_rule_percent_text}}%
                                     else
                                         span.add_num_span %
                                 .project_data
@@ -254,5 +254,5 @@ html.no-js(lang="en-gb")
                         .popup_button 继续抽奖
         include global/g_footer
 script.
-    require(['/static/js/car_house_loan.js?v=2016062703'])
+    require(['/static/js/car_house_loan.js?v=2016062705'])
 

@@ -408,7 +408,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     function car_house_loan(){
         org.ajax({
-            url: '/api/activity/chefangdai/',
+            url: '/api/activity/chefangdaiuserinfo/',
             type: 'post',
             success: function (data) {
                 if(data.ret_code=='1002') {
@@ -435,6 +435,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         })
     }
 
+    
 
     $('.popup_wrap .close_ico').click(function(){
         $('.popup_wrap').hide();
@@ -527,8 +528,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 $('.popup_wrap dl').hide();
                 $('.popup_text').text(data_text).show();
                 $('.popup_button').text('继续抽奖');
+                $('.popup_wrap').show();
+                car_house_loan();
                 $('.popup_button').click(function(){
-                    car_house_loan();
                     $('.popup_wrap ').hide();
 
                 });
