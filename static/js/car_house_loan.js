@@ -179,7 +179,7 @@
 
             var speed = 100;//速度
             var time = "";//创建一个定时器
-
+            $('.popup_text').text(data_text);
 
                 $(".choujiang").click(function() {//触发事件
                   $.ajax({
@@ -187,7 +187,7 @@
                     type: 'post',
                     success: function (data) {
                         if (data.ret_code == '0') {
-                            $('.popup_text').text(data.content);
+
                         }else{
                             $('.popup_text').text('网络错误');
                         }
