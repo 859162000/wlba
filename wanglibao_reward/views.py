@@ -922,6 +922,7 @@ class CheFangDaiUserInfoAPIView(APIView):
         """获取加息券"""
         event = None
         result_no = 0
+        name = ''
         if p2p_amount>=1000 and p2p_amount<10000:
             name = '人人都爱车房贷加息券0.8%'
             result_no = 1
