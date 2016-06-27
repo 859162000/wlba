@@ -72,7 +72,7 @@
 
 
                             org.ajax({
-                                url: '/api/activity/chefangdai/',
+                                url: '/api/activity/chefangdaiuserinfo/',
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1002') {
@@ -117,14 +117,30 @@
 
 
                                             $('.section_2 .big_title').text(data.message);
+                                            function choujiang(data_text,result_no){
+
                                             var speed = 100;//速度
                                             var time = "";//创建一个定时器
-                                              $(function () {
+
+
                                                 $(".choujiang").click(function() {//触发事件
-                                                  $("#msgBox").fadeOut();
+                                                  org.ajax({
+                                                    url: '/api/activity/chefangdai/',
+                                                    type: 'post',
+                                                    success: function (data) {
+                                                        if (data.ret_code == '0') {
+                                                            $('.popup_text').text(data.content);
+                                                        }else{
+                                                            $('.popup_text').text('网络错误');
+                                                        }
+                                                    }
+                                                  })
+
                                                   doIt(1,1)//直接传入初始化参数，防止再次点击位置不对
+
                                                 });
-                                              });
+
+
                                               function doIt(t,i){//执行循环主方法
                                                 time = setInterval(function () {
                                                   i++;
@@ -138,19 +154,20 @@
                                                 //console.log(t);
                                                 //console.log(i);
                                                 if (t == 3) {
-                                                  if (i == data.result_no) {//此处的i为设定的中奖位置，也可用ajax去请求获得
+                                                  if (i == result_no) {//此处的i为设定的中奖位置，也可用ajax去请求获得
                                                     clearInterval(time);
                                                     $('.popup_wrap dl').hide();
-                                                    $('.popup_text').text(data.content).show();
+                                                    $('.popup_text').show();
                                                     $('.popup_button').text('继续抽奖');
-                                                    $('.popup_button').click(function(){
-                                                        app_car_house_loan();
-                                                        $('.popup_wrap ').hide();
+                                                    $('.popup_wrap').show();
 
+                                                    $('.popup_button').click(function(){
+                                                        $('.popup_wrap ').hide();
+                                                        app_car_house_loan();
                                                     });
                                                   }
-
                                                 }
+                                              }
                                         }
 
 
@@ -283,41 +300,55 @@
     }
 
     function choujiang(data_text,result_no){
-        var speed = 100;//速度
-        var time = "";//创建一个定时器
-          $(function () {
-            $(".choujiang").click(function() {//触发事件
-              $("#msgBox").fadeOut();
-              doIt(1,1)//直接传入初始化参数，防止再次点击位置不对
-            });
-          });
-          function doIt(t,i){//执行循环主方法
-            time = setInterval(function () {
-              i++;
-              if (i > 8) {i = 1;t++;}
-              $(".cj").removeClass("cur");
-              $("#cj"+i).addClass("cur");
-              getLb(t,i);
-            }, speed);
-          }
-          function getLb(t,i){//中奖之后的处理
-            //console.log(t);
-            //console.log(i);
-            if (t == 3) {
-              if (i == result_no) {//此处的i为设定的中奖位置，也可用ajax去请求获得
-                clearInterval(time);
-                $('.popup_wrap dl').hide();
-                $('.popup_text').text(data_text).show();
-                $('.popup_button').text('继续抽奖');
-                $('.popup_wrap').show();
-                car_house_loan();
-                $('.popup_button').click(function(){
-                    $('.popup_wrap ').hide();
+
+            var speed = 100;//速度
+            var time = "";//创建一个定时器
+
+
+                $(".choujiang").click(function() {//触发事件
+                  org.ajax({
+                    url: '/api/activity/chefangdai/',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.ret_code == '0') {
+                            $('.popup_text').text(data.content);
+                        }else{
+                            $('.popup_text').text('网络错误');
+                        }
+                    }
+                  })
+                  doIt(1,1)//直接传入初始化参数，防止再次点击位置不对
 
                 });
+
+
+              function doIt(t,i){//执行循环主方法
+                time = setInterval(function () {
+                  i++;
+                  if (i > 8) {i = 1;t++;}
+                  $(".cj").removeClass("cur");
+                  $("#cj"+i).addClass("cur");
+                  getLb(t,i);
+                }, speed);
               }
-            }
-          }
+              function getLb(t,i){//中奖之后的处理
+                //console.log(t);
+                //console.log(i);
+                if (t == 3) {
+                  if (i == result_no) {//此处的i为设定的中奖位置，也可用ajax去请求获得
+                    clearInterval(time);
+                    $('.popup_wrap dl').hide();
+                    $('.popup_text').show();
+                    $('.popup_button').text('继续抽奖');
+                    $('.popup_wrap').show();
+
+                    $('.popup_button').click(function(){
+                        $('.popup_wrap ').hide();
+                        car_house_loan();
+                    });
+                  }
+                }
+              }
         }
 
     var swiper_1 = new Swiper('.swiper1', {
