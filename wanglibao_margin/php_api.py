@@ -303,6 +303,8 @@ class YueLiBaoBuy(APIView):
                 amount=amount,
                 amount_source=amount_source,
                 red_packet=red_packet,
+                cancel_status=False,
+                trade_status='NEW',
                 red_packet_type=red_packet_type,
             )
             device = utils.split_ua(self.request)
@@ -369,7 +371,7 @@ class YueLiBaoBuyFail(APIView):
 
                     # 增加回退红包接口
                     php_redpack_restore(product.id, product_id, product.amount, user)
-                    logger.info('purchase failed and restore red_pack. month_product_id = {},\n'.format(product_id))
+                    logger.info('purchase failed and restore red_pack. token = {},\n'.format(token))
 
             ret.update(status=1,
                        msg='success')
@@ -398,11 +400,13 @@ class YueLiBaoBuyStatus(APIView):
         product = MonthProduct.objects.filter(token=token).first()
 
         if not product:
-            ret.update(status=-1, msg='trade does not exist!')
+            ret.update(status=0, msg='trade does not exist!')
         elif product.trade_status == 'NEW':
             ret.update(status=1, msg='processing!')
-        elif product.trade_status == 'PAID':
+        elif product.trade_status == 'PAID' and not product.cancel_status:
             ret.update(status=2, msg='success!')
+        elif product.trade_status == 'PAID' and product.cancel_status:
+            ret.update(status=0, msg='canceled!')
         else:
             ret.update(status=0,
                        msg='pay failed!')
@@ -432,6 +436,10 @@ class YueLiBaoCheck(APIView):
                     product_id=product_id, cancel_status=False, trade_status='PAID')
 
                 for product in month_products:
+                    if product.red_packet == -1:
+                        product.red_packet = 0
+                        product.save()
+                        continue
                     if product.settle_status:
                         logger.info(u'该条记录已审核: product = {}, 这是重复请求, product_id = {}'.
                                     format(product.id, product_id))
@@ -445,7 +453,7 @@ class YueLiBaoCheck(APIView):
                     buyer_keeper.php_settle(product.amount_source, description=u'月利宝满标审核')
 
                 # 进行全民淘金数据写入
-                try :
+                try:
                     calc_php_commission(product_id, period)
                     logger.info(u'period = {}, 全民淘金数据写入: {}\n'.format(period, product_id))
                 except Exception, ex:
@@ -547,12 +555,12 @@ class YueLiBaoRefund(APIView):
         ret = dict()
 
         args = request.POST.get('args')
-        logger.info('in YueLiBaoRefund, args = '.format(args))
+        logger.info('in YueLiBaoRefund!')
 
         try:
             with transaction.atomic(savepoint=True):
                 for arg in eval(args):
-                    user = User.objects.get(pk=arg['userId'])
+                    user = User.objects.filter(pk=arg['userId']).first()
 
                     margin_record = MarginRecord.objects.filter(
                         # # (Q(catalog=u'月利宝本金入账') | Q(catalog=u'债转本金入账')) &
@@ -582,15 +590,18 @@ class YueLiBaoRefund(APIView):
                         except Exception, e:
                             ret.update(status=0,
                                        msg=e.message)
-                            logger.debug('in YueLiBaoRefund error = {}\n'.format(e.message))
+                            logger.debug('in YueLiBaoRefund, refund_id = {}, userId = {}, error = {}\n'.format(
+                                    arg['refundId'], arg['userId'], e.message))
                             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
                 ret.update(status=1,
                            msg=msg_list)
 
         except Exception, e:
+            logger.exception('in YueLiBaoRefund, error = {}\n'.format(e.message))
             ret.update(status=0,
                        msg=e.message)
+        logger.info('refund processed, return = {}\n'.format(ret))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
