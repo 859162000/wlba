@@ -7,8 +7,8 @@ html(style="background: #f5f5f5")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_car_house_loan.css?v=2016062401", rel="stylesheet")
-        - csrf_token
+        link(href="/static/styles/mobile_activity/app_car_house_loan.css?v=2016062701", rel="stylesheet")
+        -csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
         .body_wrap.clear
@@ -65,8 +65,8 @@ html(style="background: #f5f5f5")
                             em.section-hui {{product.period}}
                             |{{product.pay_method|period_unit}}
                           .time-tit 投资期限
-                        .body-num
-                            span {{product.total_amount | money_format_int}}
+                        //.body-num
+                        //    span {{product.total_amount | money_format_int}}
 
                       .body-right
                         if btnClass == 'btn-blue'
@@ -85,7 +85,7 @@ html(style="background: #f5f5f5")
                     dt 活动期间购买 “好车盈”和“好房赚”两款专属产品，
                     dd 单笔投资≥1000元可获得一次抽奖机会。
             .section.section_2
-                .big_title 当前抽奖机会：1
+                .big_title
                 .horn
                     img(src='/static/imgs/mobile_activity/app_car_house_loan/horn_icon.png')
                     span 186****1234获得1.8%加息券
@@ -286,15 +286,15 @@ html(style="background: #f5f5f5")
             .popup_wrap(style='display:none')
                 .popup_box
                     img.close_ico(src='/static/imgs/mobile_activity/app_car_house_loan/close.png')
-                    p.popup_text 恭喜获得1.8%加息券
+                    p.popup_text
                     dl
-                        dt 您暂时还没有抽奖机会哦~
-                        dd 马上投资指定产品，获得更多抽奖机会！
-                        .popup_button 继续抽奖
+                        dt
+                        dd
+                        .popup_button
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper_new_min.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_car_house_loan.js?v=2016062201")
+        script(src="/static/scripts/mobile_activity/app_car_house_loan.js?v=2016062701")
 
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
