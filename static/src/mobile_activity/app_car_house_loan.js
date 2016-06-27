@@ -189,7 +189,7 @@
 
     function car_house_loan(){
         org.ajax({
-            url: '/api/activity/chefangdai/',
+            url: '/api/activity/chefangdaiuserinfo/',
             type: 'post',
             success: function (data) {
                 if(data.ret_code=='1002') {
@@ -215,6 +215,7 @@
             }
         })
     }
+
 
 
     $('.popup_wrap .close_ico').click(function(){
