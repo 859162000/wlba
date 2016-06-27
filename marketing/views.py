@@ -2480,13 +2480,6 @@ class CheFangDaiProductView(TemplateView):
                     res_content['name']=res.redpack_event.name
                 res_list.append(res_content)
             rewards_list['luck_list'] = res_list
-        if not self.request.user.is_authenticated():
-            json_to_response = {
-                'ret_code': 1000,
-                'message': u'您还没有登陆',
-                'rewards_list': rewards_list
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
         p2p_products = []
         haofang = P2PProduct.objects.filter(name__contains='好房').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
@@ -2500,12 +2493,12 @@ class CheFangDaiProductView(TemplateView):
         if haoche:
             p2p_products.extend(cache_backend.get_p2p_list_from_objects([haoche]))
         
-        count = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='cfd', has_sent=False).count()
+        #count = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='cfd', has_sent=False).count()
         
         return {
             'p2p_products': p2p_products,
             'rewards_list': rewards_list,
-            'count': count,
+            #'count': count,
         }
     
 class CheFangDaiProductAPPView(TemplateView):
@@ -2555,13 +2548,6 @@ class CheFangDaiProductAPPView(TemplateView):
                     res_content['name']=res.redpack_event.name
                 res_list.append(res_content)
             rewards_list['luck_list'] = res_list
-        if not self.request.user.is_authenticated():
-            json_to_response = {
-                'ret_code': 1000,
-                'message': u'您还没有登陆',
-                'rewards_list': rewards_list
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
         p2p_products = []
         haofang = P2PProduct.objects.filter(name__contains='好房').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
@@ -2575,12 +2561,12 @@ class CheFangDaiProductAPPView(TemplateView):
         if haoche:
             p2p_products.extend(cache_backend.get_p2p_list_from_objects([haoche]))
         
-        count = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='cfd', has_sent=False).count()
+        #count = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='cfd', has_sent=False).count()
         
         return {
             'p2p_products': p2p_products,
             'rewards_list': rewards_list,
-            'count': count,
+            #'count': count,
         }
 
 class NoConfigException(Exception):

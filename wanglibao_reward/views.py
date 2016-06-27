@@ -921,27 +921,29 @@ class CheFangDaiAPIView(APIView):
     def get_redpack_event(self, p2p_amount):
         """获取加息券"""
         event = None
+        result_no = 0
         if p2p_amount>=100 and p2p_amount<10000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券0.8%')
-        
+            result_no = 1
         if p2p_amount>=30000 and p2p_amount<50000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
-        
+            result_no = 2
         if p2p_amount>=30000 and p2p_amount<80000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
-            
+            result_no = 2
         if p2p_amount>=80000 and p2p_amount<150000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.2%')
-        
+            result_no = 3
         if p2p_amount>=150000 and p2p_amount<200000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.5%')
-            
+            result_no = 4
         if p2p_amount>=200000 and p2p_amount<300000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.8%')
-        
+            result_no = 5
         if p2p_amount>=300000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券2.0%')
-        return event
+            result_no = 6
+        return event, result_no
     
     def post(self, request):
         rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
@@ -1008,18 +1010,21 @@ class CheFangDaiAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
-        redpack_event = self.get_redpack_event(reward_record.p2p_amount)
+        redpack_event, result_no = self.get_redpack_event(reward_record.p2p_amount)
         send_msg = ''
+        content = ''
         try:
             with transaction.atomic():
                 if reward_record.p2p_amount>=10000 and reward_record.p2p_amount<30000:
                     #满足条件发迅雷会员
-                    reward = Reward.objects.select_for_update().filter(type='1年迅雷白金会员', is_used=False).first()
+                    reward = Reward.objects.select_for_update().filter(type='1年迅雷会员', is_used=False).first()
                     if reward:
                         reward.is_used = True
                         reward.save()
                         reward_record.reward = reward
                         send_msg = u'恭喜您获得一年迅雷会员，请在站内信中进行查看，感谢您的参与'
+                        content = '一年迅雷会员'
+                        result_no = 0
                     else:
                         pass
                 else:
@@ -1027,6 +1032,7 @@ class CheFangDaiAPIView(APIView):
                     redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
                     reward_record.redpack_event = redpack_event
                     send_msg = u'恭喜您获得%s加息券，已经存入您的账户，请登录网利宝账户进行查看，感谢您的参与' % redpack_event.name
+                    content = redpack_event.name
 
                 reward_record.has_sent = True
                 reward_record.left_time = 0
@@ -1051,8 +1057,10 @@ class CheFangDaiAPIView(APIView):
             mes = u'当前您拥有%s次抽奖机会' % count
             json_to_response = {
                 'ret_code': 0,
-                'message': mes,
-                'rewards_list': rewards_list
+                'message': mes, #拥有抽奖机会次数
+                "content": content, #抽奖结果
+                "result_no": result_no,  #中奖序号
+                'rewards_list': rewards_list #好运榜
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
