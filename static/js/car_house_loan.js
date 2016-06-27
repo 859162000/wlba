@@ -49,29 +49,77 @@
                 }
             });
 
-        //$.ajax({
-            //url: '/api/activity/chefangdai/',
-            //type: 'post',
-            //success: function (data) {
-                ////if(data.ret_code=='1000'){
-                ////    window.location.href = '/accounts/login/?promo_token=sy&next=/activity/august_phone/?promo_token=sy'
-                ////}else if(data.ret_code=='1'||data.ret_code=='1001'||data.ret_code=='1002'){
-                ////    $('.popup_box .main .textairport').text(''+data.message+'');
-                ////    $('.popup_box').show();
-                ////}else if(data.ret_code=='0'){
-                ////    if(data.tag=='标记成功'){
-                ////        window.location.href = '/p2p/list/?promo_token=sy'
-                ////    }else{
-                ////        $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
-                ////        $('.popup_box').show();
-                ////    }
-                ////}
-                //$('.luck_title_wrap dl dt').text(data.message);
-                //for(var i=0;i<data.rewards_list.luck_list.length;i++){
-                    //alert(data.rewards_list.luck_list[i][1]);
+        $.ajax({
+            url: '/api/activity/chefangdai/',
+            type: 'post',
+            success: function (data) {
+                //if(data.ret_code=='1000'){
+                //    window.location.href = '/accounts/login/?promo_token=sy&next=/activity/august_phone/?promo_token=sy'
+                //}else if(data.ret_code=='1'||data.ret_code=='1001'||data.ret_code=='1002'){
+                //    $('.popup_box .main .textairport').text(''+data.message+'');
+                //    $('.popup_box').show();
+                //}else if(data.ret_code=='0'){
+                //    if(data.tag=='标记成功'){
+                //        window.location.href = '/p2p/list/?promo_token=sy'
+                //    }else{
+                //        $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                //        $('.popup_box').show();
+                //    }
                 //}
-            //}
-        //})
+                $('.luck_title_wrap dl dt').text(data.message);
+                ranking_list(data.rewards_list);
+            }
+        })
+
+        function switch_time(time){
+            var this_time;
+            if(time>=86400){
+                this_time = time/86400+'天'
+            }else if(time>=3600){
+                this_time = time/3600+'小时'
+            }else if(time>=60){
+                this_time = time/60+'分'
+            }else{
+                this_time = time+'秒'
+            }
+        }
+
+        alert(switch_time(500));
+
+        function ranking_list(json){
+            var rankingList = [];
+            var json_one;
+            for(var i=0; i<json.luck_list.length; i++){
+                json_one = json.luck_list[i];
+                if(json_one!=''){
+                    var number = fmoney(json_one.amount__sum, 0);
+                    if(i<3){
+                        if(i==0){
+                            rankingList.push(['<tr class="first">'].join(''));
+                        }else if(i==1){
+                            rankingList.push(['<tr class="second">'].join(''));
+                        }else if(i==2){
+                            rankingList.push(['<tr class="third">'].join(''));
+                        }
+                        rankingList.push(['<td class="one"><span class="ico"></span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">'].join(''));
+                        if(i==0){
+                            rankingList.push(['5张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                        }else if(i==1){
+                            rankingList.push(['3张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                        }else if(i==2){
+                            rankingList.push(['2张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                        }
+                    }else{
+                        var i_num = i+1;
+                        rankingList.push(['<tr><td class="one"><span class="ico">'+i_num+'</span><span class="phone">'+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'</span></td><td class="two">'+number+'元</td><td class="three">1张百元加油卡+2张星美电影票</td></tr>'].join(''));
+                    }
+
+                }else{
+                    rankingList.push(['<tr><td style="width:100%; text-align:center">虚位以待</td></tr>'].join(''));
+                }
+
+            }
+        }
 
         var speed = 100;//速度
         var time = "";//创建一个定时器
