@@ -248,8 +248,7 @@
       line-height: 46px
       font-size: 20px
       box-shadow: 3px 3px 5px #bcbcbc
-
-
+      cursor: pointer
 
     td.choujiang_td
       box-shadow: none
@@ -293,6 +292,7 @@
       right: 0
       width: 325px
       top: 15px
+      display: none
       dl
         dt
           font-size: 30px
@@ -304,6 +304,40 @@
           color: #585757
           a
             color: #fc6722
+    .luck_title_denglu
+
+      position: absolute
+      right: 0
+      width: 325px
+      top: 15px
+      display: none
+
+      p
+        font-size: 30px
+        line-height: 46px
+        color: #585757
+        text-align: center
+
+      a
+        font-size: 17px
+        border: 1px #fc6722 solid
+        color: #fc6722
+        border-radius: 5px
+        display: block
+        line-height: 26px
+        margin: 0 auto
+        text-align: center
+        width: 80px
+    .no_ranking
+      position: absolute
+      right: 0
+      text-align: center
+      font-size: 16px
+      color: #ccc
+      line-height: 38px
+      width: 325px
+      bottom: 50px
+      display: none
 
 
     .ranking
@@ -312,7 +346,7 @@
       bottom: 10px
 
 
-      display: block
+      display: none
       .ranking_title
         font-size: 16px
         color: #fc6722
@@ -323,8 +357,9 @@
 
       .ranking_list
         width: 100%
+
         li
-          font-size: 15px
+          font-size: 12px
           color: #585757
           line-height: 22px
           span
@@ -334,9 +369,9 @@
             float: left
 
           span.one
-            width: 100px
+            width: 80px
           span.two
-            width: 155px
+            width: 175px
           span.three
             width: 70px
 
@@ -612,6 +647,8 @@
         width: 24px
         height: 24px
         display: block
+        cursor: pointer
+
       dl
         width: 100%
         text-align: center
@@ -620,7 +657,8 @@
           line-height: 26px
           color: #585757
         dd
-          font-size: 18px
+          font-size: 16px
+
           line-height: 26px
           color: #585757
       p.popup_text
