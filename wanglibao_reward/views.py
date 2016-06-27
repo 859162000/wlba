@@ -923,27 +923,30 @@ class CheFangDaiUserInfoAPIView(APIView):
         event = None
         result_no = 0
         if p2p_amount>=1000 and p2p_amount<10000:
-            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券0.8%')
+            name = '人人都爱车房贷加息券0.8%'
             result_no = 1
+        if p2p_amount>=10000 and p2p_amount<30000:
+            name = '一年迅雷会员'
+            result_no = 0
         if p2p_amount>=30000 and p2p_amount<50000:
-            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
+            name = '人人都爱车房贷加息券1%'
             result_no = 2
         if p2p_amount>=30000 and p2p_amount<80000:
-            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
+            name = '人人都爱车房贷加息券1%'
             result_no = 2
         if p2p_amount>=80000 and p2p_amount<150000:
-            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.2%')
+            name = '人人都爱车房贷加息券1.2%'
             result_no = 3
         if p2p_amount>=150000 and p2p_amount<200000:
-            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.5%')
+            name = '人人都爱车房贷加息券1.5%'
             result_no = 4
         if p2p_amount>=200000 and p2p_amount<300000:
-            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.8%')
+            name = '人人都爱车房贷加息券1.8%'
             result_no = 5
         if p2p_amount>=300000:
-            event = RedPackEvent.objects.get(name='人人都爱车房贷加息券2.0%')
+            name = '人人都爱车房贷加息券2.0%'
             result_no = 6
-        return event, result_no
+        return name, result_no
     
     def post(self, request):
         rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
@@ -1008,11 +1011,12 @@ class CheFangDaiUserInfoAPIView(APIView):
                 'rewards_list': rewards_list
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        redpack_event, result_no = self.get_redpack_event(reward_record.p2p_amount)
+        name, result_no = self.get_redpack_event(reward_record.p2p_amount)
         count = user_reward.count()
         mes = u'当前您拥有%s次抽奖机会' % count
         json_to_response = {
              'ret_code': 0,
+             'content': name,
              'result_no': result_no,
              'message': mes, #拥有抽奖机会次数
              'rewards_list': rewards_list #好运榜
