@@ -100,6 +100,7 @@ def generate_bajinshe_product_data(product):
     product_total_amount = product.total_amount
     product_status = product.status
     pay_method = product.pay_method
+    product_category = product.category
     if pay_method == u'等额本息':
         pay_method_code = 3
     elif pay_method == u'按月付息':
@@ -110,6 +111,11 @@ def generate_bajinshe_product_data(product):
         pay_method_code = 2
     else:
         pay_method_code = 11
+
+    if product_category == u'新手标':
+        product_type = 5
+    else:
+        product_type = 2
 
     if product_status == u'正在招标':
         product_status_code = 1
@@ -134,7 +140,7 @@ def generate_bajinshe_product_data(product):
 
     product_data = {
         'pid': product.id,
-        'productType': 2,
+        'productType': product_type,
         'productName': product.name[:50],
         'apr': product.get_p2p_rate,
         'amount': product_total_amount,
