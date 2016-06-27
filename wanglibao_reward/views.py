@@ -932,7 +932,7 @@ class CheFangDaiUserInfoAPIView(APIView):
         if p2p_amount>=30000 and p2p_amount<50000:
             name = '人人都爱车房贷加息券1%'
             result_no = 2
-        if p2p_amount>=30000 and p2p_amount<80000:
+        if p2p_amount>=50000 and p2p_amount<80000:
             name = '人人都爱车房贷加息券1%'
             result_no = 2
         if p2p_amount>=80000 and p2p_amount<150000:
@@ -1042,7 +1042,7 @@ class CheFangDaiAPIView(APIView):
         if p2p_amount>=30000 and p2p_amount<50000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
             result_no = 2
-        if p2p_amount>=30000 and p2p_amount<80000:
+        if p2p_amount>=50000 and p2p_amount<80000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
             result_no = 2
         if p2p_amount>=80000 and p2p_amount<150000:
