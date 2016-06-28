@@ -73,7 +73,7 @@
                         })
                         function app_car_house_loan(){
 
-
+                            alert('app_car_house_loan');
                             org.ajax({
                                 url: '/api/activity/chefangdaiuserinfo/',
                                 type: 'post',
@@ -132,10 +132,14 @@
                                                     type: 'post',
                                                     success: function (data) {
                                                         if (data.ret_code == '0') {
+                                                            alert('success');
                                                             $('.popup_text').text(data.content);
                                                         }else{
                                                             $('.popup_text').text('网络错误');
                                                         }
+                                                    },
+                                                    error: function(data){
+                                                        alert('error');
                                                     }
                                                   })
 
@@ -168,12 +172,14 @@
                                                         app_car_house_loan();
                                                         $('.popup_wrap ').hide();
                                                         $(".choujiang").unbind('click');
+                                                        alert('转完');
 
                                                     });
                                                     $('.popup_wrap .close_ico').click(function(){
                                                         app_car_house_loan();
                                                         $(".choujiang").unbind('click');
                                                         $('.popup_wrap ').hide();
+                                                        alert('转完');
                                                     });
                                                   }
                                                 }

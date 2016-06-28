@@ -292,7 +292,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         })
                         function app_car_house_loan(){
 
-
+                            alert('app_car_house_loan');
                             org.ajax({
                                 url: '/api/activity/chefangdaiuserinfo/',
                                 type: 'post',
@@ -351,10 +351,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                                     type: 'post',
                                                     success: function (data) {
                                                         if (data.ret_code == '0') {
+                                                            alert('success');
                                                             $('.popup_text').text(data.content);
                                                         }else{
                                                             $('.popup_text').text('网络错误');
                                                         }
+                                                    },
+                                                    error: function(data){
+                                                        alert('error');
                                                     }
                                                   })
 
@@ -387,12 +391,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                                         app_car_house_loan();
                                                         $('.popup_wrap ').hide();
                                                         $(".choujiang").unbind('click');
+                                                        alert('转完');
 
                                                     });
                                                     $('.popup_wrap .close_ico').click(function(){
                                                         app_car_house_loan();
                                                         $(".choujiang").unbind('click');
                                                         $('.popup_wrap ').hide();
+                                                        alert('转完');
                                                     });
                                                   }
                                                 }
