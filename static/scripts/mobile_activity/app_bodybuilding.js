@@ -239,11 +239,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '“车房贷”福利专享大放送',
-			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
-			shareLink = host + '/activity/app_car_house_loan/?promo_token=xmdj2',
-			shareMainTit = '“车房贷”福利专享大放送',
-			shareBody = '平台专用车库对质押车7*24小时监管（附图），标准资产更放心！';
+			shareName = '网利宝携手小美到家0元请你做美容！',
+			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300*300.jpg',
+			shareLink = host + '/activity/app_pretty_reach_home/?promo_token=xmdj2',
+			shareMainTit = '网利宝携手小美到家0元请你做美容！',
+			shareBody = '召唤素颜美肌，赶紧来领！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -253,7 +253,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '“车房贷”福利专享大放送',
+			title: '网利宝携手小美到家0元请你做美容！',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -266,10 +266,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		})
 	})
 
+
     var login = false;
     wlb.ready({
         app: function (mixins) {
-            mixins.shareData({title: '“车房贷”福利专享大放送', content: '平台专用车库对质押车7*24小时监管（附图），标准资产更放心！'});
+            mixins.shareData({title: '网利宝携手小美到家0元请你做美容！', content: '召唤素颜美肌，赶紧来领！'});
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -287,333 +288,86 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         //    url += "?1";
                         //    self.location.replace(url);
                         //}
-                        $('.insert_text .right_link').click(function(){
-                            mixins.jumpToManageMoney();
-                        })
-                        function app_car_house_loan(){
 
-                            alert('app_car_house_loan');
+                        $('#take_prize,#take_prize_2').click(function() {
                             org.ajax({
-                                url: '/api/activity/chefangdaiuserinfo/',
+                                url: '/api/activity/xiaomei/',
                                 type: 'post',
                                 success: function (data) {
-                                    if(data.ret_code=='1002') {
-                                        $('.section_2 .big_title').text(data.message);
-                                        $('.luck_title_wrap').show();
-                                        $('.popup_wrap dl').show();
-                                        $('.popup_text').hide();
-                                        $('.popup_button').text('马上去');
-                                        $('.popup_button').click(function(){
-                                            mixins.jumpToManageMoney();
-                                        });
-                                        $('.choujiang').bind('click',function(){
-                                            $('.popup_wrap').show();
-                                        })
-                                        ranking_list(data.rewards_list);
+                                    if(data.ret_code=='1000'){
+                                        mixins.registerApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
+                                    }else if(data.ret_code=='1002'){
+                                        mixins.jumpToManageMoney();
+                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
+                                        $('.popup_box .main .textairport').text(''+data.message+'');
+                                        $('.popup_box').show();
+                                    }else{
+                                        $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                                        $('.popup_box').show();
                                     }
-                                    if(data.ret_code=='1000') {
-                                        $('.section_2 .big_title').text(data.message);
-                                        $('.popup_text').hide();
-                                        $('.popup_wrap dl').show();
-                                        $('.popup_button').text('马上去');
-                                        $('.popup_button').click(function(){
-                                            mixins.loginApp({refresh:1, url:'/activity/chefangdaiapp/'});
-                                        });
-                                        $('.choujiang').bind('click',function(){
-                                            $('.popup_wrap').show();
-                                        })
-                                        ranking_list(data.rewards_list);
-                                    }
-                                    if(data.ret_code=='1001') {
-                                        $('.section_2 .big_title').text(data.message);
-                                        $('.popup_wrap dl').show();
-                                        $('.popup_button').text('马上去');
-                                        $('.popup_button').click(function(){
-                                             mixins.loginApp({refresh:1, url:'/activity/chefangdaiapp/'});
-                                        });
-                                        $('.choujiang').bind('click',function(){
-                                            $('.popup_wrap').show();
-                                        })
-                                    }
-                                    if(data.ret_code=='0') {
-
-
-                                            $('.section_2 .big_title').text(data.message);
-                                            function app_choujiang(data_text,result_no){
-
-                                            var speed = 100;//速度
-                                            var time = "";//创建一个定时器
-
-
-                                                $(".choujiang").bind('click',function(){//触发事件
-                                                  org.ajax({
-                                                    url: '/api/activity/chefangdai/',
-                                                    type: 'post',
-                                                    success: function (data) {
-                                                        if (data.ret_code == '0') {
-                                                            alert('success');
-                                                            $('.popup_text').text(data.content);
-                                                        }else{
-                                                            $('.popup_text').text('网络错误');
-                                                        }
-                                                    },
-                                                    error: function(data){
-                                                        alert('error');
-                                                    }
-                                                  })
-
-                                                  doIt(1,1)//直接传入初始化参数，防止再次点击位置不对
-
-                                                });
-
-
-                                              function doIt(t,i){//执行循环主方法
-                                                time = setInterval(function () {
-                                                  i++;
-                                                  if (i > 8) {i = 1;t++;}
-                                                  $(".cj").removeClass("cur");
-                                                  $("#cj"+i).addClass("cur");
-                                                  getLb(t,i);
-                                                }, speed);
-                                              }
-                                              function getLb(t,i){//中奖之后的处理
-                                                //console.log(t);
-                                                //console.log(i);
-                                                if (t == 3) {
-                                                  if (i == result_no) {//此处的i为设定的中奖位置，也可用ajax去请求获得
-                                                    clearInterval(time);
-                                                    $('.popup_wrap dl').hide();
-                                                    $('.popup_text').show();
-                                                    $('.popup_button').text('继续抽奖');
-                                                    $('.popup_wrap').show();
-
-                                                    $('.popup_button').click(function(){
-                                                        app_car_house_loan();
-                                                        $('.popup_wrap ').hide();
-                                                        $(".choujiang").unbind('click');
-                                                        alert('转完');
-
-                                                    });
-                                                    $('.popup_wrap .close_ico').click(function(){
-                                                        app_car_house_loan();
-                                                        $(".choujiang").unbind('click');
-                                                        $('.popup_wrap ').hide();
-                                                        alert('转完');
-                                                    });
-                                                  }
-                                                }
-                                              }
-                                        }
-                                        app_choujiang(data.content,data.result_no);
-
-
-                                    }
-
-
-
                                 }
                             })
-                        }
-                        app_car_house_loan();
+                        })
                     }
                 })
             }
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
-
-
+                    $('#take_prize,#take_prize_2').click(function() {
+                        mixins.registerApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
+                    });
                 } else {
                     login = true;
                     connect(data)
 
-
                 }
-
             })
 
         },
         other: function(){
-
-            car_house_loan();
-
+            $('#take_prize,#take_prize_2').click(function() {
+                org.ajax({
+                    url: '/api/activity/xiaomei/',
+                    type: 'post',
+                    success: function (data) {
+                        if(data.ret_code=='1000'){
+                            window.location.href = '/weixin/regist/?promo_token=xmdj2&next=/activity/app_pretty_reach_home/?promo_token=xmdj2'
+                        }else if(data.ret_code=='1002'){
+                            window.location.href = '/weixin/list/?promo_token=xmdj2'
+                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
+                            $('.popup_box .main .textairport').text(''+data.message+'');
+                            $('.popup_box').show();
+                        }else{
+                            $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
+                            $('.popup_box').show();
+                        }
+                    }
+                })
+            })
         }
     })
 
-    function car_house_loan(){
-        $('.insert_text .right_link').click(function(){
-            window.location.href = '/weixin/list/'
-        });
+    $('.slideDown_button').on('click',function(){
+        var ele = $('.slideDown_box');
+        var curHeight = ele.height();
+        var autoHeight = ele.css('height', 'auto').height();
+        if (!ele.hasClass('down')){
+            $('.slideDown_button').addClass('open');
+            ele.height(curHeight).animate({height: autoHeight},500,function(){
+                ele.addClass('down');
 
-        org.ajax({
-            url: '/api/activity/chefangdaiuserinfo/',
-            type: 'post',
-            success: function (data) {
-                if(data.ret_code=='1002') {
-                     $('.section_2 .big_title').text(data.message);
-                    no_choujiang();
-                    ranking_list(data.rewards_list);
-                }
-                if(data.ret_code=='1000') {
-                     $('.section_2 .big_title').text(data.message);
-                    no_denglu();
-                    ranking_list(data.rewards_list);
-                }
-                if(data.ret_code=='1001') {
-                     $('.section_2 .big_title').text(data.message);
-                    no_denglu();
-                }
-                if(data.ret_code=='0') {
-                     $('.section_2 .big_title').text(data.message);
-                    choujiang(data.content,data.result_no);
-                }
+            });
+        }else{
+            $('.section_5_box p span').removeClass('open');
+            ele.height(curHeight).animate({height: 0},500,function(){
+                ele.removeClass('down');
 
-
-            }
-        })
-    }
-
-
-
-    $('.popup_wrap .close_ico').click(function(){
-        $('.popup_wrap').hide();
+            });
+        }
     });
 
-    function no_choujiang(){
-        $('.luck_title_wrap').show();
-        $('.popup_wrap dl dt').text('您暂时还没有抽奖机会哦~');
-        $('.popup_wrap dl dd').text('马上投资指定产品，获得更多抽奖机会！！');
-        $('.popup_wrap dl').show();
-        $('.popup_text').hide();
-        $('.popup_button').text('马上去');
-        $('.popup_button').click(function(){
-            window.location.href = '/weixin/list/'
-        });
-        $('.choujiang').bind('click',function(){
-            $('.popup_wrap').show();
-        })
-    }
-
-
-    function no_denglu(){
-        $('.popup_text').hide;
-        $('.popup_wrap dl dt').text('您还未登陆！');
-        $('.popup_wrap dl dd').text('请登录后查看抽奖机会！');
-        $('.popup_wrap dl').show();
-        $('.popup_button').text('马上去');
-        $('.popup_button').click(function(){
-            window.location.href = '/weixin/login/?next=/activity/chefangdaiapp/'
-        });
-        $('.choujiang').bind('click',function(){
-            $('.popup_wrap').show();
-        })
-    }
-
-
-
-    function ranking_list(json){
-
-        if(json.luck_list.length>0){
-            var rankingList = [];
-            var json_one;
-            for(var i=0; i<1; i++){
-                json_one = json.luck_list[i];
-
-                var this_time = json_one.time;
-                if(this_time>='86400'){
-                    this_time = parseInt(this_time/86400)+'天'
-                }else if(this_time>='3600'){
-                    this_time = parseInt(this_time/3600)+'小时'
-                }else if(this_time>='60'){
-                    this_time = parseInt(this_time/60)+'分'
-                }else{
-                    this_time = parseInt(this_time)+'秒'
-                }
-
-                rankingList.push([''+json_one.phone.substring(0,3)+'****' +json_one.phone.substr(json_one.phone.length-4) +'获得'+json_one.name+''].join(''));
-
-            }
-            $('.horn span').html(rankingList.join(''));
-            $('.horn').show();
-        }else{
-
-            $('.horn').hide();
-        }
-    }
-
-    var no_repeat_click = true;
-    function choujiang(data_text,result_no){
-
-            var speed = 100;//速度
-            var time = "";//创建一个定时器
-            $('.popup_text').text(data_text);
-
-                $(".choujiang").bind('click',function(){//触发事件
-                  if(no_repeat_click) {
-                      no_repeat_click = false;
-                      org.ajax({
-                          url: '/api/activity/chefangdai/',
-                          type: 'post',
-                          success: function (data) {
-                              if (data.ret_code == '0') {
-
-                              } else {
-                                  $('.popup_text').text('网络错误');
-                              }
-                          }
-                      })
-                      doIt(0, 0)//直接传入初始化参数，防止再次点击位置不对
-                  }
-                });
-
-
-              function doIt(t,i){//执行循环主方法
-                time = setInterval(function () {
-                  i++;
-                  if (i > 7) {i = 0;t++;}
-                  $(".cj").removeClass("cur");
-                  $("#cj"+i).addClass("cur");
-                  getLb(t,i);
-                }, speed);
-              }
-              function getLb(t,i){//中奖之后的处理
-                //console.log(t);
-                //console.log(i);
-                if (t == 3) {
-                  if (i == result_no) {//此处的i为设定的中奖位置，也可用ajax去请求获得
-                    clearInterval(time);
-                    no_repeat_click = true;
-
-                    $('.popup_wrap dl').hide();
-                    $('.popup_text').show();
-                    $('.popup_button').text('继续抽奖');
-                    $('.popup_wrap').show();
-
-                    $('.popup_wrap .close_ico').click(function(){
-                        car_house_loan();
-                        $(".choujiang").unbind('click');
-                        $('.popup_wrap ').hide();
-                    });
-                    $('.popup_button').click(function(){
-
-                        car_house_loan();
-                        $(".choujiang").unbind('click');
-                        $('.popup_wrap ').hide();
-                    });
-                  }
-                }
-              }
-        }
-
-    var swiper_1 = new Swiper('.swiper1', {
-		pagination : '.pagination1',
-		slidesPerView: 'auto',
-        centeredSlides: true,
-        paginationClickable: true,
-        spaceBetween: 10,
-		autoHeight: false
-	});
-
-
-
+    $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
+        $('.popup_box').hide();
+    });
 })(org);

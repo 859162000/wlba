@@ -68,9 +68,12 @@
                         //    url += "?1";
                         //    self.location.replace(url);
                         //}
+                        $('.insert_text .right_link').click(function(){
+                            mixins.jumpToManageMoney();
+                        })
                         function app_car_house_loan(){
 
-
+                            alert('app_car_house_loan');
                             org.ajax({
                                 url: '/api/activity/chefangdaiuserinfo/',
                                 type: 'post',
@@ -117,7 +120,7 @@
 
 
                                             $('.section_2 .big_title').text(data.message);
-                                            function choujiang(data_text,result_no){
+                                            function app_choujiang(data_text,result_no){
 
                                             var speed = 100;//速度
                                             var time = "";//创建一个定时器
@@ -129,10 +132,14 @@
                                                     type: 'post',
                                                     success: function (data) {
                                                         if (data.ret_code == '0') {
+                                                            alert('success');
                                                             $('.popup_text').text(data.content);
                                                         }else{
                                                             $('.popup_text').text('网络错误');
                                                         }
+                                                    },
+                                                    error: function(data){
+                                                        alert('error');
                                                     }
                                                   })
 
@@ -165,18 +172,20 @@
                                                         app_car_house_loan();
                                                         $('.popup_wrap ').hide();
                                                         $(".choujiang").unbind('click');
+                                                        alert('转完');
 
                                                     });
                                                     $('.popup_wrap .close_ico').click(function(){
                                                         app_car_house_loan();
                                                         $(".choujiang").unbind('click');
                                                         $('.popup_wrap ').hide();
+                                                        alert('转完');
                                                     });
                                                   }
                                                 }
                                               }
                                         }
-
+                                        app_choujiang(data.content,data.result_no);
 
 
                                     }
@@ -213,6 +222,10 @@
     })
 
     function car_house_loan(){
+        $('.insert_text .right_link').click(function(){
+            window.location.href = '/weixin/list/'
+        });
+
         org.ajax({
             url: '/api/activity/chefangdaiuserinfo/',
             type: 'post',
@@ -262,6 +275,7 @@
         })
     }
 
+
     function no_denglu(){
         $('.popup_text').hide;
         $('.popup_wrap dl dt').text('您还未登陆！');
@@ -269,12 +283,13 @@
         $('.popup_wrap dl').show();
         $('.popup_button').text('马上去');
         $('.popup_button').click(function(){
-            window.location.href = '/weixin/regist/?next=/activity/chefangdaiapp/'
+            window.location.href = '/weixin/login/?next=/activity/chefangdaiapp/'
         });
         $('.choujiang').bind('click',function(){
             $('.popup_wrap').show();
         })
     }
+
 
 
     function ranking_list(json){
@@ -317,7 +332,7 @@
                 $(".choujiang").bind('click',function(){//触发事件
                   if(no_repeat_click) {
                       no_repeat_click = false;
-                      $.ajax({
+                      org.ajax({
                           url: '/api/activity/chefangdai/',
                           type: 'post',
                           success: function (data) {

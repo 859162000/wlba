@@ -48,7 +48,7 @@
                     }
                 }
             });
-
+        $('.popup_wrap').hide();
         function car_house_loan(){
             $.ajax({
                 url: '/api/activity/chefangdaiuserinfo/',
@@ -103,6 +103,7 @@
             $('.popup_wrap .popup_box').show();
             $('.popup_button').text('马上去');
             $('.popup_button').bind('click',function(){
+                $('.popup_wrap').hide();
                 window.location.href = '/p2p/list/'
             });
             $('.choujiang').bind('click',function(){
@@ -119,6 +120,7 @@
             $('.popup_wrap .popup_box').show();
             $('.popup_button').text('马上去');
             $('.popup_button').bind('click',function(){
+                $('.popup_wrap').hide();
                 window.location.href = '/accounts/login/?next=/activity/chefangdai/'
             });
             $('.choujiang').bind('click',function(){
@@ -242,12 +244,13 @@
                   }
                 }
               }
+
         }
 
         $('.popup_box .close_ico').click(function(){
             $('.popup_wrap ').hide();
         })
-
+        $('.popup_wrap').hide();
     })
 
 }).call(this);

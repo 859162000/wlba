@@ -1,0 +1,75 @@
+- load formatters
+doctype html
+html(style="background: #fff")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_bodybuilding.css?v=2015052601", rel="stylesheet")
+    body
+        .body_wrap.clear
+            img.banner(src='/static/imgs/mobile_activity/app_bodybuilding/banner.jpg')
+            .section_3
+                img(src='/static/imgs/mobile_activity/app_bodybuilding/people.png')
+                .section_3_text 锐客联盟健身会所携手网利宝<br>带您轻松超越自我极限<br>你可以......
+            img.title_img.title_img1(src='/static/imgs/mobile_activity/app_bodybuilding/title_1.png')
+            .cheats_box
+                .box
+                    img(src='/static/imgs/mobile_activity/app_bodybuilding/img_1.png')
+                    dl
+                        dt 轻松注册
+                        dd 注册网利宝并完成实名认证
+                .box
+                    img(src='/static/imgs/mobile_activity/app_bodybuilding/img_2.png')
+                    dl
+                        dt 充值到账
+                        dd 充值资金到<br>网利宝帐号
+                .box
+                    img(src='/static/imgs/mobile_activity/app_bodybuilding/img_3.png')
+                    dl
+                        dt 首次投资
+                        dd 金额≥3000元
+                .box
+                    img(src='/static/imgs/mobile_activity/app_bodybuilding/img_4.png')
+                    dl
+                        dt 领卡体验
+                        dd 领取锐客联盟次卡体验一次（仅限500名额）投资成功后网利宝站内信发送
+            img.button#take_prize(src='/static/imgs/mobile_activity/app_bodybuilding/button.png')
+            img.title_img.title_img2(src='/static/imgs/mobile_activity/app_bodybuilding/title_2.png')
+            .section.section_1
+                .section_title 定期理财
+                .section_main.section_main_1
+                    img(src='/static/imgs/mobile_activity/app_bodybuilding/img_5.png')
+                    .text_box
+                        .text_line.text_1!='6<span class="small">%</span> <span class="line">一</span> 13<span class="small">%</span>'
+                        .text_line.text_2 年化利率
+                        .text_line.text_3 短期灵活、中期方便、长期优选
+            img.title_img.title_img3(src='/static/imgs/mobile_activity/app_bodybuilding/title_3.png')
+            .rule_wrap
+                dl
+                    dt 1.
+                    dd 活动时间：待定；
+                dl
+                    dt 2.
+                    dd 兑换券有效期：待定；
+                dl
+                    dt 3.
+                    dd 用户通过网利宝服务号（不含阅读原文）注册为网利宝新用户且单笔首次投资3000元及以上即可获得锐客联盟会所免费体验1次，兑换码以站内信以及短信形式通知；
+                dl
+                    dt 4.
+                    dd 手机号为网利宝唯一账户，本期新用户专享福利仅限于网利宝官网服务号渠道新注册用户参与，免费体验名额有限，送完即止；
+            .popup_box
+                .main
+                    .textairport
+                    .popup_button 知道了
+                    img.close_popup(src="/static/imgs/mobile_activity/app_pretty_reach_home/close_popup.png")
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_bodybuilding.js?v=2015060301")
+        - csrf_token
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                    iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                    ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
