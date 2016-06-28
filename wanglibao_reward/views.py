@@ -925,28 +925,28 @@ class CheFangDaiUserInfoAPIView(APIView):
         name = ''
         if p2p_amount>=1000 and p2p_amount<10000:
             name = '人人都爱车房贷加息券0.8%'
-            result_no = 1
+            result_no = 0
         if p2p_amount>=10000 and p2p_amount<30000:
             name = '一年迅雷会员'
-            result_no = 0
+            result_no = 3
         if p2p_amount>=30000 and p2p_amount<50000:
             name = '人人都爱车房贷加息券1%'
-            result_no = 2
+            result_no = 1
         if p2p_amount>=50000 and p2p_amount<80000:
             name = '人人都爱车房贷加息券1%'
-            result_no = 2
+            result_no = 6
         if p2p_amount>=80000 and p2p_amount<150000:
             name = '人人都爱车房贷加息券1.2%'
-            result_no = 3
+            result_no = 7
         if p2p_amount>=150000 and p2p_amount<200000:
             name = '人人都爱车房贷加息券1.5%'
-            result_no = 4
+            result_no = 5
         if p2p_amount>=200000 and p2p_amount<300000:
             name = '人人都爱车房贷加息券1.8%'
-            result_no = 5
+            result_no = 2
         if p2p_amount>=300000:
             name = '人人都爱车房贷加息券2.0%'
-            result_no = 6
+            result_no = 4
         return name, result_no
     
     def post(self, request):
@@ -1036,27 +1036,27 @@ class CheFangDaiAPIView(APIView):
         result_no = 0
         if p2p_amount>=1000 and p2p_amount<10000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券0.8%')
-            result_no = 1
-        if p2p_amount>=10000 and p2p_amount<30000:
             result_no = 0
+        if p2p_amount>=10000 and p2p_amount<30000:
+            result_no = 3
         if p2p_amount>=30000 and p2p_amount<50000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
-            result_no = 2
+            result_no = 1
         if p2p_amount>=50000 and p2p_amount<80000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1%')
-            result_no = 2
+            result_no = 6
         if p2p_amount>=80000 and p2p_amount<150000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.2%')
-            result_no = 3
+            result_no = 7
         if p2p_amount>=150000 and p2p_amount<200000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.5%')
-            result_no = 4
+            result_no = 5
         if p2p_amount>=200000 and p2p_amount<300000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券1.8%')
-            result_no = 5
+            result_no = 2
         if p2p_amount>=300000:
             event = RedPackEvent.objects.get(name='人人都爱车房贷加息券2.0%')
-            result_no = 6
+            result_no = 4
         return event, result_no
     
     def post(self, request):
