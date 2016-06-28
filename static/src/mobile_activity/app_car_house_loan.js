@@ -156,7 +156,7 @@
                                               function doIt(t,i){//执行循环主方法
                                                 time = setInterval(function () {
                                                   i++;
-                                                  if (i > 8) {i = 1;t++;}
+                                                  if (i > 7) {i = 0;t++;}
                                                   $(".cj").removeClass("cur");
                                                   $("#cj"+i).addClass("cur");
                                                   getLb(t,i);
@@ -335,6 +335,7 @@
             $('.horn').hide();
         }
     }
+
 
     var no_repeat_click = true;
     function choujiang(data_text,result_no){
