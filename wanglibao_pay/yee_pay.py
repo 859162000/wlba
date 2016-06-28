@@ -742,7 +742,7 @@ class YeeShortPay:
         if not order_id.isdigit():
             return {"ret_code": 20125, "message": "订单号错误"}
 
-        pay_info = PayInfo.objects.filter(order_id=order_id).first()
+        pay_info = PayInfo.objects.filter(order_id=order_id).select_for_update().first()
         if not pay_info or pay_info.status == PayInfo.SUCCESS:
             return {"ret_code": 20121, "message": "订单不存在或已支付成功"}
 
