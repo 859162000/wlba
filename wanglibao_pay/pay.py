@@ -1,8 +1,9 @@
 # encoding:utf-8
 
-import hmac
+import md5
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models.query_utils import Q
 from django.forms.models import model_to_dict
@@ -45,6 +46,7 @@ class PayOrder(object):
             'huifu': ['huifu_bind_code', 'is_bind_huifu'],
             'yeepay': ['yee_bind_code', 'is_bind_yee'],
             'kuaipay': ['kuai_code', 'is_bind_kuai'],
+            'baopay': ['bao_code', None],
         }
 
     @staticmethod
@@ -61,7 +63,10 @@ class PayOrder(object):
                 channel = bank.pc_channel
             else:
                 channel = bank.channel
-            bind_code = getattr(bank, PayOrder.channel_mapping.get(channel)[0])
+            try:
+                bind_code = getattr(bank, PayOrder.channel_mapping.get(channel)[0])
+            except:
+                bind_code = None
             return bank, channel, bind_code
         except:
             logger.exception('third_pay_error')
@@ -433,6 +438,7 @@ class ProxyPay(object):
         :return:
         """
         try:
+            print 'proxy_pay_message' + str(pay_message)
             # use PayMessage to CHECK PARA, RAISE ERROR before proxy_pay_callback
             return self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
                                                     pay_message.res_content, request)
@@ -475,7 +481,7 @@ class YeeProxyPay(ProxyPay):
 
 
 
-class BaoProxyPay(object):
+class BaoProxyPay(ProxyPay):
     """
     宝付网关支付（网 银）
     """
@@ -484,27 +490,27 @@ class BaoProxyPay(object):
         self.proxy_pay_url = settings.BAO_PROXY_PAY_URL
 
     def _get_pay_id(self, gate_id):
-        gate_id_to_pay_id = {
-                'JH':1001, #招商银行(综)
-                'J0':1002, # 中国工商银行 (综)
-                'JF':1003, # 中国建设银行 (综)
-                'J8':1004, # 上海浦东发展银行(综)
-                '29':1005, # 中国农业银行 (综)
-                'J7':1006, # 中国民生银行 (综)
-                'J6':1009, # 兴业银行(综)
-                'J4':1020, # 中国交通银行 (综)
-                'JC':1022, # 中国光大银行 (综)
-                'J5':1026, # 中国银行(综)
-                '15':1032, # 北京银行(综)
-                '50':1035, # 平安银行(综)
-                '19':1036, # 广发银行|cgb(综)
-                '46':1038, # 中国邮政储蓄银行(综)
-                '33':1039, # 中信银行(综)
-                '13':1050, # 华夏银行(综)
-                'JE':1059, # 上海银行(综)
-                '40':1060, # 北京农商银行 (综)
-        }
-        return gate_id_to_pay_id.get(gate_id)
+        # gate_id_to_pay_id = {
+                # 'JH':1001, #招商银行(综)
+                # 'J0':1002, # 中国工商银行 (综)
+                # 'JF':1003, # 中国建设银行 (综)
+                # 'J8':1004, # 上海浦东发展银行(综)
+                # '29':1005, # 中国农业银行 (综)
+                # 'J7':1006, # 中国民生银行 (综)
+                # 'J6':1009, # 兴业银行(综)
+                # 'J4':1020, # 中国交通银行 (综)
+                # 'JC':1022, # 中国光大银行 (综)
+                # 'J5':1026, # 中国银行(综)
+                # '15':1032, # 北京银行(综)
+                # '50':1035, # 平安银行(综)
+                # '19':1036, # 广发银行|cgb(综)
+                # '46':1038, # 中国邮政储蓄银行(综)
+                # '33':1039, # 中信银行(综)
+                # '13':1050, # 华夏银行(综)
+                # 'JE':1059, # 上海银行(综)
+                # '40':1060, # 北京农商银行 (综)
+        # }
+        return Bank.objects.get(gate_id=gate_id).bao_code
 
     def _post(self, order_id, amount, gate_id):
         """
@@ -523,46 +529,52 @@ class BaoProxyPay(object):
                 'PayID': pay_id,
                 'TradeDate': trade_date,
                 'TransID': order_id,#len [8-20]
-                'OrderMoney': amount*100, #unit fen
+                'OrderMoney': int(amount*100), #unit fen
+                'ProductName': '商品名称',
                 'NoticeType': 1,
-                'PageUrl'#页面返回
-                'ReturnUrl'#交易通知
-                'Md5Sign': ''
+                # 'PageUrl': 'https://www.wanglibao.com',#页面返回
+                'PageUrl': settings.CALLBACK_HOST + reverse('baoproxypay-deposit-completeview'),#交易通知
+                # 'ReturnUrl': reverse('baoproxypay-deposit-callback'),#交易通知
+                'ReturnUrl': settings.CALLBACK_HOST + reverse('baoproxypay-deposit-callback'),#交易通知
+                'Signature': ''
                 }
-        key_list = ['MemberID','PayID','TradeDate',' TransID ','OrderMoney' ,
+        key_list = ['MemberID','PayID','TradeDate','TransID','OrderMoney' ,
                     'PageUrl','ReturnUrl','NoticeType']
-        str_to_sign = '|'.join([post_para.get(k) for k in key_list])
+        str_to_sign = '|'.join([str(post_para.get(k)) for k in key_list])
         str_to_sign += '|' + secret_key
-        md5_sign = hmac.new(secret_key, str_to_sign).hexdigest()
-        post_para.update(Md5Sign=md5_sign)
+        md5_sign = md5.new(str_to_sign).hexdigest()
+        post_para.update(Signature=md5_sign)
+        print 'Signature:' + md5_sign + '|' + str_to_sign
         return post_para
 
 
 class BaoProxyPayCallbackMessage(PayMessage):
-    def _get_hmac(self, message_dict):
+    def _get_signature(self, message_dict):
         """
-        MD5(MemberID={MemberID}~|~TerminalID={Term inalID}~|~TransID={TransID}~|~Result={Resu lt}~|~ResultDesc={resultDesc}~|~FactMoney= {factMoney}~|~AdditionalInfo={additionalIn fo}~|~SuccTime={SuccTime}~|~ Md5Sign={ 密 钥 }) 
+        MD5(MemberID={MemberID}~|~TerminalID={Term inalID}~|~TransID={TransID}~|~Result={Resu lt}~|~ResultDesc={resultDesc}~|~FactMoney= {factMoney}~|~AdditionalInfo={additionalIn fo}~|~SuccTime={SuccTime}~|~ Signature={ 密 钥 }) 
         """
         separator = '~|~'
         secret_key = settings.BAO_PROXY_PAY_SECRET_KEY
         key_list = ['MemberID','TerminalID','TransID','Result',
                 'ResultDesc','FactMoney','AdditionalInfo','SuccTime']
-        str_to_sign = separator.join(k + '=' + message_dict.get(k) for k in key_list)
-        str_to_sign += separator + secret_key
-        return hmac.new(secret_key, str_to_sign).hexdigest()
+        str_to_sign = separator.join(k + '=' + message_dict.get(k, '') for k in key_list)
+        str_to_sign += separator + 'Md5Sign=' + secret_key
+        print 'callbackmessage_strtosign' + str_to_sign
+        return md5.new(str_to_sign).hexdigest()
 
     def parse_message(self, message_dict, res_ip):
         
         # check
-        hmac = self._get_hmac(message_dict)
-        if hmac != message_dict.get('Md5Sign'):
+        signature = self._get_signature(message_dict)
+        if signature != message_dict.get('Md5Sign'):
+            print signature + '|' + message_dict.get('Md5Sign')
             raise ThirdPayError(40015, '不合法的第三方支付信息' + str(message_dict))
 
         try:
             # convert data
             self.order_id = int(message_dict.get('TransID'))
-            self.amount = fmt_two_amount(message_dict.get('factMoney')/100.0)
-            # 1代表成功
+            self.amount = fmt_two_amount(int(message_dict.get('FactMoney'))/100.0)
+            # 第三方1代表成功
             ret_code = int(message_dict.get('Result'))
             if ret_code == 1:
                 self.ret_code = 0
@@ -571,7 +583,9 @@ class BaoProxyPayCallbackMessage(PayMessage):
             self.res_message = message_dict.get('resultDesc')
             self.res_content = str(message_dict)
         except:
+            logger.exception('不合法的第三方支付信息')
             raise ThirdPayError(40015, '不合法的第三方支付信息' + str(message_dict))
+        return self
 
 
 
