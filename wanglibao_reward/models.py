@@ -132,7 +132,7 @@ class WanglibaoActivityReward(models.Model):
         
 class WanglibaoActivityRewardOrder(models.Model):
     order_id =models.IntegerField(default=0, verbose_name=u'订单ID', unique=True)
-    user = models.ForeignKey(User, related_name='reward_owner', default=None, blank=True, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, default=None, blank=True, null=True, on_delete=models.SET_NULL)
     redpack_event = models.ForeignKey(RedPackEvent, default=None, blank=True, null=True, verbose_name=u'用户获得的红包')
     reward = models.ForeignKey(Reward, default=None, blank=True, null=True, verbose_name=u'用户获得的奖品')
     experience = models.ForeignKey(ExperienceEvent, default=None, blank=True, null=True, verbose_name=u'用户获得的体验金')
