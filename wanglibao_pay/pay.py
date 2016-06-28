@@ -1,8 +1,9 @@
 # encoding:utf-8
 
-import hmac
+import md5
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models.query_utils import Q
 from django.forms.models import model_to_dict
@@ -21,6 +22,7 @@ from wanglibao_pay.exceptions import ThirdPayError
 from wanglibao_pay.models import PayInfo, Card, PayResult, Bank
 import logging
 from wanglibao_pay.util import fmt_two_amount
+import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +46,7 @@ class PayOrder(object):
             'huifu': ['huifu_bind_code', 'is_bind_huifu'],
             'yeepay': ['yee_bind_code', 'is_bind_yee'],
             'kuaipay': ['kuai_code', 'is_bind_kuai'],
+            'baopay': ['bao_code', None],
         }
 
     @staticmethod
@@ -60,7 +63,10 @@ class PayOrder(object):
                 channel = bank.pc_channel
             else:
                 channel = bank.channel
-            bind_code = getattr(bank, PayOrder.channel_mapping.get(channel)[0])
+            try:
+                bind_code = getattr(bank, PayOrder.channel_mapping.get(channel)[0])
+            except:
+                bind_code = None
             return bank, channel, bind_code
         except:
             logger.exception('third_pay_error')
@@ -399,37 +405,16 @@ class YeeProxyPayCallbackMessage(PayMessage):
         except:
             raise ThirdPayError(40015, '不合法的第三方支付信息' + str(message_dict))
 
-class YeeProxyPay(object):
+class ProxyPay(object):
     """
-    易宝网银支付，跳转到易宝的支付页面
-    1.后台回调地址要通过管理页面设置，页面重定向通过p8_Url设置
-    2.生成hmac的参数是有顺序的
-    易宝支付有个坑：post用gbk编码，算hmac用utf8编码
+    子类需要定义proxy_pay_url和_post方法
     """
     def __init__(self):
         self.pay_order = PayOrder()
-        self.proxy_pay_url = settings.YEE_PROXY_PAY_URL
+        self.proxy_pay_url = None
 
     def _post(self, order_id, amount, gate_id):
-        yee_proxy_bank_code = Bank.objects.get(gate_id=gate_id).yee_bind_code + '-NET-B2C'
-        yee_proxy_bank_code = yee_proxy_bank_code.upper()
-        post_para = {
-            'p0_Cmd': 'Buy',
-            'p1_MerId': settings.YEE_PROXY_PAY_MER_ID,
-            'p2_Order': order_id,
-            'p3_Amt': amount,
-            'p4_Cur': 'CNY',
-            # 商品名称， Max（20）,p6, p7为商品分类，描述，我们暂时就不传了
-            #'p5_Pid': u'网利宝最专业的P2P之选'.encode('GBK'),
-            # todo urgent 中文商品名称
-            'p5_Pid': 'Wanglibao',
-            # 回调地址， Max（200）,页面回调地址
-            'p8_Url': settings.YEE_PROXY_PAY_WEB_CALLBACK_URL,
-            'pd_FrpId': yee_proxy_bank_code,
-            'hmac': ''
-        }
-        post_para.update(hmac=YeeProxyPayCallbackMessage.get_hmac(post_para, 'request'))
-        return post_para
+        pass
 
     def proxy_pay(self, user, amount,  gate_id,  request_ip, device_type):
         try:
@@ -453,6 +438,7 @@ class YeeProxyPay(object):
         :return:
         """
         try:
+            print 'proxy_pay_message' + str(pay_message)
             # use PayMessage to CHECK PARA, RAISE ERROR before proxy_pay_callback
             return self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
                                                     pay_message.res_content, request)
@@ -461,5 +447,150 @@ class YeeProxyPay(object):
             raise
 
 
+class YeeProxyPay(ProxyPay):
+    """
+    易宝网银支付，跳转到易宝的支付页面
+    1.后台回调地址要通过管理页面设置，页面重定向通过p8_Url设置
+    2.生成hmac的参数是有顺序的
+    易宝支付有个坑：post用gbk编码，算hmac用utf8编码
+    """
+    def __init__(self):
+        super(YeeProxyPay, self).__init__()
+        self.proxy_pay_url = settings.YEE_PROXY_PAY_URL
+
+    def _post(self, order_id, amount, gate_id):
+        yee_proxy_bank_code = Bank.objects.get(gate_id=gate_id).yee_bind_code + '-NET-B2C'
+        yee_proxy_bank_code = yee_proxy_bank_code.upper()
+        post_para = {
+            'p0_Cmd': 'Buy',
+            'p1_MerId': settings.YEE_PROXY_PAY_MER_ID,
+            'p2_Order': order_id,
+            'p3_Amt': amount,
+            'p4_Cur': 'CNY',
+            # 商品名称， Max（20）,p6, p7为商品分类，描述，我们暂时就不传了
+            #'p5_Pid': u'网利宝最专业的P2P之选'.encode('GBK'),
+            # todo urgent 中文商品名称
+            'p5_Pid': 'Wanglibao',
+            # 回调地址， Max（200）,页面回调地址
+            'p8_Url': settings.YEE_PROXY_PAY_WEB_CALLBACK_URL,
+            'pd_FrpId': yee_proxy_bank_code,
+            'hmac': ''
+        }
+        post_para.update(hmac=YeeProxyPayCallbackMessage.get_hmac(post_para, 'request'))
+        return post_para
 
 
+
+class BaoProxyPay(ProxyPay):
+    """
+    宝付网关支付（网 银）
+    """
+    def __init__(self):
+        super(BaoProxyPay,self).__init__()
+        self.proxy_pay_url = settings.BAO_PROXY_PAY_URL
+
+    def _get_pay_id(self, gate_id):
+        # gate_id_to_pay_id = {
+                # 'JH':1001, #招商银行(综)
+                # 'J0':1002, # 中国工商银行 (综)
+                # 'JF':1003, # 中国建设银行 (综)
+                # 'J8':1004, # 上海浦东发展银行(综)
+                # '29':1005, # 中国农业银行 (综)
+                # 'J7':1006, # 中国民生银行 (综)
+                # 'J6':1009, # 兴业银行(综)
+                # 'J4':1020, # 中国交通银行 (综)
+                # 'JC':1022, # 中国光大银行 (综)
+                # 'J5':1026, # 中国银行(综)
+                # '15':1032, # 北京银行(综)
+                # '50':1035, # 平安银行(综)
+                # '19':1036, # 广发银行|cgb(综)
+                # '46':1038, # 中国邮政储蓄银行(综)
+                # '33':1039, # 中信银行(综)
+                # '13':1050, # 华夏银行(综)
+                # 'JE':1059, # 上海银行(综)
+                # '40':1060, # 北京农商银行 (综)
+        # }
+        return Bank.objects.get(gate_id=gate_id).bao_code
+
+    def _post(self, order_id, amount, gate_id):
+        """
+        MD5({MemberID}|{PayID}|{TradeDate}|{ TransID }|{OrderMoney}
+                        |{PageUrl}|{ReturnUrl}|{NoticeType}|{密钥}) 
+        """
+        pay_id = self._get_pay_id(gate_id)
+        assert pay_id is not None
+        trade_date = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        secret_key = settings.BAO_PROXY_PAY_SECRET_KEY
+        post_para = {
+                'MemberID': settings.BAO_PROXY_PAY_MEMBERID,
+                'TerminalID': settings.BAO_PROXY_PAY_TERMINALID,
+                'InterfaceVersion': '4.0',
+                'KeyType': 1,
+                'PayID': pay_id,
+                'TradeDate': trade_date,
+                'TransID': order_id,#len [8-20]
+                'OrderMoney': int(amount*100), #unit fen
+                'ProductName': '商品名称',
+                'NoticeType': 1,
+                # 'PageUrl': 'https://www.wanglibao.com',#页面返回
+                'PageUrl': settings.CALLBACK_HOST + reverse('baoproxypay-deposit-completeview'),#交易通知
+                # 'ReturnUrl': reverse('baoproxypay-deposit-callback'),#交易通知
+                'ReturnUrl': settings.CALLBACK_HOST + reverse('baoproxypay-deposit-callback'),#交易通知
+                'Signature': ''
+                }
+        key_list = ['MemberID','PayID','TradeDate','TransID','OrderMoney' ,
+                    'PageUrl','ReturnUrl','NoticeType']
+        str_to_sign = '|'.join([str(post_para.get(k)) for k in key_list])
+        str_to_sign += '|' + secret_key
+        md5_sign = md5.new(str_to_sign).hexdigest()
+        post_para.update(Signature=md5_sign)
+        print 'Signature:' + md5_sign + '|' + str_to_sign
+        return post_para
+
+
+class BaoProxyPayCallbackMessage(PayMessage):
+    def _get_signature(self, message_dict):
+        """
+        MD5(MemberID={MemberID}~|~TerminalID={Term inalID}~|~TransID={TransID}~|~Result={Resu lt}~|~ResultDesc={resultDesc}~|~FactMoney= {factMoney}~|~AdditionalInfo={additionalIn fo}~|~SuccTime={SuccTime}~|~ Signature={ 密 钥 }) 
+        """
+        separator = '~|~'
+        secret_key = settings.BAO_PROXY_PAY_SECRET_KEY
+        key_list = ['MemberID','TerminalID','TransID','Result',
+                'ResultDesc','FactMoney','AdditionalInfo','SuccTime']
+        str_to_sign = separator.join(k + '=' + message_dict.get(k, '') for k in key_list)
+        str_to_sign += separator + 'Md5Sign=' + secret_key
+        print 'callbackmessage_strtosign' + str_to_sign
+        return md5.new(str_to_sign).hexdigest()
+
+    def parse_message(self, message_dict, res_ip):
+        
+        # check
+        signature = self._get_signature(message_dict)
+        if signature != message_dict.get('Md5Sign'):
+            print signature + '|' + message_dict.get('Md5Sign')
+            raise ThirdPayError(40015, '不合法的第三方支付信息' + str(message_dict))
+
+        try:
+            # convert data
+            self.order_id = int(message_dict.get('TransID'))
+            self.amount = fmt_two_amount(int(message_dict.get('FactMoney'))/100.0)
+            # 第三方1代表成功
+            ret_code = int(message_dict.get('Result'))
+            if ret_code == 1:
+                self.ret_code = 0
+            else:
+                self.ret_code = 1
+            self.res_message = message_dict.get('resultDesc')
+            self.res_content = str(message_dict)
+        except:
+            logger.exception('不合法的第三方支付信息')
+            raise ThirdPayError(40015, '不合法的第三方支付信息' + str(message_dict))
+        return self
+
+
+
+
+
+
+
+        

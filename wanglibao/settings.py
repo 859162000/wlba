@@ -921,6 +921,11 @@ else:
     YTX_API_URL = "https://sandboxapp.cloopen.com:8883/2013-12-26"
     YTX_APPID = "8a48b55149896cfd0149ac6a77e41962"
 
+    BAO_PROXY_PAY_URL = 'https://tgw.baofoo.com/payindex'
+    BAO_PROXY_PAY_SECRET_KEY = 'abcdefg'
+    BAO_PROXY_PAY_MEMBERID = '100000178'
+    BAO_PROXY_PAY_TERMINALID = '10000001'
+
 PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'
 WITHDRAW_BACK_RETURN_URL = CALLBACK_HOST + '/pay/withdraw/callback/'
