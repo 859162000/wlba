@@ -2464,23 +2464,6 @@ class CheFangDaiProductView(TemplateView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
-        rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
-        rewards_list = {}
-        if rewards:
-            res_list = []
-            for res in rewards:
-                #好运榜数据
-                res_content = {}
-                seconds =(datetime.now()-datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
-                res_content['phone']=res.user.wanglibaouserprofile.phone
-                res_content['time']=seconds
-                if res.reward:
-                    res_content['name']=res.reward.content
-                else:
-                    res_content['name']=res.redpack_event.name
-                res_list.append(res_content)
-            rewards_list['luck_list'] = res_list
-        
         p2p_products = []
         haofang = P2PProduct.objects.filter(name__contains='好房').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
         haoche = P2PProduct.objects.filter(name__contains='好车').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
@@ -2492,13 +2475,9 @@ class CheFangDaiProductView(TemplateView):
             p2p_products.extend(cache_backend.get_p2p_list_from_objects([haofang]))
         if haoche:
             p2p_products.extend(cache_backend.get_p2p_list_from_objects([haoche]))
-        
-        #count = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='cfd', has_sent=False).count()
-        
+                
         return {
             'p2p_products': p2p_products,
-            'rewards_list': rewards_list,
-            #'count': count,
         }
     
 class CheFangDaiProductAPPView(TemplateView):
@@ -2532,23 +2511,6 @@ class CheFangDaiProductAPPView(TemplateView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
-        rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
-        rewards_list = {}
-        if rewards:
-            res_list = []
-            for res in rewards:
-                #好运榜数据
-                res_content = {}
-                seconds =(datetime.now()-datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
-                res_content['phone']=res.user.wanglibaouserprofile.phone
-                res_content['time']=seconds
-                if res.reward:
-                    res_content['name']=res.reward.content
-                else:
-                    res_content['name']=res.redpack_event.name
-                res_list.append(res_content)
-            rewards_list['luck_list'] = res_list
-        
         p2p_products = []
         haofang = P2PProduct.objects.filter(name__contains='好房').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
         haoche = P2PProduct.objects.filter(name__contains='好车').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
@@ -2560,13 +2522,9 @@ class CheFangDaiProductAPPView(TemplateView):
             p2p_products.extend(cache_backend.get_p2p_list_from_objects([haofang]))
         if haoche:
             p2p_products.extend(cache_backend.get_p2p_list_from_objects([haoche]))
-        
-        #count = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='cfd', has_sent=False).count()
-        
+                
         return {
             'p2p_products': p2p_products,
-            'rewards_list': rewards_list,
-            #'count': count,
         }
 
 class NoConfigException(Exception):
