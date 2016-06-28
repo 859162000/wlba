@@ -1,0 +1,258 @@
+-load formatters
+-load mathfilters
+doctype html
+html.no-js(lang="en-gb")
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/car_house_loan.css?v=2016062803")
+        - csrf_token
+    body(style="background:#fafafa")
+        include global/g_nav
+        .body_wrap.clear
+            .banner
+                .banner_main
+                    .text_1 走进优质资产系列专题之
+                    .text_2 活动时间：2016年6月29日—7月5日
+            .section.section_white.section_1
+                .section_main
+                    .big_title “车房” 专享福利大放送
+                    .big_title_line
+                    .small_title 活动时间：2016年6月29日—7月5日
+                    .project_title
+                        span 车房贷推荐：
+                        a(href='/p2p/list/') 更多>>
+                    .project_wrap
+                        for product in p2p_products
+                            status = product['display_status']
+                            .project_box
+                                .title_text {{product.name}}
+                                earning_rate = str(product['expected_earning_rate'])
+                                .add_num {{earning_rate}}
+                                    if product.activity
+                                        span.xunlei-vip-rate(title="{{product.activity.activity_name}}")％ + {{product.activity.activity_rule_percent_text}}%
+                                    else
+                                        span.add_num_span %
+                                .project_data
+                                    .data_1 本期额度
+                                        span {{product.total_amount | money_format_int}}
+                                    .data_1 项目期限
+                                        span {{product.period}}{{product.pay_method|period_unit}}
+                                .project_wrap_2
+                                    .project_bar
+                                        percent = float(product['ordered_amount']) / product['total_amount'] * 100
+                                        if status == '抢购中' or status == '满标审核'
+                                            span.progress-indicator(style="width:{{percent | percentage}}")
+                                        else
+                                            span.progress-indicator(style="width:{{percent | percentage}}")
+                                    percent = float(product['ordered_amount']) / product['total_amount'] * 100
+                                    if status == '抢购中' or status == '满标审核'
+                                            .percentage_num {{percent | percentage}}
+                                    else
+                                            .percentage_num {{percent | percentage}}
+                                .footer_b
+                                    amount = product['total_amount'] - product['ordered_amount']
+                                    span.footer_b_1 可投资金额{{amount | money_format_int}}元
+                                    span.footer_b_3 还款方式：{{product.display_payback_method}}
+                                .span3-omega.align-right
+                                  p
+                                    if status == '抢购中'
+                                        a.button-home(href="/p2p/detail/{{product.id}}/")
+                                          span.icon-p2p-home.purcharsing
+                                          {{status}}
+                                    else
+                                        a.button-home-disabled(href="javascript:void(0)", disabled)
+                                          if status == '已还款'
+                                            span.icon-p2p-home.finished
+                                          elif status == '还款中'
+                                            span.icon-p2p-home.payment
+                                          else
+                                            span.icon-p2p-home.audit
+
+                                          {{status}}
+                    .footer_text 活动期间购买 “好车盈”和“好房赚”两款专属产品，单笔投资≥1000元可获得一次抽奖机会，100%中奖。
+                    
+                    
+
+            
+            .section.section_grey.section_2
+                .section_main.section__main_2
+                    .luck_draw_title 抽奖大转盘：
+                    #container
+                        table
+                          tr
+                            td
+                              div#cj0.cj.cur
+                                  .big_text!='0.8<span>％</span>'
+                                  .small_text 加息券
+                            td
+                              div#cj1.cj
+                                  .big_text!='1<span>％</span>'
+                                  .small_text 加息券
+                            td
+                              div#cj2.cj
+                                  .big_text!='1.8<span>％</span>'
+                                  .small_text 加息券
+                          tr
+                            td
+                              div#cj7.cj
+                                  .big_text!='1.2<span>％</span>'
+                                  .small_text 加息券
+                            td.choujiang_td
+                              span.choujiang 马上抽奖
+                            td
+                              div#cj3.cj
+                                  .big_text!='1<span>年</span>'
+                                  .small_text 迅雷会员
+                          tr
+                            td
+                              div#cj6.cj
+                                  .big_text!='1<span>%</span>'
+                                  .small_text 加息券
+                            td
+                              div#cj5.cj
+                                  .big_text!='1.5<span>%</span>'
+                                  .small_text 加息券
+                            td
+                              div#cj4.cj
+                                  .big_text!='2<span>%</span>'
+                                  .small_text 加息券
+                        .luck_title_wrap
+                            dl
+                                dt
+                                dd!='投资指定产品，获得更多抽奖机会<a href="/p2p/list/">马上去</a>'
+                        .luck_title_denglu
+                            p 您还未登陆
+                            a(href='/accounts/login/?next=/activity/chefangdai/') 马上登陆
+                        .no_ranking 暂无中奖记录
+                        .ranking
+                            .ranking_title 好运榜
+                            ul.ranking_list
+                                //li
+                                //    span.one 186****1234
+                                //    span.two 获得 1.8%加息券
+                                //    span.three 13秒前
+                    .clear
+                    .rule_wrap
+                        dl
+                            dt 温馨提示：
+                            dd 1、活动期间投资“好车盈”和“好房赚”两款专属产品，才能获得抽奖资格。
+                            dd 2、迅雷会员兑换时间截止到2016年9月30日。
+                            dd 3 、加息券限1月及以上标可使，2万起投，有效期领取之日7天。
+            .section.section_3
+                .section_main
+                    dl
+                        dt!='<span>车房贷</span>是以车辆、房产作为质押物或抵押物的融资项目'
+                        dd 车房是传统的标准化资产，以车房做抵押或质押的借款项目不仅小额分散，抵质押物在市场的变现能力也更强，所以除了互联网金融平台外，传统的金融机构、担保小贷公司也都广泛开展车房贷业务。
+                        dd <br>作为一种起步较早的业务种类，车房贷目前已成为市场中风控手段较为成熟、质量较高的资产之一。
+            .section.section_grey.section_4
+                .section_main
+                    .big_title 车房贷优势
+                    .big_title_line
+                    .superiority_wrap
+                        .box
+                            img(src="/static/imgs/pc_activity/car_house_loan/section_4_img1.png")
+                            p 资产标准： 评估精准
+                        .box
+                            img(src="/static/imgs/pc_activity/car_house_loan/section_4_img2.png")
+                            p 抵质押物易变现：风险更低
+                        .box
+                            img(src="/static/imgs/pc_activity/car_house_loan/section_4_img3.png")
+                            p 借款期限较短：资金灵活
+                        .box
+                            img(src="/static/imgs/pc_activity/car_house_loan/section_4_img4.png")
+                            p 项目额度较小：小额分散
+            .section.section_white.section_5
+                .section_main
+                    .big_title 车房贷审核流程
+                    .big_title_line
+                    .tree
+                        .text_title.text_title_1 1.提出借款申请
+                        .text_title.text_title_2 2.合作机构初审
+                        .text_title.text_title_3 3.平台复审
+                        .text_title.text_title_4 4.办理抵质押手续
+                        .text_title.text_title_5 5.签署抵质押合同和借款合同，其他贷后处置合同及协议
+                        ul.ul_list.ul_list1
+                            li 借款客户的信用状况和还款来源
+                            li 抵质押物的基本情况和价值评估
+                        ul.ul_list.ul_list2
+                            li!='<span>车辆质押：</span>车辆合法性调查、扣押全套车辆证件、车辆收入车库'
+                            li!='<span>车辆抵押：</span>车辆合法性调查、车管所办理抵押手续、安装GPS2-3个、扣押车辆证件等'
+                            li!='<span>房产抵押：</span>调查产权是否具备抵押条件、当地建委落抵押登记、公证处公证、收押房产相关证件和借款人部分证件等'
+                        .tree_button 债权上线
+            .section.section_grey.section_6
+                .section_main
+                    .big_title 抵质押物的评估和处置
+                    .big_title_line
+                    .evaluate_wrap
+                      .box
+                          img(src="/static/imgs/pc_activity/car_house_loan/section_6_img1.png")
+                          dl
+                            dt 精准评估
+                            dd 内部询价和第三方专业评估相结合
+                      .box
+                          img(src="/static/imgs/pc_activity/car_house_loan/section_6_img2.png")
+                          dl
+                            dt 质押率低
+                            dd 一般不超过评估价7成
+                      .box
+                          img(src="/static/imgs/pc_activity/car_house_loan/section_6_img3.png")
+                          dl
+                            dt 快速处置
+                            dd 合作机构优先回购
+                    .rule_wrap 平台还额外设立金盾计划，在招商银行开设独立账户存储专项资金，<br>专门收购线上逾期或违约的不良债权，维护投资用户的权益。
+            .section.section_white.section_7
+                .section_main
+                    .big_title 贷后监管手段
+                    .big_title_line
+                    .supervise_wrap
+                        .box
+                          img(src="/static/imgs/pc_activity/car_house_loan/section_7_img1.png")
+                          dl
+                            dt 档案监管
+                            dd 风控部统一管理
+                        .box
+                          img(src="/static/imgs/pc_activity/car_house_loan/section_7_img2.png")
+                          dl
+                            dt 抵质押物监管
+                            dd.center •抵押车：GPS每日定位与追踪<br>•质押车：专人监管、停放在平台专用车库、7*24小时摄像监管<br>•抵押房：不定期暗访被抵押的房产，监督还款记录，定期查询借款涉案或相关负面信息。
+                        .box
+                          img(src="/static/imgs/pc_activity/car_house_loan/section_7_img3.png")
+                          dl
+                            dt 催收制度
+                            dd 提前七天提醒返还本息
+                        .box
+                          img(src="/static/imgs/pc_activity/car_house_loan/section_7_img4.png")
+                          dl
+                            dt 黑名单制度
+                            dd 根据回款情况，<br>及时淘汰不良信用客户
+            .section.section_grey.section_8
+                .section_main
+                    .big_title 质押车监管
+                    .big_title_line
+                    .small_title 质押车停放在平台专用车库，由专人监管，并进行7*24小时摄像监管
+                    .photo_wrap
+                        img.img_1(src="/static/imgs/pc_activity/car_house_loan/section_8_img_1.jpg")
+                        img.img_2(src="/static/imgs/pc_activity/car_house_loan/section_8_img_2.jpg")
+                        img.img_3(src="/static/imgs/pc_activity/car_house_loan/section_8_img_3.jpg")
+                        img.img_4(src="/static/imgs/pc_activity/car_house_loan/section_8_img_4.jpg")
+                        img.img_5(src="/static/imgs/pc_activity/car_house_loan/section_8_img_5.jpg")
+                        img.img_6(src="/static/imgs/pc_activity/car_house_loan/section_8_img_6.jpg")
+                        img.img_7(src="/static/imgs/pc_activity/car_house_loan/section_8_img_7.jpg")
+            .section.section_9
+                .section_main
+                    p 2014年8月上线以来，网利宝除了深耕车房贷市场，还在木材、珠宝、物流货运、金融仓储等其他细分产业进行了深度布局，不仅建立了一个稳定的、挖掘优质资产的渠道，还先后服务近 2000 家中小企业，2016年5月末完成了60多亿交易额，获得了160多万用户的信赖。
+            .popup_wrap(style='display:none')
+                .popup_bg
+                .popup_box
+                    img.close_ico(src='/static/imgs/mobile_activity/app_car_house_loan/close.png')
+                    p.popup_text
+                    dl
+                        dt
+                        dd
+                    .popup_button 继续抽奖
+        include global/g_footer
+script.
+    require(['/static/js/car_house_loan.js?v=2016062803'])
+

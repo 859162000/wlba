@@ -128,6 +128,7 @@ class P2PTrader(object):
         try:
             logger.debug("=20151125= RewardDistributer.processor_for_distribute : [%s], [%s]" % (self.user.id, self.order_id) )
             kwargs = {
+                'product': self.product,
                 'amount': amount,
                 'order_id': self.order_id,
                 'user': self.user,}

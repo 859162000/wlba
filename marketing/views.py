@@ -70,6 +70,11 @@ from wanglibao_reward.models import WanglibaoActivityReward
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
 
+from wanglibao_p2p.common import get_p2p_list
+from operator import itemgetter
+
+from wanglibao_reward.views import get_activity_config
+
 import re
 import sys
 import time
@@ -2430,6 +2435,53 @@ class AppLotteryTemplate(TemplateView):
         return super(AppLotteryTemplate, self).dispatch(request, *args, **kwargs)
 
 
+class CheFangDaiProductView(TemplateView):
+    template_name = 'car_house_loan.jade'
+
+    def get_context_data(self, **kwargs):
+        json_to_response = get_activity_config('chefangdai')
+        if json_to_response:
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        p2p_products = []
+        haofang = P2PProduct.objects.filter(name__contains='好房').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
+        haoche = P2PProduct.objects.filter(name__contains='好车').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
+        
+        from wanglibao_redis.backend import redis_backend
+        cache_backend = redis_backend()
+        
+        if haofang:
+            p2p_products.extend(cache_backend.get_p2p_list_from_objects([haofang]))
+        if haoche:
+            p2p_products.extend(cache_backend.get_p2p_list_from_objects([haoche]))
+                
+        return {
+            'p2p_products': p2p_products,
+        }
+    
+class CheFangDaiProductAPPView(TemplateView):
+    template_name = 'app_car_house_loan.jade'
+
+    def get_context_data(self, **kwargs):
+        json_to_response = get_activity_config('chefangdai')
+        if json_to_response:
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        
+        p2p_products = []
+        haofang = P2PProduct.objects.filter(name__contains='好房').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
+        haoche = P2PProduct.objects.filter(name__contains='好车').extra(select={'rank': "ordered_amount/total_amount"}).order_by('-status_int','-rank').first()
+        
+        from wanglibao_redis.backend import redis_backend
+        cache_backend = redis_backend()
+        
+        if haofang:
+            p2p_products.extend(cache_backend.get_p2p_list_from_objects([haofang]))
+        if haoche:
+            p2p_products.extend(cache_backend.get_p2p_list_from_objects([haoche]))
+                
+        return {
+            'p2p_products': p2p_products,
+        }
 
 class NoConfigException(Exception):
     def __init__(self, conf):
@@ -3292,8 +3344,10 @@ class ShieldPlanH5View(TemplateView):
             'p2p': p2p_list
         }
 
+
 class HMDP2PListView(TemplateView):
     p2p_list_url_name = ""
+
     def get_context_data(self, **kwargs):
         p2p_products = []
         p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_name_contains_p2p_list("产融通HMD")

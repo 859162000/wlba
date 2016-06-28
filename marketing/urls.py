@@ -3,7 +3,7 @@ from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
                             ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi, \
                             OpenHouseApiView, MaiMaiView, ShieldPlanView, ShieldPlanH5View, HMDP2PListView, \
-                            SixBillionView
+                            SixBillionView, CheFangDaiProductView, CheFangDaiProductAPPView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -97,12 +97,16 @@ urlpatterns = patterns(
     url(r'^open_day_review/$', HMDP2PListView.as_view(template_name="open_day_review.jade", p2p_list_url_name="p2p_list")),
     url(r'^center_film_ticket/$', TemplateView.as_view(template_name="center_film_ticket.jade")),
     url(r'^six_billion/(?P<template>\w+)/$', SixBillionView.as_view(), name="six_billion"),
+    url(r'^car_house_loan/$', TemplateView.as_view(template_name="car_house_loan.jade")),
     url(r'^european_cup/$', TemplateView.as_view(template_name="european_cup.jade")),
 
     url(r'^one_lifestyle/$', TemplateView.as_view(template_name="lifestyle.jade")),
     url(r'^xunlei_three/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='')),
     url(r'^xunlei_treasure/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='', template_name="xunlei.jade")),
     url(r'^shield_plan/$', ShieldPlanView.as_view()),
+    url(r"^chefangdai/$", CheFangDaiProductView.as_view()),
+    url(r"^chefangdaiapp/$", CheFangDaiProductAPPView.as_view()),
+    
 )
 
 # app URL
@@ -231,6 +235,7 @@ urlpatterns += patterns(
     url(r'^app_baby_box/ios/$', TemplateView.as_view(template_name="app_baby_box_ios.jade")),
     url(r'^app_baby_box/android/$', TemplateView.as_view(template_name="app_baby_box_android.jade")),
     url(r'^app_jack_shrimp/$', TemplateView.as_view(template_name="app_jack_shrimp.jade")),
+    url(r'^app_car_house_loan/$', TemplateView.as_view(template_name="app_car_house_loan.jade")),
     url(r'^app_european_cup/$', TemplateView.as_view(template_name="app_european_cup.jade")),
     # url(r'^app_six_billion/$', TemplateView.as_view(template_name="app_six_billion.jade")),
 
