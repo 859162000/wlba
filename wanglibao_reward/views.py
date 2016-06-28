@@ -1130,12 +1130,12 @@ class CheFangDaiAPIView(APIView):
             with transaction.atomic():
                 if reward_record.p2p_amount>=10000 and reward_record.p2p_amount<30000:
                     #满足条件发迅雷会员
-                    reward = Reward.objects.select_for_update().filter(type='1年迅雷会员', is_used=False).first()
+                    reward = Reward.objects.select_for_update().filter(type='一年迅雷会员', is_used=False).first()
                     if reward:
                         reward.is_used = True
                         reward.save()
                         reward_record.reward = reward
-                        send_msg = u'恭喜您获得一年迅雷会员，请在站内信中进行查看，感谢您的参与'
+                        send_msg = u'恭喜您获得一年迅雷会员，兑换码为：%s，感谢您的参与' % reward.content
                         content = '一年迅雷会员'
                         result_no = 0
                     else:
@@ -1144,7 +1144,7 @@ class CheFangDaiAPIView(APIView):
                     #满足条件发加息券
                     redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
                     reward_record.redpack_event = redpack_event
-                    send_msg = u'恭喜您获得%s加息券，已经存入您的账户，请登录网利宝账户进行查看，感谢您的参与' % redpack_event.name
+                    send_msg = u'恭喜您获得%s加息券，已经存入您的账户，请在我的账户中进行查看，感谢您的参与' % redpack_event.name
                     content = redpack_event.name
 
                 reward_record.has_sent = True
