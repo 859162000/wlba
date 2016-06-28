@@ -63,7 +63,7 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                     # 如果使用红包的话,需要先将红包的钱判断正确后存入用户账户,然后再去检测购买金额和余额
                     # 如果使用红包的话, 增加红包使用记录
                     if red_packet_id and int(red_packet_id) > 0:
-                        logger.info('month product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
+                        logger.info('buy_month_product token = {} used with red_pack_id = {}'.format(token, red_packet_id))
                         redpack = RedPackRecord.objects.filter(pk=red_packet_id).first()
                         redpack_order_id = OrderHelper.place_order(user, order_type=u'优惠券消费', redpack=redpack.id,
                                                                    product_id=product.product_id, status=u'新建').id
@@ -118,10 +118,8 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
     request_url = settings.PHP_SQS_HOST
     res = save_to_sqs(request_url, args)
 
-    logger.info('in buy month product, token = {}, freeze = {}'.format(token, product.amount_source))
+    logger.info('in buy_month_product, token = {}, freeze = {}'.format(token, product.amount_source))
     logger.info('save to sqs! args = {}, return = {}'.format(args, res))
-
-    print res.text
 
 
 @app.task
@@ -151,25 +149,31 @@ def assignment_buy(buyer_token=None, seller_token=None):
                 buyer_keeper = PhpMarginKeeper(assignment.buyer, )
                 seller_keeper = PhpMarginKeeper(assignment.seller, )
 
-                # 卖家流水
-                seller_keeper.margin_process(
-                    assignment.seller, 0, assignment.buy_price, description=u'卖债转', catalog=u"转让回款")
-                # 卖家流水增加一条, 先加买家的钱, 再减去平台手续费
-                seller_keeper.margin_process(
-                    assignment.seller, 1, assignment.fee, description=u'债转平台手续费', catalog=u"转让手续费")
                 # 买家流水
-                buyer_keeper.margin_process(
-                    assignment.buyer, 1, assignment.buy_price, description=u'买债转', catalog=u"投资")
+                buyer_ret = buyer_keeper.margin_process(
+                          assignment.buyer, 1, assignment.buy_price, description=u'买债转', catalog=u"投资")
+                if buyer_ret:
+                    # 卖家流水
+                    seller_keeper.margin_process(
+                        assignment.seller, 0, assignment.buy_price, description=u'卖债转', catalog=u"转让回款")
+                    # 卖家流水增加一条, 先加买家的钱, 再减去平台手续费
+                    seller_keeper.margin_process(
+                        assignment.seller, 1, assignment.fee, description=u'债转平台手续费', catalog=u"转让手续费")
 
-                # 如果加减钱成功后, 更新债转的表的状态为成功
-                assignment.trade_status = 'PAID'
-                assignment.save()
-                ret.update(status=1,
-                           buyToken=assignment.buyer_token,
-                           sellToken=assignment.seller_token,
-                           msg='success')
+                    # 如果加减钱成功后, 更新债转的表的状态为成功
+                    assignment.trade_status = 'PAID'
+                    assignment.save()
+                    ret.update(status=1,
+                               buyToken=assignment.buyer_token,
+                               sellToken=assignment.seller_token,
+                               msg='success')
+                else:
+                    ret.update(status=0,
+                               buyToken=assignment.buyer_token,
+                               sellToken=assignment.seller_token,
+                               msg=u'用户余额不足')
         except Exception, e:
-            logger.debug('buy month product failed with exception: {}'.format(str(e)))
+            logger.debug('buy assignment product failed with exception: {}'.format(str(e)))
             assignment.trade_status = 'FAILED'
             ret.update(status=0,
                        buyToken=assignment.buyer_token,

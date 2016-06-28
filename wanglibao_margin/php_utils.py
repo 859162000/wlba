@@ -156,11 +156,15 @@ class PhpMarginKeeper(MarginKeeper):
             if status == 0:
                 margin.margin += amount
             else:
+                if margin_before < amount:
+                    logger.exception(u'用户余额不足,不支持本次债转, user_id= {}, amount = {}'.format(user.id, amount))
+                    # raise MarginLack(u'202')
+                    return 0
                 margin.margin -= amount
                 margin_uninvested = margin.uninvested  # 初始未投资余额
                 uninvested = margin.uninvested - amount  # 未投资金额 - 投资金额 = 未投资余额计算结果
                 margin.uninvested = uninvested if uninvested >= 0 else Decimal('0.00')  # 未投资余额计算结果<0时,结果置0
-                margin.uninvested_freeze += amount if uninvested >= 0 else margin_uninvested
+                # margin.uninvested_freeze += amount if uninvested >= 0 else margin_uninvested
                 # 未投资余额计算结果<0时,未投资冻结金额等于+初始未投资余额
             margin.save()
             record = self.tracer(catalog, amount, margin.margin, description, margin_before=margin_before)
@@ -275,6 +279,7 @@ class PhpMarginKeeper(MarginKeeper):
             catalog = u'投资'       # u'月利宝交易成功扣款' ----> u'投资'
             record = self.tracer(catalog, amount, margin.margin, description,
                                  freeze_before=freeze_before, freeze_after=margin.freeze, margin_before=margin_before)
+
             return record
 
     def php_amortize(self, refund_id, user, catalog, amount, description,
