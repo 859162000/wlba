@@ -595,7 +595,7 @@ def _give_redpack(user, give_mode, device_type):
 
 
 #发放奖励类型的红包
-def give_activity_redpack(user, event, device_type, just_one_packet=False, check_issue_time=False):
+def give_activity_redpack(user, event, device_type, just_one_packet=False, check_issue_time=False, send_message=True):
     """
 
     :param user:
@@ -632,7 +632,10 @@ def give_activity_redpack(user, event, device_type, just_one_packet=False, check
 
     start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                               record.created_at, event.available_at, event.unavailable_at)
-    _send_message(user, event, end_time)
+
+    if send_message:
+        _send_message(user, event, end_time)
+
     return True,""
 
 # Add by hb on 2015-12-14
