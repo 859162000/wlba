@@ -95,15 +95,18 @@
         car_house_loan();
 
         function no_choujiang(){
+            $('.popup_text').hide();
             $('.popup_wrap dl dt').text('您暂时还没有抽奖机会哦~');
             $('.popup_wrap dl dd').text('马上投资指定产品，获得更多抽奖机会！！');
             $('.popup_wrap dl').show();
-            $('.popup_text').hide();
+
+            $('.popup_wrap .popup_box').show();
             $('.popup_button').text('马上去');
-            $('.popup_button').click(function(){
+            $('.popup_button').bind('click',function(){
                 window.location.href = '/p2p/list/'
             });
             $('.choujiang').bind('click',function(){
+                $('.popup_wrap .popup_box').show();
                 $('.popup_wrap').show();
             })
         }
@@ -113,11 +116,13 @@
             $('.popup_wrap dl dt').text('您还未登陆！');
             $('.popup_wrap dl dd').text('请登录后查看抽奖机会！');
             $('.popup_wrap dl').show();
+            $('.popup_wrap .popup_box').show();
             $('.popup_button').text('马上去');
-            $('.popup_button').click(function(){
+            $('.popup_button').bind('click',function(){
                 window.location.href = '/accounts/login/?next=/activity/chefangdai/'
             });
             $('.choujiang').bind('click',function(){
+                $('.popup_wrap .popup_box').show();
                 $('.popup_wrap').show();
             })
         }
@@ -175,33 +180,38 @@
             }
         }
 
+        var no_repeat_click = true;
         function choujiang(data_text,result_no){
 
             var speed = 100;//速度
             var time = "";//创建一个定时器
             $('.popup_text').text(data_text);
 
+
                 $(".choujiang").bind('click',function(){//触发事件
-                  $.ajax({
-                    url: '/api/activity/chefangdai/',
-                    type: 'post',
-                    success: function (data) {
-                        if (data.ret_code == '0') {
+                  if(no_repeat_click) {
+                      no_repeat_click = false;
+                      $.ajax({
+                          url: '/api/activity/chefangdai/',
+                          type: 'post',
+                          success: function (data) {
+                              if (data.ret_code == '0') {
 
-                        }else{
-                            $('.popup_text').text('网络错误');
-                        }
-                    }
-                  })
-                  doIt(1,1)//直接传入初始化参数，防止再次点击位置不对
-
+                              } else {
+                                  $('.popup_text').text('网络错误');
+                              }
+                          }
+                      })
+                      doIt(0, 0)//直接传入初始化参数，防止再次点击位置不对
+                  }
                 });
+
 
 
               function doIt(t,i){//执行循环主方法
                 time = setInterval(function () {
                   i++;
-                  if (i > 8) {i = 1;t++;}
+                  if (i > 7) {i = 0;t++;}
                   $(".cj").removeClass("cur");
                   $("#cj"+i).addClass("cur");
                   getLb(t,i);
@@ -213,9 +223,11 @@
                 if (t == 3) {
                   if (i == result_no) {//此处的i为设定的中奖位置，也可用ajax去请求获得
                     clearInterval(time);
+                    no_repeat_click = true;
                     $('.popup_wrap dl').hide();
                     $('.popup_text').show();
                     $('.popup_button').text('继续抽奖');
+                    $('.popup_wrap .popup_box').show();
                     $('.popup_wrap').show();
                     $('.popup_button').click(function(){
                         car_house_loan();
@@ -223,7 +235,7 @@
                         $('.popup_wrap ').hide();
                     });
                     $('.popup_wrap .close_ico').click(function(){
-                       car_house_loan();
+                        car_house_loan();
                         $(".choujiang").unbind('click');
                         $('.popup_wrap ').hide();
                     });
