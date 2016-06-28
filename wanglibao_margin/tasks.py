@@ -218,9 +218,9 @@ def assignment_buy(buyer_token=None, seller_token=None):
                 seller_keeper = PhpMarginKeeper(assignment.seller, )
 
                 # 买家流水
-                ret = buyer_keeper.margin_process(
+                buyer_ret = buyer_keeper.margin_process(
                           assignment.buyer, 1, assignment.buy_price, description=u'买债转', catalog=u"投资")
-                if ret:
+                if buyer_ret:
                     # 卖家流水
                     seller_keeper.margin_process(
                         assignment.seller, 0, assignment.buy_price, description=u'卖债转', catalog=u"转让回款")
