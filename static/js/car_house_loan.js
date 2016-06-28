@@ -76,8 +76,16 @@
                         $('.luck_title_wrap dl dt').text(data.message);
                         $('.luck_title_wrap dl dd').hide();
                         $('.luck_title_wrap').show();
-
-                        no_denglu();
+                        $('.popup_wrap .popup_box').show();
+                        $('.popup_button').text('我知道了');
+                        $('.popup_button').bind('click',function(){
+                            $('.popup_wrap').hide();
+                            window.location.href = '/p2p/list/'
+                        });
+                        $('.choujiang').bind('click',function(){
+                            $('.popup_wrap .popup_box').show();
+                            $('.popup_wrap').show();
+                        })
                         ranking_list(data.rewards_list);
                     }
                     if(data.ret_code=='0') {
