@@ -235,6 +235,11 @@ def assignment_buy(buyer_token=None, seller_token=None):
                                buyToken=assignment.buyer_token,
                                sellToken=assignment.seller_token,
                                msg='success')
+                else:
+                    ret.update(status=0,
+                               buyToken=assignment.buyer_token,
+                               sellToken=assignment.seller_token,
+                               msg=u'用户余额不足')
         except Exception, e:
             logger.debug('buy assignment product failed with exception: {}'.format(str(e)))
             assignment.trade_status = 'FAILED'
