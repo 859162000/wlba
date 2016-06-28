@@ -181,6 +181,10 @@ class PhpMarginKeeper(MarginKeeper):
             if status == 0:
                 margin.margin += amount
             else:
+                if margin_before < amount:
+                    logger.exception(u'用户余额不足,不支持本次债转, user_id= {}, amount = {}'.format(user.id, amount))
+                    # raise MarginLack(u'202')
+                    return 0
                 margin.margin -= amount
                 margin_uninvested = margin.uninvested  # 初始未投资余额
                 uninvested = margin.uninvested - amount  # 未投资金额 - 投资金额 = 未投资余额计算结果

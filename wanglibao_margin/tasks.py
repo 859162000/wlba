@@ -217,25 +217,26 @@ def assignment_buy(buyer_token=None, seller_token=None):
                 buyer_keeper = PhpMarginKeeper(assignment.buyer, )
                 seller_keeper = PhpMarginKeeper(assignment.seller, )
 
-                # 卖家流水
-                seller_keeper.margin_process(
-                    assignment.seller, 0, assignment.buy_price, description=u'卖债转', catalog=u"转让回款")
-                # 卖家流水增加一条, 先加买家的钱, 再减去平台手续费
-                seller_keeper.margin_process(
-                    assignment.seller, 1, assignment.fee, description=u'债转平台手续费', catalog=u"转让手续费")
                 # 买家流水
-                buyer_keeper.margin_process(
-                    assignment.buyer, 1, assignment.buy_price, description=u'买债转', catalog=u"投资")
+                ret = buyer_keeper.margin_process(
+                          assignment.buyer, 1, assignment.buy_price, description=u'买债转', catalog=u"投资")
+                if ret:
+                    # 卖家流水
+                    seller_keeper.margin_process(
+                        assignment.seller, 0, assignment.buy_price, description=u'卖债转', catalog=u"转让回款")
+                    # 卖家流水增加一条, 先加买家的钱, 再减去平台手续费
+                    seller_keeper.margin_process(
+                        assignment.seller, 1, assignment.fee, description=u'债转平台手续费', catalog=u"转让手续费")
 
-                # 如果加减钱成功后, 更新债转的表的状态为成功
-                assignment.trade_status = 'PAID'
-                assignment.save()
-                ret.update(status=1,
-                           buyToken=assignment.buyer_token,
-                           sellToken=assignment.seller_token,
-                           msg='success')
+                    # 如果加减钱成功后, 更新债转的表的状态为成功
+                    assignment.trade_status = 'PAID'
+                    assignment.save()
+                    ret.update(status=1,
+                               buyToken=assignment.buyer_token,
+                               sellToken=assignment.seller_token,
+                               msg='success')
         except Exception, e:
-            logger.debug('buy month product failed with exception: {}'.format(str(e)))
+            logger.debug('buy assignment product failed with exception: {}'.format(str(e)))
             assignment.trade_status = 'FAILED'
             ret.update(status=0,
                        buyToken=assignment.buyer_token,
