@@ -13,10 +13,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from marketing import tools
 from wanglibao import settings
 from wanglibao_account.auth_backends import User
-from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
 from wanglibao_margin.tasks import buy_month_product, assignment_buy, buy_mall_product
 from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
@@ -423,29 +421,29 @@ class YueLiBaoBuyFail(APIView):
         user_id = request.POST.get('userId')
         token = request.POST.get('token')
 
-        user = User.objects.get(pk=user_id)
-        product = MonthProduct.objects.filter(token=token).first()
+        with transaction.atomic(savepoint=True):
+            user = User.objects.get(pk=user_id)
+            product = MonthProduct.objects.select_for_update().filter(token=token).first()
 
-        # if user != request.user:
-        #     ret.update(status=0, msg='user authenticate error')
-        #     return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+            # if user != request.user:
+            #     ret.update(status=0, msg='user authenticate error')
+            #     return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
-        # 不存在的订单显示成功
-        if not product:
-            ret.update(status=2, msg='success')
-            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
-        if product.cancel_status:
-            ret.update(status=1, msg='already canceled!')
-            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
-        # 未扣款成功的订单, 直接返回成功
-        if product.trade_status == 'NEW':
-            product.cancel_status = True
-            product.save()
-            ret.update(status=1, msg='not paid!')
-            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+            # 不存在的订单显示成功
+            if not product:
+                ret.update(status=2, msg='success')
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+            if product.cancel_status:
+                ret.update(status=1, msg='already canceled!')
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+            # 未扣款成功的订单, 直接返回成功
+            if product.trade_status == 'NEW':
+                product.cancel_status = True
+                product.save()
+                ret.update(status=1, msg='not paid!')
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
-        try:
-            with transaction.atomic(savepoint=True):
+            try:
                 product_id = product.product_id
                 buyer_keeper = PhpMarginKeeper(user, product_id)
                 record = buyer_keeper.yue_cancel(user, product.amount_source)
@@ -459,13 +457,13 @@ class YueLiBaoBuyFail(APIView):
                     php_redpack_restore(product.id, product_id, product.amount, user)
                     logger.info('purchase failed and restore red_pack. token = {},\n'.format(token))
 
-            ret.update(status=1,
+                ret.update(status=1,
                        msg='success')
-        except Exception, e:
-            logger.debug('in YueLiBaoBuyFail, failed with : {}\n'.format(e.message))
-            ret.update(status=0,
-                       msg=e.message)
-        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+            except Exception, e:
+                logger.debug('in YueLiBaoBuyFail, failed with : {}\n'.format(e.message))
+                ret.update(status=0,
+                           msg=e.message)
+            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
 class YueLiBaoBuyStatus(APIView):
@@ -520,10 +518,13 @@ class YueLiBaoCheck(APIView):
 
         try:
             with transaction.atomic(savepoint=True):
+                # 字段没有索引, 应该会锁表?
+                # 会锁, 已验证
                 month_products = MonthProduct.objects.filter(
                     product_id=product_id, cancel_status=False, trade_status='PAID')
 
                 for product in month_products:
+                    # 这是对应商城直接购买的还款, 如果有这种还款忽略.
                     if product.red_packet == -1:
                         product.red_packet = 0
                         product.save()
@@ -577,7 +578,7 @@ class YueLiBaoCancel(APIView):
 
         try:
             with transaction.atomic(savepoint=True):
-                month_products = MonthProduct.objects.filter(token__in=tokens)
+                month_products = MonthProduct.objects.select_for_update().filter(token__in=tokens)
                 for product in month_products:
                     user = product.user
                     product_id = product.product_id
@@ -650,6 +651,7 @@ class YueLiBaoRefund(APIView):
                 for arg in eval(args):
                     user = User.objects.filter(pk=arg['userId']).first()
 
+                    # TODO: 此处用marginrecord流水来确定是否还款,容易出问题,最好是用中间表,并建立唯一索引,查询时将表记录锁定
                     margin_record = MarginRecord.objects.filter(
                         # # (Q(catalog=u'月利宝本金入账') | Q(catalog=u'债转本金入账')) &
                         # (Q(catalog=u'\u6708\u5229\u5b9d\u672c\u91d1\u5165\u8d26') |

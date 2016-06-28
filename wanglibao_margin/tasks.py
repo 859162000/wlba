@@ -38,23 +38,25 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
     ###### 以下  如果是 amount 是 优惠后的金额
     :return:
     """
-    product = MonthProduct.objects.filter(token=token).first()
+    # 标志购买成功才去走活动检查.
+    flag = False
+    with transaction.atomic(savepoint=True):
+        product = MonthProduct.objects.select_for_update().filter(token=token).first()
 
-    if not product:
-        return
+        if not product:
+            return
 
-    ret = dict()
+        ret = dict()
 
-    if product.trade_status != 'NEW':
-        ret.update(status=1,
-                   token=product.token,
-                   msg='already saved!')
-    else:
-        # 未被取消的订单才可以扣款
-        if not product.cancel_status:
-            # 状态成功, 对买家扣款, 加入冻结资金
-            try:
-                with transaction.atomic(savepoint=True):
+        if product.trade_status != 'NEW':
+            ret.update(status=1,
+                       token=product.token,
+                       msg='already saved!')
+        else:
+            # 未被取消的订单才可以扣款
+            if not product.cancel_status:
+                # 状态成功, 对买家扣款, 加入冻结资金
+                try:
                     buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
 
                     user = User.objects.filter(pk=user).first()
@@ -82,34 +84,36 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
                     ret.update(status=1,
                                token=token,
                                msg='success')
+                    flag = True
 
-                    try:
-                        tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
-                                                               "device": device, "order_id": product.id,
-                                                               "product_id": product.id, "is_full": False,
-                                                               "product_balance_after": 0, "ylb_period": int(period)},
-                                                       queue='celery_ylb')
+                except Exception, e:
+                    logger.exception("buy_month_product failed:")
+                    logger.debug('buy_month_product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
+                    product.trade_status = 'FAILED'
+                    product.save()
+                    ret.update(status=0,
+                               token=product.token,
+                               msg='pay failed!' + str(e))
 
-                    except Exception, e:
-                        logger.debug('tools.decide_first.apply_async failed with = {} !!!'.format(e.message))
+    if flag:
+        try:
+            tools.decide_first.apply_async(kwargs={"user_id": user.id, "amount": amount_source,
+                                                   "device": device, "order_id": product.id,
+                                                   "product_id": product.id, "is_full": False,
+                                                   "product_balance_after": 0, "ylb_period": int(period)},
+                                           queue='celery_ylb')
 
-                    # 模拟一个request
-                    request = urllib2.Request("")
-                    try:
-                        logger.info(u"=遍历渠道= CoopRegister.process_for_purchase : {}, {}".
-                                    format(user, product.id))
-                        CoopRegister(request).process_for_purchase_yuelibao(user, product.id)
-                    except Exception, e:
-                        logger.debug(u"=遍历渠道= CoopRegister.process_for_purchase Except:{}".format(e))
+        except Exception, e:
+            logger.debug('tools.decide_first.apply_async failed with = {} !!!'.format(e.message))
 
-            except Exception, e:
-                logger.exception("buy_month_product failed:")
-                logger.debug('buy_month_product failed with exception: {}, red_pack_id = {}'.format(str(e), red_packet_id))
-                product.trade_status = 'FAILED'
-                product.save()
-                ret.update(status=0,
-                           token=product.token,
-                           msg='pay failed!' + str(e))
+        # 模拟一个request
+        request = urllib2.Request("")
+        try:
+            logger.info(u"=遍历渠道= CoopRegister.process_for_purchase : {}, {}".
+                        format(user, product.id))
+            CoopRegister(request).process_for_purchase_yuelibao(user, product.id)
+        except Exception, e:
+            logger.debug(u"=遍历渠道= CoopRegister.process_for_purchase Except:{}".format(e))
 
     # 写入 sqs
     args_data = dict()
@@ -135,23 +139,23 @@ def buy_mall_product(token=None, amount_source=None, payback_source=None, user=N
     ###### 以下  如果是 amount 是 优惠后的金额
     :return:
     """
-    product = MonthProduct.objects.filter(token=token).first()
+    with transaction.atomic(savepoint=True):
+        product = MonthProduct.objects.select_for_update().filter(token=token).first()
 
-    if not product:
-        return
+        if not product:
+            return
 
-    ret = dict()
+        ret = dict()
 
-    if product.trade_status != 'NEW':
-        ret.update(status=1,
-                   token=product.token,
-                   msg='already saved!')
-    else:
-        # 未被取消的订单才可以扣款
-        if not product.cancel_status:
-            # 状态成功, 对买家扣款, 加入冻结资金
-            try:
-                with transaction.atomic(savepoint=True):
+        if product.trade_status != 'NEW':
+            ret.update(status=1,
+                       token=product.token,
+                       msg='already saved!')
+        else:
+            # 未被取消的订单才可以扣款
+            if not product.cancel_status:
+                # 状态成功, 对买家扣款, 加入冻结资金
+                try:
                     buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
                     # 直接扣款
                     # margin_process(self, user, status, amount, description=u'', catalog=u'', savepoint=True)
@@ -168,13 +172,13 @@ def buy_mall_product(token=None, amount_source=None, payback_source=None, user=N
                                token=token,
                                msg='success')
 
-            except Exception, e:
-                logger.debug('buy_mall_product failed with exception: {}'.format(e.message))
-                product.trade_status = 'FAILED'
-                product.save()
-                ret.update(status=0,
-                           token=product.token,
-                           msg='pay failed!' + e.message)
+                except Exception, e:
+                    logger.debug('buy_mall_product failed with exception: {}'.format(e.message))
+                    product.trade_status = 'FAILED'
+                    product.save()
+                    ret.update(status=0,
+                               token=product.token,
+                               msg='pay failed!' + e.message)
 
     # 写入 sqs
     args_data = dict()
@@ -197,22 +201,23 @@ def assignment_buy(buyer_token=None, seller_token=None):
     :param seller_token:
     :return:
     """
-    assignment = AssignmentOfClaims.objects.filter(buyer_token=buyer_token, seller_token=seller_token).first()
-    if not assignment:
-        return
+    with transaction.atomic(savepoint=True):
+        # TODO: 表没有唯一索引,select_for_update时会锁表,需要建立唯一索引
+        assignment = AssignmentOfClaims.objects.filter(buyer_token=buyer_token, seller_token=seller_token).first()
+        if not assignment:
+            return
 
-    ret = dict()
+        ret = dict()
 
-    if assignment.trade_status != 'NEW':
-        ret.update(status=1,
-                   buyToken=assignment.buyer_token,
-                   sellToken=assignment.seller_token,
-                   msg='already saved!')
+        if assignment.trade_status != 'NEW':
+            ret.update(status=1,
+                       buyToken=assignment.buyer_token,
+                       sellToken=assignment.seller_token,
+                       msg='already saved!')
 
-    else:
-        # 状态成功, 对买家扣款, 卖家回款.
-        try:
-            with transaction.atomic(savepoint=True):
+        else:
+            # 状态成功, 对买家扣款, 卖家回款.
+            try:
                 # status == 0 加钱, 其他减钱. 这直接对买家余额减钱, 卖家余额加钱
                 buyer_keeper = PhpMarginKeeper(assignment.buyer, )
                 seller_keeper = PhpMarginKeeper(assignment.seller, )
@@ -240,13 +245,14 @@ def assignment_buy(buyer_token=None, seller_token=None):
                                buyToken=assignment.buyer_token,
                                sellToken=assignment.seller_token,
                                msg=u'用户余额不足')
-        except Exception, e:
-            logger.debug('buy assignment product failed with exception: {}'.format(str(e)))
-            assignment.trade_status = 'FAILED'
-            ret.update(status=0,
-                       buyToken=assignment.buyer_token,
-                       sellToken=assignment.seller_token,
-                       msg=str(e))
+            except Exception, e:
+                logger.debug('buy assignment product failed with exception: {}'.format(str(e)))
+                assignment.trade_status = 'FAILED'
+                assignment.save()
+                ret.update(status=0,
+                           buyToken=assignment.buyer_token,
+                           sellToken=assignment.seller_token,
+                           msg=str(e))
 
     # 写入 sqs
     data = dict()
@@ -258,5 +264,3 @@ def assignment_buy(buyer_token=None, seller_token=None):
 
     logger.info('in buy zhaizhuan, buyer_token = {}, seller_token = {}'.format(buyer_token, seller_token))
     logger.info('save to sqs! args = {}, return = {}'.format(data, ret))
-
-    print ret.text
