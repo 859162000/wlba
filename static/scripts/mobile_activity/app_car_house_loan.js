@@ -367,8 +367,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                                     }
                                                   })
 
-                                                  doIt(1,1)//直接传入初始化参数，防止再次点击位置不对
-
+                                                  doIt(0,0)//直接传入初始化参数，防止再次点击位置不对
                                                 });
 
 
@@ -554,7 +553,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $('.horn').hide();
         }
     }
-    
+
 
     var no_repeat_click = true;
     function choujiang(data_text,result_no){
