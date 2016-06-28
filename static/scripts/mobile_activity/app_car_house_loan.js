@@ -488,6 +488,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         })
     }
 
+
     function no_denglu(){
         $('.popup_text').hide;
         $('.popup_wrap dl dt').text('您还未登陆！');
@@ -501,6 +502,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $('.popup_wrap').show();
         })
     }
+
 
 
     function ranking_list(json){
@@ -543,7 +545,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 $(".choujiang").bind('click',function(){//触发事件
                   if(no_repeat_click) {
                       no_repeat_click = false;
-                      $.ajax({
+                      org.ajax({
                           url: '/api/activity/chefangdai/',
                           type: 'post',
                           success: function (data) {
