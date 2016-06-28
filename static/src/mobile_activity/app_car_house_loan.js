@@ -269,6 +269,7 @@
         })
     }
 
+
     function no_denglu(){
         $('.popup_text').hide;
         $('.popup_wrap dl dt').text('您还未登陆！');
@@ -282,6 +283,7 @@
             $('.popup_wrap').show();
         })
     }
+
 
 
     function ranking_list(json){
@@ -324,7 +326,7 @@
                 $(".choujiang").bind('click',function(){//触发事件
                   if(no_repeat_click) {
                       no_repeat_click = false;
-                      $.ajax({
+                      org.ajax({
                           url: '/api/activity/chefangdai/',
                           type: 'post',
                           success: function (data) {
