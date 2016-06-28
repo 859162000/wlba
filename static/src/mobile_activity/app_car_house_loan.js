@@ -73,7 +73,7 @@
                         })
                         function app_car_house_loan(){
 
-                            alert('app_car_house_loan');
+                            //alert('app_car_house_loan');
                             org.ajax({
                                 url: '/api/activity/chefangdaiuserinfo/',
                                 type: 'post',
@@ -81,8 +81,10 @@
                                     if(data.ret_code=='1002') {
                                         $('.section_2 .big_title').text(data.message);
                                         $('.luck_title_wrap').show();
-                                        $('.popup_wrap dl').show();
                                         $('.popup_text').hide();
+                                        $('.popup_wrap dl dt').text('您暂时还没有抽奖机会哦~');
+                                        $('.popup_wrap dl dd').text('马上投资指定产品，获得更多抽奖机会！！');
+                                        $('.popup_wrap dl').show();
                                         $('.popup_button').text('马上去');
                                         $('.popup_button').click(function(){
                                             mixins.jumpToManageMoney();
@@ -94,7 +96,9 @@
                                     }
                                     if(data.ret_code=='1000') {
                                         $('.section_2 .big_title').text(data.message);
-                                        $('.popup_text').hide();
+                                        $('.popup_text').hide;
+                                        $('.popup_wrap dl dt').text('您还未登陆！');
+                                        $('.popup_wrap dl dd').text('请登录后查看抽奖机会！');
                                         $('.popup_wrap dl').show();
                                         $('.popup_button').text('马上去');
                                         $('.popup_button').click(function(){
@@ -107,10 +111,11 @@
                                     }
                                     if(data.ret_code=='1001') {
                                         $('.section_2 .big_title').text(data.message);
-                                        $('.popup_wrap dl').show();
-                                        $('.popup_button').text('马上去');
+                                        $('.popup_text').text(data.message);
+                                        $('.popup_wrap dl').hide();
+                                        $('.popup_button').text('我知道了');
                                         $('.popup_button').click(function(){
-                                             mixins.loginApp({refresh:1, url:'/activity/chefangdaiapp/'});
+                                            mixins.jumpToManageMoney();
                                         });
                                         $('.choujiang').bind('click',function(){
                                             $('.popup_wrap').show();
@@ -132,14 +137,14 @@
                                                     type: 'post',
                                                     success: function (data) {
                                                         if (data.ret_code == '0') {
-                                                            alert('success');
+                                                            //alert('success');
                                                             $('.popup_text').text(data.content);
                                                         }else{
                                                             $('.popup_text').text('网络错误');
                                                         }
                                                     },
                                                     error: function(data){
-                                                        alert('error');
+                                                        //alert('error');
                                                     }
                                                   })
 
@@ -172,14 +177,14 @@
                                                         app_car_house_loan();
                                                         $('.popup_wrap ').hide();
                                                         $(".choujiang").unbind('click');
-                                                        alert('转完');
+                                                        //alert('转完');
 
                                                     });
                                                     $('.popup_wrap .close_ico').click(function(){
                                                         app_car_house_loan();
                                                         $(".choujiang").unbind('click');
                                                         $('.popup_wrap ').hide();
-                                                        alert('转完');
+                                                        //alert('转完');
                                                     });
                                                   }
                                                 }
@@ -241,8 +246,16 @@
                     ranking_list(data.rewards_list);
                 }
                 if(data.ret_code=='1001') {
-                     $('.section_2 .big_title').text(data.message);
-                    no_denglu();
+                    $('.section_2 .big_title').text(data.message);
+                    $('.popup_text').text(data.message);
+                    $('.popup_wrap dl').hide();
+                    $('.popup_button').text('我知道了');
+                    $('.popup_button').click(function(){
+                        window.location.href = '/weixin/list/'
+                    });
+                    $('.choujiang').bind('click',function(){
+                        $('.popup_wrap').show();
+                    })
                 }
                 if(data.ret_code=='0') {
                      $('.section_2 .big_title').text(data.message);
@@ -262,10 +275,11 @@
 
     function no_choujiang(){
         $('.luck_title_wrap').show();
+        $('.popup_text').hide();
         $('.popup_wrap dl dt').text('您暂时还没有抽奖机会哦~');
         $('.popup_wrap dl dd').text('马上投资指定产品，获得更多抽奖机会！！');
         $('.popup_wrap dl').show();
-        $('.popup_text').hide();
+
         $('.popup_button').text('马上去');
         $('.popup_button').click(function(){
             window.location.href = '/weixin/list/'
