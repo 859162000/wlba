@@ -339,7 +339,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 
                                             $('.section_2 .big_title').text(data.message);
-                                            function choujiang(data_text,result_no){
+                                            function app_choujiang(data_text,result_no){
 
                                             var speed = 100;//速度
                                             var time = "";//创建一个定时器
@@ -398,7 +398,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                                 }
                                               }
                                         }
-
+                                        app_choujiang(data.content,data.result_no);
 
 
                                     }
@@ -495,7 +495,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         $('.popup_wrap dl').show();
         $('.popup_button').text('马上去');
         $('.popup_button').click(function(){
-            window.location.href = '/weixin/regist/?next=/activity/chefangdaiapp/'
+            window.location.href = '/weixin/login/?next=/activity/chefangdaiapp/'
         });
         $('.choujiang').bind('click',function(){
             $('.popup_wrap').show();
