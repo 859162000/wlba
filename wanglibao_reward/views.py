@@ -899,7 +899,11 @@ class CheFangDaiDistributer(RewardDistributer):
     @method_decorator(transaction.atomic)
     def distribute(self):
         try:
-            if (self.product.name.find('好房贷')>=0 & self.product.name.find('好车盈')>=0) | self.amount>=1000:
+            json_to_response = get_activity_config('chefangdai')
+            #判断活动时间
+            if json_to_response:
+                return
+            if (self.product.name.find('好房')>=0 & self.product.name.find('好车')>=0) | self.amount>=1000:
                 WanglibaoActivityRewardOrder.objects.create(
                         activity='cfd',
                         order_id=self.order_id,
