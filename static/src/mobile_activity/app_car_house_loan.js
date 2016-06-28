@@ -68,6 +68,9 @@
                         //    url += "?1";
                         //    self.location.replace(url);
                         //}
+                        $('.insert_text .right_link').click(function(){
+                            mixins.jumpToManageMoney();
+                        })
                         function app_car_house_loan(){
 
 
@@ -213,6 +216,10 @@
     })
 
     function car_house_loan(){
+        $('.insert_text .right_link').click(function(){
+            window.location.href = '/weixin/list/'
+        });
+
         org.ajax({
             url: '/api/activity/chefangdaiuserinfo/',
             type: 'post',
