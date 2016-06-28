@@ -900,7 +900,7 @@ class CheFangDaiDistributer(RewardDistributer):
     def distribute(self):
         try:
             if (self.product.name.find('好房贷')>=0 & self.product.name.find('好车盈')>=0) | self.amount>=1000:
-                WanglibaoActivityReward.objects.create(
+                WanglibaoActivityRewardOrder.objects.create(
                         activity='cfd',
                         order_id=self.order_id,
                         user=self.user,
@@ -950,23 +950,7 @@ class CheFangDaiUserInfoAPIView(APIView):
         return name, result_no
     
     def post(self, request):
-        rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
-        rewards_list = {}
-        if rewards:
-            res_list = []
-            for res in rewards:
-                #好运榜数据
-                res_content = {}
-                seconds =(datetime.datetime.now()-datetime.datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
-                res_content['phone']=res.user.wanglibaouserprofile.phone
-                res_content['time']=seconds
-                if res.reward:
-                    res_content['name']=res.reward.content
-                else:
-                    res_content['name']=res.redpack_event.name
-                res_list.append(res_content)
-            rewards_list['luck_list'] = res_list
-            
+        rewards_list = get_luck_list()
         if not request.user.is_authenticated():
             json_to_response = {
                 'ret_code': 1000,
@@ -975,34 +959,11 @@ class CheFangDaiUserInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        key = 'chefangdai'
-        activity_config = Misc.objects.filter(key=key).first()
-        if activity_config:
-            activity = json.loads(activity_config.value)
-            if type(activity) == dict:
-                try:
-                    start_time = activity['start_time']
-                    end_time = activity['end_time']
-                except KeyError, reason:
-                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
-                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
-            else:
-                raise Exception(u"misc中activities的配置参数，应是字典类型")
-        else:
-            raise Exception(u"misc中没有配置activities杂项")
-
-        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
-        if now < start_time or now >= end_time:
-            message = u'活动还未开始,请耐心等待'
-            if now >= end_time:
-                message = u'活动已结束，感谢参与'
-            json_to_response = {
-                'ret_code': 1001,
-                'message': message
-            }
+        json_to_response = get_activity_config('chefangdai')
+        if json_to_response:
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        user_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='cfd', has_sent=False)
+        user_reward = WanglibaoActivityRewardOrder.objects.filter(user=request.user, activity='cfd', has_sent=False)
         reward_record = user_reward.first()
         logger.debug("reward_record:%s" % (reward_record,))
         if reward_record == None:
@@ -1023,7 +984,57 @@ class CheFangDaiUserInfoAPIView(APIView):
              'rewards_list': rewards_list #好运榜
          }
         return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-            
+
+#----------------------------------------------------------------------
+def get_activity_config(key):
+    """获取活动配置"""
+    activity_config = Misc.objects.filter(key=key).first()
+    if activity_config:
+        activity = json.loads(activity_config.value)
+        if type(activity) == dict:
+            try:
+                start_time = activity['start_time']
+                end_time = activity['end_time']
+            except KeyError, reason:
+                logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+        else:
+            raise Exception(u"misc中activities的配置参数，应是字典类型")
+    else:
+        raise Exception(u"misc中没有配置activities杂项")
+    json_to_response = {}
+    now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
+    if now < start_time or now >= end_time:
+        message = u'活动还未开始,请耐心等待'
+        if now >= end_time:
+            message = u'活动已结束，感谢参与'
+            json_to_response = {
+                'ret_code': 1001,
+                'message': message
+            }
+    return json_to_response
+
+#----------------------------------------------------------------------
+def get_luck_list():
+    """获取好运榜"""
+    rewards = WanglibaoActivityRewardOrder.objects.filter(activity='cfd', has_sent=True).order_by('-create_at')[0:10]
+    rewards_list = {}
+    if rewards:
+        res_list = []
+        for res in rewards:
+            #好运榜数据
+            res_content = {}
+            seconds = (datetime.datetime.now()-datetime.datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
+            res_content['phone']=res.user.wanglibaouserprofile.phone
+            res_content['time']=seconds
+            if res.reward:
+                res_content['name']=res.reward.content
+            else:
+                res_content['name']=res.redpack_event.name
+            res_list.append(res_content)
+        rewards_list['luck_list'] = res_list
+    return rewards_list
+
 class CheFangDaiAPIView(APIView):
     permission_classes = ()
 
@@ -1061,23 +1072,6 @@ class CheFangDaiAPIView(APIView):
         return event, result_no
     
     def post(self, request):
-        rewards = WanglibaoActivityReward.objects.filter(activity='cfd', has_sent=True)[0:10]
-        rewards_list = {}
-        if rewards:
-            res_list = []
-            for res in rewards:
-                #好运榜数据
-                res_content = {}
-                seconds =(datetime.datetime.now()-datetime.datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
-                res_content['phone']=res.user.wanglibaouserprofile.phone
-                res_content['time']=seconds
-                if res.reward:
-                    res_content['name']=res.reward.content
-                else:
-                    res_content['name']=res.redpack_event.name
-                res_list.append(res_content)
-            rewards_list['luck_list'] = res_list
-            
         if not request.user.is_authenticated():
             json_to_response = {
                 'ret_code': 1000,
@@ -1086,31 +1080,8 @@ class CheFangDaiAPIView(APIView):
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        key = 'chefangdai'
-        activity_config = Misc.objects.filter(key=key).first()
-        if activity_config:
-            activity = json.loads(activity_config.value)
-            if type(activity) == dict:
-                try:
-                    start_time = activity['start_time']
-                    end_time = activity['end_time']
-                except KeyError, reason:
-                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
-                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
-            else:
-                raise Exception(u"misc中activities的配置参数，应是字典类型")
-        else:
-            raise Exception(u"misc中没有配置activities杂项")
-
-        now = time.strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())
-        if now < start_time or now >= end_time:
-            message = u'活动还未开始,请耐心等待'
-            if now >= end_time:
-                message = u'活动已结束，感谢参与'
-            json_to_response = {
-                'ret_code': 1001,
-                'message': message
-            }
+        json_to_response = get_activity_config('chefangdai')
+        if json_to_response:
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         try:
@@ -1123,14 +1094,13 @@ class CheFangDaiAPIView(APIView):
             ##################
 
             with transaction.atomic():
-                user_reward = WanglibaoActivityReward.objects.select_for_update().filter(user=request.user, activity='cfd', has_sent=False)
+                user_reward = WanglibaoActivityRewardOrder.objects.select_for_update().filter(user=request.user, activity='cfd', has_sent=False)
                 reward_record = user_reward.first()
                 logger.debug("reward_record:%s" % (reward_record,))
                 if reward_record == None:
                     json_to_response = {
                         'ret_code': 1002,
                         'message': u'您暂时没有抽奖机会',
-                        #'rewards_list': rewards_list
                     }
                     return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
@@ -1151,7 +1121,6 @@ class CheFangDaiAPIView(APIView):
                         json_to_response = {
                             'ret_code': 1002,
                             'message': u'奖品已经发完，感谢参与',
-                            # 'rewards_list': rewards_list
                         }
                         return HttpResponse(json.dumps(json_to_response), content_type='application/json')
                 elif redpack_event:
@@ -1164,7 +1133,6 @@ class CheFangDaiAPIView(APIView):
                     json_to_response = {
                         'ret_code': 1002,
                         'message': u'奖品已经发完，感谢参与',
-                        # 'rewards_list': rewards_list
                     }
                     return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
@@ -1191,7 +1159,7 @@ class CheFangDaiAPIView(APIView):
 
             count = user_reward.count() - 1
             mes = u'当前您拥有%s次抽奖机会' % count
-
+            rewards_list = get_luck_list()
             json_to_response = {
                 'ret_code': 0,
                 'message': mes, #拥有抽奖机会次数
