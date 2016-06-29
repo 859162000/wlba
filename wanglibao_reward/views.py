@@ -958,7 +958,7 @@ class CheFangDaiUserInfoAPIView(APIView):
         if not request.user.is_authenticated():
             json_to_response = {
                 'ret_code': 1000,
-                'message': u'您还没有登陆',
+                'message': u'您还没有登录',
                 'rewards_list': rewards_list
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
@@ -1029,8 +1029,8 @@ def get_luck_list():
             #好运榜数据
             res_content = {}
             seconds = (datetime.datetime.now()-datetime.datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
-            res_content['phone']=res.user.wanglibaouserprofile.phone
-            res_content['time']=seconds
+            res_content['phone'] = safe_phone_str(res.user.wanglibaouserprofile.phone)
+            res_content['time'] = seconds
             if res.reward:
                 #Modify by hb on 2016-06-29
                 #res_content['name']=res.reward.content

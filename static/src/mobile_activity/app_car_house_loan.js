@@ -18,11 +18,12 @@
 			});
 		}
 	});
+
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
 			shareName = '“车房贷”福利专享大放送',
 			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
-			shareLink = host + '/activity/app_car_house_loan/?promo_token=xmdj2',
+			shareLink = host + '/activity/chefangdaiapp/',
 			shareMainTit = '“车房贷”福利专享大放送',
 			shareBody = '平台专用车库对质押车7*24小时监管（附图），标准资产更放心！';
 		//分享给微信好友
@@ -97,7 +98,7 @@
                                     if(data.ret_code=='1000') {
                                         $('.section_2 .big_title').text(data.message);
                                         $('.popup_text').hide;
-                                        $('.popup_wrap dl dt').text('您还未登陆！');
+                                        $('.popup_wrap dl dt').text('您还未登录！');
                                         $('.popup_wrap dl dd').text('请登录后查看抽奖机会！');
                                         $('.popup_wrap dl').show();
                                         $('.popup_button').text('马上去');
@@ -291,7 +292,7 @@
 
     function no_denglu(){
         $('.popup_text').hide;
-        $('.popup_wrap dl dt').text('您还未登陆！');
+        $('.popup_wrap dl dt').text('您还未登录！');
         $('.popup_wrap dl dd').text('请登录后查看抽奖机会！');
         $('.popup_wrap dl').show();
         $('.popup_button').text('马上去');
@@ -399,6 +400,7 @@
                 }
               }
         }
+
 
     var swiper_1 = new Swiper('.swiper1', {
 		pagination : '.pagination1',
