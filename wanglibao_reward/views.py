@@ -50,7 +50,7 @@ from wanglibao_rest.utils import split_ua
 import wanglibao_activity.backends as activity_backend
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str4
 from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank, updateRedisWeekTopRank, updateRedisWeekSum
 from weixin.models import WeixinAccounts
 from wechatpy.oauth import WeChatOAuth
@@ -1029,7 +1029,7 @@ def get_luck_list():
             #好运榜数据
             res_content = {}
             seconds = (datetime.datetime.now()-datetime.datetime.strptime(timezone.localtime(res.create_at).strftime('%Y-%m-%d %H:%M:%S'), "%Y-%m-%d %H:%M:%S")).total_seconds()
-            res_content['phone'] = safe_phone_str(res.user.wanglibaouserprofile.phone)
+            res_content['phone'] = safe_phone_str4(res.user.wanglibaouserprofile.phone)
             res_content['time'] = seconds
             if res.reward:
                 #Modify by hb on 2016-06-29
