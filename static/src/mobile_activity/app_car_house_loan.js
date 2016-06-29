@@ -97,7 +97,7 @@
                                     if(data.ret_code=='1000') {
                                         $('.section_2 .big_title').text(data.message);
                                         $('.popup_text').hide;
-                                        $('.popup_wrap dl dt').text('您还未登陆！');
+                                        $('.popup_wrap dl dt').text('您还未登录！');
                                         $('.popup_wrap dl dd').text('请登录后查看抽奖机会！');
                                         $('.popup_wrap dl').show();
                                         $('.popup_button').text('马上去');
@@ -291,7 +291,7 @@
 
     function no_denglu(){
         $('.popup_text').hide;
-        $('.popup_wrap dl dt').text('您还未登陆！');
+        $('.popup_wrap dl dt').text('您还未登录！');
         $('.popup_wrap dl dd').text('请登录后查看抽奖机会！');
         $('.popup_wrap dl').show();
         $('.popup_button').text('马上去');
@@ -399,6 +399,7 @@
                 }
               }
         }
+
 
     var swiper_1 = new Swiper('.swiper1', {
 		pagination : '.pagination1',
