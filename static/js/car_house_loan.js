@@ -122,7 +122,7 @@
 
         function no_denglu(){
             $('.popup_text').hide();
-            $('.popup_wrap dl dt').text('您还未登陆！');
+            $('.popup_wrap dl dt').text('您还未登录！');
             $('.popup_wrap dl dd').text('请登录后查看抽奖机会！');
             $('.popup_wrap dl').show();
             $('.popup_wrap .popup_box').show();
@@ -254,6 +254,7 @@
               }
 
         }
+
 
         $('.popup_box .close_ico').click(function(){
             $('.popup_wrap ').hide();
