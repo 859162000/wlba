@@ -237,11 +237,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			});
 		}
 	});
+
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
 			shareName = '“车房贷”福利专享大放送',
 			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
-			shareLink = host + '/activity/app_car_house_loan/?promo_token=xmdj2',
+			shareLink = host + '/activity/chefangdaiapp/',
 			shareMainTit = '“车房贷”福利专享大放送',
 			shareBody = '平台专用车库对质押车7*24小时监管（附图），标准资产更放心！';
 		//分享给微信好友

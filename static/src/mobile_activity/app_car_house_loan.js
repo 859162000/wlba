@@ -18,6 +18,7 @@
 			});
 		}
 	});
+
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
 			shareName = '“车房贷”福利专享大放送',
