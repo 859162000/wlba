@@ -903,7 +903,7 @@ class CheFangDaiDistributer(RewardDistributer):
             #判断活动时间
             if json_to_response:
                 return
-            if (self.product.name.find('好房')>=0 & self.product.name.find('好车')>=0) | self.amount>=1000:
+            if (self.product.name.find('好房')>=0 or self.product.name.find('好车')>=0) and self.amount>=1000:
                 WanglibaoActivityRewardOrder.objects.create(
                         activity='cfd',
                         order_id=self.order_id,
@@ -1032,7 +1032,9 @@ def get_luck_list():
             res_content['phone']=res.user.wanglibaouserprofile.phone
             res_content['time']=seconds
             if res.reward:
-                res_content['name']=res.reward.content
+                #Modify by hb on 2016-06-29
+                #res_content['name']=res.reward.content
+                res_content['name']=res.reward.type
             else:
                 res_content['name']=res.redpack_event.name
             res_list.append(res_content)
@@ -1149,10 +1151,11 @@ class CheFangDaiAPIView(APIView):
         else:
             logger.debug('人人都爱车房贷user_phone:%s, reward:%s' % (request.user.wanglibaouserprofile.phone, content))
 
-            send_messages.apply_async(kwargs={
-                "phones": [request.user.wanglibaouserprofile.phone, ],
-                "messages": [send_msg, ],
-            })
+            # Comment by hb on 2016-06-29
+            # send_messages.apply_async(kwargs={
+            #     "phones": [request.user.wanglibaouserprofile.phone, ],
+            #     "messages": [send_msg, ],
+            # })
 
             inside_message.send_one.apply_async(kwargs={
                 "user_id": request.user.id,
