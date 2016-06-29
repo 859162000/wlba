@@ -359,7 +359,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
             });
         }else{
-            $('.section_5_box p span').removeClass('open');
+            $('.slideDown_button').removeClass('open');
+
             ele.height(curHeight).animate({height: 0},500,function(){
                 ele.removeClass('down');
 
@@ -370,4 +371,5 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
         $('.popup_box').hide();
     });
+
 })(org);
