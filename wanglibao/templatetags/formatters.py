@@ -122,6 +122,9 @@ def safe_mail(user):
     return result
 
 
+def safe_phone_str4(phone):
+    return phone[:3] + '*' * (len(phone) - 3 - 4) + phone[-4:]
+
 def safe_phone_str(phone):
     return phone[:3] + '*' * (len(phone) - 2 - 3) + phone[-2:]
 
