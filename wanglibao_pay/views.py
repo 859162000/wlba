@@ -203,7 +203,6 @@ class BaoProxyPayCompleteView(TemplateView):
         logger.info('bao_proxy_pay_complete_view_post:'+str(request.GET))
         code, amount = bao_proxy_pay_process_request(request, just_parse_message=True)
 
-        print 'bao_proxy_pay_complete: %s %s'%(code, amount)
         return self.render_to_response({
             'result': '充值提交成功' if code == 0 else '充值提交失败',
             'amount': amount
