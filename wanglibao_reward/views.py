@@ -1032,7 +1032,9 @@ def get_luck_list():
             res_content['phone']=res.user.wanglibaouserprofile.phone
             res_content['time']=seconds
             if res.reward:
-                res_content['name']=res.reward.content
+                #Modify by hb on 2016-06-29
+                #res_content['name']=res.reward.content
+                res_content['name']=res.reward.type
             else:
                 res_content['name']=res.redpack_event.name
             res_list.append(res_content)
