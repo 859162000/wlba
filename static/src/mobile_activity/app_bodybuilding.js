@@ -140,7 +140,8 @@
 
             });
         }else{
-            $('.section_5_box p span').removeClass('open');
+            $('.slideDown_button').removeClass('open');
+
             ele.height(curHeight).animate({height: 0},500,function(){
                 ele.removeClass('down');
 
@@ -151,4 +152,5 @@
     $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
         $('.popup_box').hide();
     });
+
 })(org);
