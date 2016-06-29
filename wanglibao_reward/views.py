@@ -958,7 +958,7 @@ class CheFangDaiUserInfoAPIView(APIView):
         if not request.user.is_authenticated():
             json_to_response = {
                 'ret_code': 1000,
-                'message': u'您还没有登陆',
+                'message': u'您还没有登录',
                 'rewards_list': rewards_list
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
