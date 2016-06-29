@@ -1151,10 +1151,11 @@ class CheFangDaiAPIView(APIView):
         else:
             logger.debug('人人都爱车房贷user_phone:%s, reward:%s' % (request.user.wanglibaouserprofile.phone, content))
 
-            send_messages.apply_async(kwargs={
-                "phones": [request.user.wanglibaouserprofile.phone, ],
-                "messages": [send_msg, ],
-            })
+            # Comment by hb on 2016-06-29
+            # send_messages.apply_async(kwargs={
+            #     "phones": [request.user.wanglibaouserprofile.phone, ],
+            #     "messages": [send_msg, ],
+            # })
 
             inside_message.send_one.apply_async(kwargs={
                 "user_id": request.user.id,
