@@ -420,6 +420,7 @@ class ProxyPay(object):
         try:
             order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device_type)
             post_data = self._post(order_id, amount, gate_id)
+            logger.critical('proxy_pay_post:'+str(post_data))
             PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
             # message为空前段页面会判定为支付成功
             message = ''
@@ -438,7 +439,6 @@ class ProxyPay(object):
         :return:
         """
         try:
-            print 'proxy_pay_message' + str(pay_message)
             # use PayMessage to CHECK PARA, RAISE ERROR before proxy_pay_callback
             return self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
                                                     pay_message.res_content, request)
@@ -533,7 +533,7 @@ class BaoProxyPay(ProxyPay):
                 'ProductName': '商品名称',
                 'NoticeType': 1,
                 # 'PageUrl': 'https://www.wanglibao.com',#页面返回
-                'PageUrl': settings.CALLBACK_HOST + reverse('baoproxypay-deposit-completeview'),#交易通知
+                'PageUrl': settings.CALLBACK_HOST + reverse('baoproxypay-deposit-completeview'),#页面返回
                 # 'ReturnUrl': reverse('baoproxypay-deposit-callback'),#交易通知
                 'ReturnUrl': settings.CALLBACK_HOST + reverse('baoproxypay-deposit-callback'),#交易通知
                 'Signature': ''
@@ -544,7 +544,6 @@ class BaoProxyPay(ProxyPay):
         str_to_sign += '|' + secret_key
         md5_sign = md5.new(str_to_sign).hexdigest()
         post_para.update(Signature=md5_sign)
-        print 'Signature:' + md5_sign + '|' + str_to_sign
         return post_para
 
 
@@ -559,7 +558,6 @@ class BaoProxyPayCallbackMessage(PayMessage):
                 'ResultDesc','FactMoney','AdditionalInfo','SuccTime']
         str_to_sign = separator.join(k + '=' + message_dict.get(k, '') for k in key_list)
         str_to_sign += separator + 'Md5Sign=' + secret_key
-        print 'callbackmessage_strtosign' + str_to_sign
         return md5.new(str_to_sign).hexdigest()
 
     def parse_message(self, message_dict, res_ip):
@@ -567,7 +565,6 @@ class BaoProxyPayCallbackMessage(PayMessage):
         # check
         signature = self._get_signature(message_dict)
         if signature != message_dict.get('Md5Sign'):
-            print signature + '|' + message_dict.get('Md5Sign')
             raise ThirdPayError(40015, '不合法的第三方支付信息' + str(message_dict))
 
         try:
