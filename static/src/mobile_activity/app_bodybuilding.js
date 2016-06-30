@@ -72,7 +72,7 @@
 
                         $('#take_prize,#take_prize_2').click(function() {
                             org.ajax({
-                                url: '/api/activity/xiaomei/',
+                                url: '/api/activity/ruike/',
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
@@ -109,7 +109,7 @@
         other: function(){
             $('#take_prize,#take_prize_2').click(function() {
                 org.ajax({
-                    url: '/api/activity/xiaomei/',
+                    url: '/api/activity/ruike/',
                     type: 'post',
                     success: function (data) {
                         if(data.ret_code=='1000'){
@@ -128,6 +128,7 @@
             })
         }
     })
+
 
     $('.slideDown_button').on('click',function(){
         var ele = $('.slideDown_box');
