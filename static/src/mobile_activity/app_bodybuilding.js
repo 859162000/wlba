@@ -20,11 +20,11 @@
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '网利宝携手小美到家0元请你做美容！',
-			shareImg = host + '/static/imgs/mobile_activity/app_bodybuilding/300*300.jpg',
+			shareName = '锐客联盟健身会所携手网利宝  0元邀您健身',
+			shareImg = host + '/static/imgs/mobile_activity/app_bodybuilding/300x300.jpg',
 			shareLink = host + '/activity/app_bodybuilding/?promo_token=ruike',
-			shareMainTit = '网利宝携手小美到家0元请你做美容！',
-			shareBody = '召唤素颜美肌，赶紧来领！';
+			shareMainTit = '锐客联盟健身会所携手网利宝  0元邀您健身',
+			shareBody = '引爆完美身型新风尚 还不快快来';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -46,12 +46,11 @@
 			imgUrl: shareImg
 		})
 	})
-
-
+    
     var login = false;
     wlb.ready({
         app: function (mixins) {
-            mixins.shareData({title: '网利宝携手小美到家0元请你做美容！', content: '召唤素颜美肌，赶紧来领！'});
+            mixins.shareData({title: '锐客联盟健身会所携手网利宝  0元邀您健身', content: '引爆完美身型新风尚 还不快快来'});
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
