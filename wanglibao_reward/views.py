@@ -991,7 +991,7 @@ class RuiKeAPIView(APIView):
         except Exception:
             reward_record.has_sent = False
             reward_record.save()
-            logger.debug('锐客联盟发奖失败user_phone:%s, WanglibaoActivityReward_id:%s, reward_id:%s, reward_type:%s' % (request.user.wanglibaouserprofile.phone, reward_record.id, reward.type))
+            logger.debug('锐客联盟发奖失败user_phone:%s, WanglibaoActivityReward_id:%s, reward_id:%s, reward_type:%s' % (request.user.wanglibaouserprofile.phone, reward_record.id, reward.id, reward.type))
         else:
             logger.debug('锐客联盟user_phone:%s, reward_id:%s, reward:%s' % (request.user.wanglibaouserprofile.phone, reward.id, reward.type))
 
