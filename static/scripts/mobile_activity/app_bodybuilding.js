@@ -291,7 +291,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
                         $('#take_prize,#take_prize_2').click(function() {
                             org.ajax({
-                                url: '/api/activity/xiaomei/',
+                                url: '/api/activity/ruike/',
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
@@ -328,7 +328,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         other: function(){
             $('#take_prize,#take_prize_2').click(function() {
                 org.ajax({
-                    url: '/api/activity/xiaomei/',
+                    url: '/api/activity/ruike/',
                     type: 'post',
                     success: function (data) {
                         if(data.ret_code=='1000'){
@@ -347,6 +347,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         }
     })
+
 
     $('.slideDown_button').on('click',function(){
         var ele = $('.slideDown_box');
