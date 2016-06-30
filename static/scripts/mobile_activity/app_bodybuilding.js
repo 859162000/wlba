@@ -240,8 +240,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
 			shareName = '网利宝携手小美到家0元请你做美容！',
-			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300*300.jpg',
-			shareLink = host + '/activity/app_pretty_reach_home/?promo_token=xmdj2',
+			shareImg = host + '/static/imgs/mobile_activity/app_bodybuilding/300*300.jpg',
+			shareLink = host + '/activity/app_bodybuilding/?promo_token=ruike',
 			shareMainTit = '网利宝携手小美到家0元请你做美容！',
 			shareBody = '召唤素颜美肌，赶紧来领！';
 		//分享给微信好友
@@ -295,10 +295,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
-                                        mixins.registerApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
-                                    }else if(data.ret_code=='1002'){
+                                        mixins.registerApp({refresh:1, url:'/activity/app_bodybuilding/?promo_token=ruike'});
+                                    }else if(data.ret_code=='1001'){
                                         mixins.jumpToManageMoney();
-                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
+                                    }else if(data.ret_code=='1002'||data.ret_code=='1003'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
                                     }else{
@@ -315,7 +315,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 if (data.ph == '') {
                     login = false;
                     $('#take_prize,#take_prize_2').click(function() {
-                        mixins.registerApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
+                        mixins.registerApp({refresh:1, url:'/activity/app_bodybuilding/?promo_token=ruike'});
                     });
                 } else {
                     login = true;
@@ -332,10 +332,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     type: 'post',
                     success: function (data) {
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?promo_token=xmdj2&next=/activity/app_pretty_reach_home/?promo_token=xmdj2'
-                        }else if(data.ret_code=='1002'){
-                            window.location.href = '/weixin/list/?promo_token=xmdj2'
-                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
+                            window.location.href = '/weixin/regist/?promo_token=ruike&next=/activity/app_bodybuilding/?promo_token=ruike'
+                        }else if(data.ret_code=='1001'){
+                            window.location.href = '/weixin/list/?promo_token=ruike'
+                        }else if(data.ret_code=='1002'||data.ret_code=='1003'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
                         }else{
