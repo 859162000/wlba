@@ -951,6 +951,7 @@ class RuiKeAPIView(APIView):
                 'ret_code': 1004,
                 'message': u'您不满足领取条件',
             }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         try:
             with transaction.atomic():
