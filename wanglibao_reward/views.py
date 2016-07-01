@@ -991,7 +991,7 @@ class RuiKeAPIView(APIView):
                         reward_record.reward = reward
                         reward.is_used = True
                         reward.save()
-                        send_msg = u'尊敬的用户，恭喜您在参与网利宝0元邀您健身活动中获得锐客联盟会所八折办理年卡资格，您的兑换码为：%s，请凭借此信息至锐客联盟健身会所咨询使用，感谢您的参与！' % reward.content
+                        send_msg = u'尊敬的用户，恭喜您在参与网利宝0元邀您健身活动中获得锐客联盟会所八折办理年卡资格，请凭借此信息至锐客联盟健身会所咨询使用，感谢您的参与！'
                     else:
                         json_to_response = {
                             'ret_code': 1003,
