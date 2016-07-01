@@ -265,7 +265,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			imgUrl: shareImg
 		})
 	})
-    
+
     var login = false;
     wlb.ready({
         app: function (mixins) {
@@ -310,6 +310,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     }
                 })
             }
+            
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
