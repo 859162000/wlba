@@ -944,11 +944,11 @@ class RuiKeAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
         #非锐客渠道的用户
-        if Channels.objects.filter(introducedby__user_id=self.user.id, code=channel_code).first():
+        if Channels.objects.filter(introducedby__user_id=request.user.id, code=channel_code).first():
             pass
         else:
             json_to_response = {
-                'ret_code': 1001,
+                'ret_code': 1004,
                 'message': u'您不满足领取条件',
             }
 
