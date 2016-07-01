@@ -966,6 +966,8 @@ class RuiKeAPIView(APIView):
                     reward = Reward.objects.select_for_update().filter(type='锐客联盟免费健身1次兑换码', is_used=False).first()
                     if reward:
                         reward_record.reward = reward
+                        reward.is_used = True
+                        reward.save()
                         send_msg = u'尊敬的用户，恭喜您在参与网利宝0元邀您健身活动中获得锐客联盟会所免费体验一次，您的兑换码为：%s，凭借此兑换码更可享受八折办理年卡资格。请凭借此信息至锐客联盟健身会所咨询使用，感谢您的参与！' % reward.content
                     else:
                         json_to_response = {
@@ -977,6 +979,8 @@ class RuiKeAPIView(APIView):
                     reward = Reward.objects.select_for_update().filter(type='锐客联盟年卡8折兑换码', is_used=False).first()
                     if reward:
                         reward_record.reward = reward
+                        reward.is_used = True
+                        reward.save()
                         send_msg = u'尊敬的用户，恭喜您在参与网利宝0元邀您健身活动中获得锐客联盟会所八折办理年卡资格，您的兑换码为：%s，请凭借此信息至锐客联盟健身会所咨询使用，感谢您的参与！' % reward.content
                     else:
                         json_to_response = {
