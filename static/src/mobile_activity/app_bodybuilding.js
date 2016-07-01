@@ -115,9 +115,7 @@
                     success: function (data) {
                         if(data.ret_code=='1000'){
                             window.location.href = '/weixin/regist/?promo_token=ruike&next=/activity/app_bodybuilding/?promo_token=ruike'
-                        }else if(data.ret_code=='1001'){
-                            window.location.href = '/weixin/list/?promo_token=ruike'
-                        }else if(data.ret_code=='1002'||data.ret_code=='1003'){
+                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1003'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
                         }else{
