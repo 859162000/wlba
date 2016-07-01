@@ -46,7 +46,7 @@
 			imgUrl: shareImg
 		})
 	})
-    
+
     var login = false;
     wlb.ready({
         app: function (mixins) {
@@ -91,6 +91,7 @@
                     }
                 })
             }
+            
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
