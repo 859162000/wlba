@@ -296,9 +296,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
                                         mixins.registerApp({refresh:1, url:'/activity/app_bodybuilding/?promo_token=ruike'});
-                                    }else if(data.ret_code=='1001'){
-                                        mixins.jumpToManageMoney();
-                                    }else if(data.ret_code=='1002'||data.ret_code=='1003'){
+                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='0'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
                                     }else{
@@ -311,6 +309,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     }
                 })
             }
+
 
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
@@ -334,7 +333,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     success: function (data) {
                         if(data.ret_code=='1000'){
                             window.location.href = '/weixin/regist/?promo_token=ruike&next=/activity/app_bodybuilding/?promo_token=ruike'
-                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1003'){
+                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='0'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
                         }else{
