@@ -239,11 +239,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '网利宝携手小美到家0元请你做美容！',
-			shareImg = host + '/static/imgs/mobile_activity/app_pretty_reach_home/300*300.jpg',
-			shareLink = host + '/activity/app_pretty_reach_home/?promo_token=xmdj2',
-			shareMainTit = '网利宝携手小美到家0元请你做美容！',
-			shareBody = '召唤素颜美肌，赶紧来领！';
+			shareName = '锐客联盟健身会所携手网利宝  0元邀您健身',
+			shareImg = host + '/static/imgs/mobile_activity/app_bodybuilding/300x300.jpg',
+			shareLink = host + '/activity/app_bodybuilding/?promo_token=ruike',
+			shareMainTit = '锐客联盟健身会所携手网利宝  0元邀您健身',
+			shareBody = '引爆完美身型新风尚 还不快快来';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -253,7 +253,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝携手小美到家0元请你做美容！',
+			title: '锐客联盟健身会所携手网利宝  0元邀您健身',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -270,7 +270,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     var login = false;
     wlb.ready({
         app: function (mixins) {
-            mixins.shareData({title: '网利宝携手小美到家0元请你做美容！', content: '召唤素颜美肌，赶紧来领！'});
+            mixins.shareData({title: '锐客联盟健身会所携手网利宝  0元邀您健身', content: '引爆完美身型新风尚 还不快快来'});
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -291,14 +291,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
                         $('#take_prize,#take_prize_2').click(function() {
                             org.ajax({
-                                url: '/api/activity/xiaomei/',
+                                url: '/api/activity/ruike/',
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
-                                        mixins.registerApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
-                                    }else if(data.ret_code=='1002'){
-                                        mixins.jumpToManageMoney();
-                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
+                                        mixins.registerApp({refresh:1, url:'/activity/app_bodybuilding/?promo_token=ruike'});
+                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='0'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
                                     }else{
@@ -311,11 +309,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     }
                 })
             }
+
+
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
                     $('#take_prize,#take_prize_2').click(function() {
-                        mixins.registerApp({refresh:1, url:'/activity/app_pretty_reach_home/?promo_token=xmdj2'});
+                        mixins.registerApp({refresh:1, url:'/activity/app_bodybuilding/?promo_token=ruike'});
                     });
                 } else {
                     login = true;
@@ -328,14 +328,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         other: function(){
             $('#take_prize,#take_prize_2').click(function() {
                 org.ajax({
-                    url: '/api/activity/xiaomei/',
+                    url: '/api/activity/ruike/',
                     type: 'post',
                     success: function (data) {
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?promo_token=xmdj2&next=/activity/app_pretty_reach_home/?promo_token=xmdj2'
-                        }else if(data.ret_code=='1002'){
-                            window.location.href = '/weixin/list/?promo_token=xmdj2'
-                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1004'){
+                            window.location.href = '/weixin/regist/?promo_token=ruike&next=/activity/app_bodybuilding/?promo_token=ruike'
+                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='0'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
                         }else{
@@ -347,6 +345,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         }
     })
+
 
     $('.slideDown_button').on('click',function(){
         var ele = $('.slideDown_box');
