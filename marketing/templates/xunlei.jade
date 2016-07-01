@@ -6,7 +6,7 @@ html
         - with '网利宝' as title
         include global/g_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/xunlei.css?v=20160614")
+        link(rel="stylesheet",href="/static/styles/pc_activity/xunlei.css?v=20160701")
         script(src="https://static.geetest.com/static/tools/gt.js")
     body()
         - csrf_token
@@ -128,6 +128,10 @@ html
                         p 6. 用户注册时建议根据注册提示登陆迅雷账号，以便迅雷会员奖励顺利发放；
                         p 7. 红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次且仅限散标使用，不可叠加使用，使用后无论是 否有余额均失效；
                         p 8. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+
+        .activity-end-box
+            h3 温馨提示
+            p 本期活动已结束，感谢您的支持！
         .alert-box(style='display:none')
             .alert-top
             a(href='javascript:void(0)')#close-modal.close-modal.close-btn
@@ -163,4 +167,4 @@ html
         include global/g_footer
         include include/tracking
     script.
-        require(['/static/src/pc/xunlei.js?v=2016061401'])
+        require(['/static/src/pc/xunlei.js?v=20160701'])
