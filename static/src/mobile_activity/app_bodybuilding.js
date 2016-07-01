@@ -34,7 +34,7 @@
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝携手小美到家0元请你做美容！',
+			title: '锐客联盟健身会所携手网利宝  0元邀您健身',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -46,6 +46,7 @@
 			imgUrl: shareImg
 		})
 	})
+
 
     var login = false;
     wlb.ready({
@@ -91,7 +92,7 @@
                     }
                 })
             }
-            
+
             mixins.sendUserInfo(function (data) {
                 if (data.ph == '') {
                     login = false;
