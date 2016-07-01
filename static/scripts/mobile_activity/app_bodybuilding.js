@@ -253,7 +253,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝携手小美到家0元请你做美容！',
+			title: '锐客联盟健身会所携手网利宝  0元邀您健身',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -265,6 +265,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			imgUrl: shareImg
 		})
 	})
+
 
     var login = false;
     wlb.ready({
