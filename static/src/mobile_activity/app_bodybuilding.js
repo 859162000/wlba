@@ -77,12 +77,25 @@
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
                                         mixins.registerApp({refresh:1, url:'/activity/app_bodybuilding/?promo_token=ruike'});
-                                    }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='0'){
+                                    }else if(data.ret_code=='1001'){
                                         $('.popup_box .main .textairport').text(''+data.message+'');
                                         $('.popup_box').show();
+                                        $('.popup_box .popup_button').click(function(){
+                                            mixins.jumpToManageMoney();
+                                        });
+
+                                    }else if(data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='1004'||data.ret_code=='0'){
+                                        $('.popup_box .main .textairport').text(''+data.message+'');
+                                        $('.popup_box').show();
+                                        $('.popup_box .popup_button').click(function(){
+                                            $('.popup_box').hide();
+                                        });
                                     }else{
                                         $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
                                         $('.popup_box').show();
+                                        $('.popup_box .popup_button').click(function(){
+                                            $('.popup_box').hide();
+                                        });
                                     }
                                 }
                             })
@@ -114,19 +127,30 @@
                     success: function (data) {
                         if(data.ret_code=='1000'){
                             window.location.href = '/weixin/regist/?promo_token=ruike&next=/activity/app_bodybuilding/?promo_token=ruike'
-                        }else if(data.ret_code=='1001'||data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='0'){
+                        }else if(data.ret_code=='1001'){
                             $('.popup_box .main .textairport').text(''+data.message+'');
                             $('.popup_box').show();
+                            $('.popup_box .popup_button').click(function() {
+                                window.location.href = '/weixin/list/?promo_token=ruike'
+                            });
+                        }else if(data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='1004'||data.ret_code=='0'){
+                            $('.popup_box .main .textairport').text(''+data.message+'');
+                            $('.popup_box').show();
+                            $('.popup_box .popup_button').click(function(){
+                                $('.popup_box').hide();
+                            });
                         }else{
                             $('.popup_box .main .textairport').text('系统繁忙，请稍后再试');
                             $('.popup_box').show();
+                            $('.popup_box .popup_button').click(function(){
+                                $('.popup_box').hide();
+                            });
                         }
                     }
                 })
             })
         }
     })
-
 
     $('.slideDown_button').on('click',function(){
         var ele = $('.slideDown_box');
@@ -147,8 +171,8 @@
             });
         }
     });
-
-    $('.popup_box .popup_button,.popup_box .close_popup').click(function(){
+	//
+    $('.popup_box .close_popup').click(function(){
         $('.popup_box').hide();
     });
 
