@@ -7,7 +7,7 @@ html(style="background: #f5f5f5")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_car_house_loan.css?v=2016062801", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_car_house_loan.css?v=20160705", rel="stylesheet")
         -csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -15,130 +15,7 @@ html(style="background: #f5f5f5")
             .section.section_1
                 .banner
                     img(src='/static/imgs/mobile_activity/app_car_house_loan/banner_1.png')
-                    .banner_text
-                        span 活动时间：2016年6月29日—7月5日
 
-                .big_title “车房”专享福利大放送
-                .small_title 活动时间：2016年6月29日-7月5日
-                .insert_text
-                    span.left_link 车房贷推荐：
-                    span.right_link 更多>>
-
-                
-                for product in p2p_products
-                  status = product['display_status']
-                  if status == '抢购中'
-                    listClass = 'profit-blue'
-                    btnClass = 'btn-blue'
-                  elif status == '已还款'
-                    listClass = 'profit-hui'
-                    btnClass = 'btn-grey'
-                  elif status == '还款中'
-                    listClass = 'profit-hui'
-                    btnClass = 'btn-lightblue'
-                  else
-                    listClass = 'profit-hui'
-                    btnClass = 'btn-red'
-                  .list-section
-                    a(href="/weixin/view/detail/{{product.id}}/").section-head
-                      if product.category == '新手标'
-                        span.head-prompt  新手福利
-                      else
-                          if product.is_app_exclusive
-                            span.head-prompt  APP专享
-                      span.head-tit {{product.name}}
-                    .section-body
-                      a(href="/weixin/view/detail/{{product.id}}/").body-left
-                        .body-Profit
-                          span.profit-cont
-                            .profit-math(class=listClass)
-                              earning_rate = str(product['expected_earning_rate'])
-                              span.profit-num {{earning_rate}}
-                              span.profit-sign %
-                              if product.activity
-                                span.prpfit-add +
-                                span.profit-addNum {{product.activity.activity_rule_percent_text}}
-                                span.profit-addNumsign %
-                            .profit-tit 年化收益
-                        .body-time
-                          .time-num
-                            em.section-hui {{product.period}}
-                            |{{product.pay_method|period_unit}}
-                          .time-tit 投资期限
-                        //.body-num
-                        //    span {{product.total_amount | money_format_int}}
-
-                      .body-right
-                        if btnClass == 'btn-blue'
-                          a(href="/weixin/view/buy/{{product.id}}/?next=/weixin/list/").btn-body(class=btnClass) {{status}}
-                        else
-                          a(href="/weixin/view/detail/{{product.id}}/").btn-body(class=btnClass) {{status}}
-                    percent = float(product['ordered_amount']) / product['total_amount'] * 100
-                    //if status == '抢购中'
-                    //  .section-progressd(style="width:{{percent | percentage}}")
-
-
-
-                
-                
-                dl
-                    dt 活动期间购买 “好车盈”和“好房赚”两款专属产品，
-                    dd 单笔投资≥1000元可获得一次抽奖机会。
-            .section.section_2
-                .big_title
-                .horn
-                    img(src='/static/imgs/mobile_activity/app_car_house_loan/horn_icon.png')
-                    span 186****1234获得1.8%加息券
-                #container
-                    .table
-                      .tr
-                        .td.first_td
-                          div#cj0.cj.cur
-                              .big_text!='0.8<span>％</span>'
-                              .small_text 加息券
-                        .td
-                          div#cj1.cj
-                              .big_text!='1<span>％</span>'
-                              .small_text 加息券
-                        .td
-                          div#cj2.cj
-                              .big_text!='1.8<span>％</span>'
-                              .small_text 加息券
-                      .tr
-                        .td.first_td
-                          div#cj7.cj
-                              .big_text!='1.2<span>％</span>'
-                              .small_text 加息券
-                        .td.choujiang_td
-                          span.choujiang 马上抽奖
-                        .td
-                          div#cj3.cj
-                              .big_text!='1<span>年</span>'
-                              .small_text 迅雷会员
-                      .tr
-                        .td.first_td
-                          div#cj6.cj
-                              .big_text!='1<span>%</span>'
-                              .small_text 加息券
-                        .td
-                          div#cj5.cj
-                              .big_text!='1.5<span>%</span>'
-                              .small_text 加息券
-                        .td
-                          div#cj4.cj
-                              .big_text!='2<span>%</span>'
-                              .small_text 加息券
-                .rule_wrap
-                    p.rule_title 温馨提示：
-                    dl.rule_dl
-                        dt 1、
-                        dd 活动期间投资“好车盈”和“好房赚”两款专属产品，才能获得抽奖资格。
-                    dl.rule_dl
-                        dt 2、
-                        dd 迅雷会员兑换时间截止到2016年9月30日。
-                    dl.rule_dl
-                        dt 3、
-                        dd 加息券限1月及以上标可使，2万起投，有效期领取之日7天。
             .section_3
                 p.title_big!='<span>车房贷</span>是以车辆、房产作为质押物或抵押物的融资项目。'
                 .title_line
