@@ -10,6 +10,10 @@ require.config({
 });
 
 require(['jquery', 'activityRegister', 'csrf'], function ($, re) {
+    $('.activity-end-box').modal({
+        showClose: false
+    })
+
     var count = 0;
     //注册
     re.activityRegister.activityRegisterInit({

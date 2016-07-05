@@ -5,7 +5,7 @@
       return $.modal.defaults = {
         overlay: "#000",
         opacity: 0.6,
-        zIndex: 99,
+        zIndex: 99999,
         escapeClose: true,
         clickClose: false,
         closeText: '&times;',
@@ -21,3 +21,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=modal.js.map

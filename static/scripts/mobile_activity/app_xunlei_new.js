@@ -220,7 +220,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 ;var count = 0, timer;
 org.ui = (function(){
     var lib = {
-        _alert: function(txt, callback,btn){
+        _alert: function(txt, callback,btn,status){
             var alertFram = '';
             if(document.getElementById("alert-cont")){
                 document.getElementById("alert-cont").innerHTML = '';
@@ -246,6 +246,9 @@ org.ui = (function(){
                 callback && callback();
                 count = 0;
             })
+            if(status == 'close'){
+              $('.close_btn,.cha').hide()
+            }
             document.body.onselectstart = function(){return false;};
         }
     }
@@ -262,8 +265,9 @@ org.xunlei = (function(org){
             lib._getRewardCount();
             //lib._listScroll();
             lib._luckDraw();
-            lib._goRegistFun();
-            lib._coopPv();
+            //lib._goRegistFun();
+            //lib._coopPv();
+            org.ui.alert('<div style="margin-top:2rem">本期活动已结束，感谢您的支持！</div>', '', '' ,'close')
         },
         _newUserReward : function(){
            $('#rewardDetail').on('click',function(){
