@@ -1,5 +1,5 @@
 # encoding:utf-8
-
+import hmac
 import md5
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
