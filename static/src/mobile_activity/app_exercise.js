@@ -76,7 +76,7 @@
                                 type: 'post',
                                 success: function (data) {
                                     if(data.ret_code=='1000'){
-                                        mixins.registerApp({refresh:1, url:'/activity/app_bodybuilding/?promo_token=ruikefuwuhao'});
+                                        mixins.registerApp({refresh:1, url:'/activity/app_exercise/?promo_token=ruikefuwuhao'});
                                     }else if(data.ret_code=='1001'){
                                         mixins.jumpToManageMoney();
                                     }else if(data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='1004'||data.ret_code=='0'){
@@ -104,7 +104,7 @@
                 if (data.ph == '') {
                     login = false;
                     $('#take_prize,#take_prize_2').click(function() {
-                        mixins.registerApp({refresh:1, url:'/activity/app_bodybuilding/?promo_token=ruikefuwuhao'});
+                        mixins.registerApp({refresh:1, url:'/activity/app_exercise/?promo_token=ruikefuwuhao'});
                     });
                 } else {
                     login = true;
@@ -121,7 +121,7 @@
                     type: 'post',
                     success: function (data) {
                         if(data.ret_code=='1000'){
-                            window.location.href = '/weixin/regist/?promo_token=ruikefuwuhao&next=/activity/app_bodybuilding/?promo_token=ruikefuwuhao'
+                            window.location.href = '/weixin/regist/?promo_token=ruikefuwuhao&next=/activity/app_exercise/?promo_token=ruikefuwuhao'
                         }else if(data.ret_code=='1001'){
                             window.location.href = '/weixin/list/?promo_token=ruikefuwuhao'
                         }else if(data.ret_code=='1002'||data.ret_code=='1003'||data.ret_code=='1004'||data.ret_code=='0'){
