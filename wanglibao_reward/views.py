@@ -1069,7 +1069,7 @@ class RuiKeFuWuHaoAPIView(APIView):
     permission_classes = ()
 
     def __init__(self):
-        super(RuiKeAPIView, self).__init__()
+        super(RuiKeFuWuHaoAPIView, self).__init__()
     
     def post(self, request):
         if not request.user.is_authenticated():
