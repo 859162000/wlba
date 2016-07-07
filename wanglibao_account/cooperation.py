@@ -841,7 +841,7 @@ class BaJinSheCallback(CoopCallback):
                         term_mark.append(str(user_amo.term))
                         if user_amo.term == 1:
                             get_amortize_arg['user_amo'] = user_amo
-                            get_amortize_arg['state'] = 5
+                            get_amortize_arg['state'] = 0
                             act_data = self.get_amortize_data(**get_amortize_arg)
                             act_data_list.append(act_data)
 
