@@ -1031,7 +1031,7 @@ class RuiKeAPIView(APIView):
         
 class RuiKeFuWuHaoDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
-        super(RuiKeDistributer, self).__init__(request, kwargs)
+        super(RuiKeFuWuHaoDistributer, self).__init__(request, kwargs)
         self.amount = kwargs['amount']
         self.order_id = kwargs['order_id']
         self.user = kwargs['user']
