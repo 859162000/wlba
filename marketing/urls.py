@@ -239,6 +239,7 @@ urlpatterns += patterns(
     url(r'^app_european_cup/$', TemplateView.as_view(template_name="app_european_cup.jade")),
     # url(r'^app_six_billion/$', TemplateView.as_view(template_name="app_six_billion.jade")),
     url(r'^app_bodybuilding/$', TemplateView.as_view(template_name="app_bodybuilding.jade")),
+    url(r'^app_exercise/$', TemplateView.as_view(template_name="app_exercise.jade")),
 
     # url(r'^festival_two/$', TemplateView.as_view(template_name="festival_two.html")),
     url(r'^h5_shield_plan/$', ShieldPlanH5View.as_view()),
