@@ -64,7 +64,7 @@ from wanglibao_account.views import (ThirdOrderApiView, ThirdOrderQueryApiView, 
 from marketing.views import UserActivityStatusAPIView, HappyMonkeyAPIView
 from wanglibao_reward.views import (JiaKeAPIView, BaoGeAPIView, XiaoMeiAPIView,ZhongYingAPIView, WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView,
                                     WeixinActivityAPIView, QMBanquetRewardAPI, HMBanquetRewardAPI,
-                                    Lantern_FetchRewardAPI, FetchMarchAwardAPI, XunleiTreasureAPIView, RuiKeAPIView,RuiKeFuWuHaoAPIView,
+                                    Lantern_FetchRewardAPI, FetchMarchAwardAPI, XunleiTreasureAPIView, RuiKeAPIView,
                                     AprilAwardApi, KongGangAPIView, FetchNewUserReward, ZhaoXiangGuanAPIView, HmdInvestTopRanks, CheFangDaiAPIView,CheFangDaiUserInfoAPIView)
 from marketing.views import CustomerAccount2015ApiView
 
@@ -304,7 +304,7 @@ urlpatterns += patterns(
     url(r'^activity/hmd_invest_ranks/$', HmdInvestTopRanks.as_view()),
     url(r'^activity/jiake/$', JiaKeAPIView.as_view()),
     url(r'^activity/ruike/$', RuiKeAPIView.as_view()),
-    url(r'^activity/ruikefuwuhao/$', RuiKeFuWuHaoAPIView.as_view()),
+    url(r'^activity/ruikefuwuhao/$', RuiKeAPIView.as_view()),
 )
 
 # app端改版新接口

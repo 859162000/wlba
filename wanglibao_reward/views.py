@@ -906,8 +906,8 @@ class RuiKeDistributer(RewardDistributer):
             #判断活动时间
             if json_to_response:
                 return
-            #判断是否锐客渠道的用户
-            if Channels.objects.filter(introducedby__user_id=self.user.id, code=channel_code).first():
+            #判断是否是锐客渠道和锐客服务号渠道的用户
+            if Channels.objects.filter(introducedby__user_id=self.user.id, code__in=['ruike','ruikefuwuhao']).first():
                 #判断是否已经产生发奖机会，以确保只是首投发奖
                 if WanglibaoActivityReward.objects.filter(user=self.user, activity=channel_code).first():
                     return
@@ -944,148 +944,8 @@ class RuiKeAPIView(APIView):
         if json_to_response:
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
-        #非锐客渠道的用户
-        if Channels.objects.filter(introducedby__user_id=request.user.id, code=channel_code).first():
-            pass
-        else:
-            json_to_response = {
-                'ret_code': 1004,
-                'message': u'您不满足领取条件',
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-
-        try:
-            with transaction.atomic():
-                user_reward = WanglibaoActivityReward.objects.select_for_update().filter(user=request.user, activity=channel_code)
-                reward_record = user_reward.first()
-                #判断是否有领奖资格，排除老用户和非锐客渠道的用户
-                if reward_record == None:
-                    json_to_response = {
-                        'ret_code': 1001,
-                        'message': u'您不满足领取条件',
-                    }
-                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-                #判断是否已经发过奖
-                if reward_record.has_sent:
-                    json_to_response = {
-                        'ret_code': 1002,
-                        'message': u'您已经领取过奖品',
-                    }
-                    return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-
-                if reward_record.p2p_amount>=3000:
-                    reward = Reward.objects.select_for_update().filter(type='锐客联盟免费健身1次兑换码', is_used=False).first()
-                    if reward:
-                        reward_record.reward = reward
-                        reward.is_used = True
-                        reward.save()
-                        send_msg = u'尊敬的用户，恭喜您在参与网利宝0元邀您健身活动中获得锐客联盟会所免费体验一次，您的兑换码为：%s，凭借此兑换码更可享受八折办理年卡资格。请凭借此信息至锐客联盟健身会所咨询使用，感谢您的参与！' % reward.content
-                    else:
-                        json_to_response = {
-                            'ret_code': 1003,
-                            'message': u'奖品已经发完，感谢参与',
-                        }
-                        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-                else:
-                    reward = Reward.objects.select_for_update().filter(type='锐客联盟年卡8折兑换码', is_used=False).first()
-                    if reward:
-                        reward_record.reward = reward
-                        reward.is_used = True
-                        reward.save()
-                        send_msg = u'尊敬的用户，恭喜您在参与网利宝0元邀您健身活动中获得锐客联盟会所八折办理年卡资格，请凭借此信息至锐客联盟健身会所咨询使用，感谢您的参与！'
-                    else:
-                        json_to_response = {
-                            'ret_code': 1003,
-                            'message': u'奖品已经发完，感谢参与',
-                        }
-                        return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-
-                reward_record.has_sent = True
-                reward_record.left_time = 0
-                reward_record.save()
-        except Exception:
-            reward_record.has_sent = False
-            reward_record.save()
-            logger.debug('锐客联盟发奖失败user_phone:%s, WanglibaoActivityReward_id:%s, reward_id:%s, reward_type:%s' % (request.user.wanglibaouserprofile.phone, reward_record.id, reward.id, reward.type))
-        else:
-            logger.debug('锐客联盟user_phone:%s, reward_id:%s, reward:%s' % (request.user.wanglibaouserprofile.phone, reward.id, reward.type))
-
-            send_messages.apply_async(kwargs={
-                "phones": [request.user.wanglibaouserprofile.phone, ],
-                "messages": [send_msg, ],
-            })
-
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": request.user.id,
-                "title": u"锐客联盟",
-                "content": send_msg,
-                "mtype": "activity"
-            })
-
-            json_to_response = {
-                'ret_code': 0,
-                'message': u'领取成功，请留意您的站内信及短信！',
-            }
-
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        
-class RuiKeFuWuHaoDistributer(RewardDistributer):
-    def __init__(self, request, kwargs):
-        super(RuiKeFuWuHaoDistributer, self).__init__(request, kwargs)
-        self.amount = kwargs['amount']
-        self.order_id = kwargs['order_id']
-        self.user = kwargs['user']
-        self.request = request
-        self.product = kwargs['product']
-
-    @method_decorator(transaction.atomic)
-    def distribute(self):
-        try:
-            channel_code = 'ruikefuwuhao'
-            json_to_response = get_activity_config(channel_code)
-            #判断活动时间
-            if json_to_response:
-                return
-            #判断是否锐客渠道的用户
-            if Channels.objects.filter(introducedby__user_id=self.user.id, code=channel_code).first():
-                #判断是否已经产生发奖机会，以确保只是首投发奖
-                if WanglibaoActivityReward.objects.filter(user=self.user, activity=channel_code).first():
-                    return
-                else:
-                    WanglibaoActivityReward.objects.create(
-                            activity=channel_code,
-                            order_id=self.order_id,
-                            user=self.user,
-                            p2p_amount=self.amount,
-                            has_sent=False,
-                            left_times=1,
-                            join_times=1)
-            else:
-                return
-        except Exception:
-            logger.debug('user:%s, order_id:%s,p2p_amount:%s,锐客联盟发奖报错', self.user.id, self.order_id, self.amount)
-    
-class RuiKeFuWuHaoAPIView(APIView):
-    permission_classes = ()
-
-    def __init__(self):
-        super(RuiKeFuWuHaoAPIView, self).__init__()
-    
-    def post(self, request):
-        if not request.user.is_authenticated():
-            json_to_response = {
-                'ret_code': 1000,
-                'message': u'您还没有登录',
-            }
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        
-        channel_code = 'ruikefuwuhao'
-        json_to_response = get_activity_config(channel_code)
-        if json_to_response:
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
-        
-        #非锐客渠道的用户
-        if Channels.objects.filter(introducedby__user_id=request.user.id, code=channel_code).first():
+        #判断是否是锐客渠道和锐客服务号渠道的用户
+        if Channels.objects.filter(introducedby__user_id=self.user.id, code__in=['ruike','ruikefuwuhao']).first():
             pass
         else:
             json_to_response = {
