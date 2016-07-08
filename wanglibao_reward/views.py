@@ -869,7 +869,6 @@ class RewardDistributer(object):
             #KongGangRewardDistributer:('kgyx',),
             CheFangDaiDistributer:(),
             RuiKeDistributer:(),
-            RuiKeFuWuHaoDistributer:(),
         }
 
     @property
