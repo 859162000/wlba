@@ -117,7 +117,6 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
 
         # ruike qudao
         try:
-            user = User.objects.filter(pk=user).first()
             kargs = {
                 'amount': amount_source,
                 'order_id': product.id,
