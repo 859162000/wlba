@@ -944,7 +944,7 @@ class RuiKeAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
         
         #判断是否是锐客渠道和锐客服务号渠道的用户
-        if Channels.objects.filter(introducedby__user_id=self.user.id, code__in=['ruike','ruikefuwuhao']).first():
+        if Channels.objects.filter(introducedby__user_id=request.user.id, code__in=['ruike','ruikefuwuhao']).first():
             pass
         else:
             json_to_response = {
