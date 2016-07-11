@@ -33,6 +33,7 @@ from wanglibao_rest.utils import split_ua
 from wanglibao_pay.kuai_pay import KuaiPay, KuaiShortPay
 from wanglibao_pay.huifu_pay import HuifuShortPay
 from wanglibao_pay.yee_pay import YeePay, YeeShortPay
+from wanglibao_pay.baopay import BaoPayInterface
 
 logger = logging.getLogger(__name__)
 
@@ -506,7 +507,10 @@ def bind_pay_deposit(request):
         result = YeeShortPay().pre_pay(request)
 
         return result
-
+    elif bank.channel == 'baopay':
+        res = BaoPayInterface(user, ip, device_type).pre_pay(
+                card_no, amount, input_phone, gate_id,request)
+        return res
     elif bank.channel == 'kuaipay':
         stop_no_sms_channel = Misc.objects.filter(
                 key='kuai_qpay_stop_no_sms_channel').first()  
@@ -585,6 +589,8 @@ def bind_pay_dynnum(request):
         res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, 
                                             token, input_phone, device,
                                             ip, request, mode=mode)
+    elif card.bank.channel == 'baopay':
+        res = BaoPayInterface(user, ip, device).dynnum_bind_pay(oreder_id, vcode, request)
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 

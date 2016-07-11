@@ -145,3 +145,29 @@ def utc_to_local_timestamp(time_obj=timezone.now()):
     utc_time = timezone.localtime(time_obj).strftime(time_format)
     utc_timestamp = str(int(time.mktime(time.strptime(utc_time, time_format))))
     return utc_timestamp
+
+
+def chunks(l, n):
+    """把一个list分成多个长度最长为n的小list"""
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
+
+def update_by_keys(dict1, dict2, *key_args):
+    """
+    >>> d1 = {}
+    >>> d2 = {'k1':1,'k2':2,'k3':3}
+    >>> d1={}
+    >>> update_by_keys(d1, d2, 'k1', 'k2')
+    >>> d1
+    {'k2': 2, 'k1': 1}
+    """
+    dict1.update([(k,v) for k,v in dict2.items() if k in key_args])
+
+
+
+
+
+
+
+
+

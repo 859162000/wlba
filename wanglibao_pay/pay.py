@@ -111,7 +111,7 @@ class PayOrder(object):
         :param request_ip:
         :param device_type:
         :param request_para_str: 发往第三方的请求信息
-        :return:
+        :return: order.id
         """
         # 处理必填信息
         bank, channel, bind_code = self.get_bank_and_channel(gate_id, device_type)
@@ -182,7 +182,7 @@ class PayOrder(object):
         :param card_no:
         :param bank: instance
         :param user: instance
-        :return:
+        :return: True/False
         """
         card = Card.objects.filter(no=card_no, user=user).first()
         if not card:
@@ -491,24 +491,24 @@ class BaoProxyPay(ProxyPay):
 
     def _get_pay_id(self, gate_id):
         # gate_id_to_pay_id = {
-                # 'JH':1001, #招商银行(综)
-                # 'J0':1002, # 中国工商银行 (综)
-                # 'JF':1003, # 中国建设银行 (综)
-                # 'J8':1004, # 上海浦东发展银行(综)
-                # '29':1005, # 中国农业银行 (综)
-                # 'J7':1006, # 中国民生银行 (综)
-                # 'J6':1009, # 兴业银行(综)
-                # 'J4':1020, # 中国交通银行 (综)
-                # 'JC':1022, # 中国光大银行 (综)
-                # 'J5':1026, # 中国银行(综)
-                # '15':1032, # 北京银行(综)
-                # '50':1035, # 平安银行(综)
-                # '19':1036, # 广发银行|cgb(综)
-                # '46':1038, # 中国邮政储蓄银行(综)
-                # '33':1039, # 中信银行(综)
-                # '13':1050, # 华夏银行(综)
-                # 'JE':1059, # 上海银行(综)
-                # '40':1060, # 北京农商银行 (综)
+                # 'JH':3001, #招商银行(综)
+                # 'J0':3002, # 中国工商银行 (综)
+                # 'JF':3003, # 中国建设银行 (综)
+                # 'J8':3004, # 上海浦东发展银行(综)
+                # '29':3005, # 中国农业银行 (综)
+                # 'J7':3006, # 中国民生银行 (综)
+                # 'J6':3009, # 兴业银行(综)
+                # 'J4':3020, # 中国交通银行 (综)
+                # 'JC':3022, # 中国光大银行 (综)
+                # 'J5':3026, # 中国银行(综)
+                # '15':3032, # 北京银行(综)
+                # '50':3035, # 平安银行(综)
+                # '19':3036, # 广发银行|cgb(综)
+                # '46':3038, # 中国邮政储蓄银行(综)
+                # '33':3039, # 中信银行(综)
+                # '13':3050, # 华夏银行(综)
+                # 'JE':3059, # 上海银行(综)
+                # '40':3060, # 北京农商银行 (综)
         # }
         return Bank.objects.get(gate_id=gate_id).bao_code
 
