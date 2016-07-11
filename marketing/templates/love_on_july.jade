@@ -1,0 +1,27 @@
+-load formatters
+-load mathfilters
+doctype html
+html.no-js(lang="en-gb")
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/car_house_loan.css?v=20160705")
+        - csrf_token
+    body(style="background:#fafafa")
+        include global/g_nav
+        .body_wrap.clear
+            .banner
+            .popup_wrap(style='display:none')
+                .popup_bg
+                .popup_box
+                    img.close_ico(src='/static/imgs/mobile_activity/app_car_house_loan/close.png')
+                    p.popup_text
+                    dl
+                        dt
+                        dd
+                    .popup_button 继续抽奖
+        include global/g_footer
+script.
+    require(['/static/js/car_house_loan.js?v=2016062901'])
+
