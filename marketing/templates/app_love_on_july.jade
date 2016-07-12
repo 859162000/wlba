@@ -1,0 +1,130 @@
+- load formatters
+- load mathfilters
+doctype html
+html(style="background: #fcf1e7")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_love_on_july.css?v=2015053113", rel="stylesheet")
+        - csrf_token
+    body
+        input(type='hidden',value='{{user.is_authenticated}}')#authenticated
+        .body_wrap.clear
+            img.banner(src='/static/imgs/mobile_activity/app_love_on_july/img_01.png')
+            .act_time1 活动时间：7月15日－7月31日
+            img.title_img.title_img1(src='/static/imgs/mobile_activity/app_love_on_july/img_03.png')
+            .juanshouyu 中国男人性格里埋藏着深深的含蓄，<br>往往在表达爱意上总显得羞涩，<br>尤其是对朝夕相伴的妻子、爱人、女友，<br>习惯了她的付出与陪伴，满怀感激却“爱你在心口难开”！<br>宝宝在这个七月，帮你对她勇敢的说爱！
+            img.line(src='/static/imgs/mobile_activity/app_love_on_july/img_05.png')
+            img.xin(src='/static/imgs/mobile_activity/app_love_on_july/img_07.png')
+            .section_wrap
+                img.title_img.title_img1(src='/static/imgs/mobile_activity/app_love_on_july/img_7_14.png')
+                .title_text “爱妻”专项优质标的
+                .swiper_waper
+                    .swiper-container.swiper1
+                        .swiper-wrapper
+                            .swiper-slide
+                                img.slide_img(src='/static/imgs/mobile_activity/app_love_on_july/img_8_18.png')
+                                .biao_text!='7月17日及7月27日，平台将随机为1至2个标的<span>加息1.7%或者2.7%</span>'
+                            .swiper-slide
+                                img.slide_img(src='/static/imgs/mobile_activity/app_love_on_july/img_8_18.png')
+                                .biao_text!='活动期间内，平台将不定期发布妻月鲜花标。单笔投资达2.7万元及以上，<span>送包月鲜花。</span>'
+                    .pagination.pagination1
+                .rule_wrap
+                    .title_text 温馨提示：
+                    dl
+                        dt 1、
+                        dd 每个爱妻月鲜花标限制前30名投资用户，先到先得；同一用户在同一标的只能获取一次，多笔投资以单笔投资最高金额为准，不可累加；满标之后工作人员会在3-5工作日内联系用户确认礼品配送相关事宜。
+                    dl
+                        dt 2、
+                        dd 活动专项标的不可使用其他加息券或者红包。
+                img.line(src='/static/imgs/mobile_activity/app_love_on_july/img10_02.png')
+                img.title_img.title_img2(src='/static/imgs/mobile_activity/app_love_on_july/img11_04.png')
+                .title_text.title_text2 活动期间，平台每天将为当天投资金额<br>累计最高的前三名用户送上精彩好礼
+                img.act_ranking(src='/static/imgs/mobile_activity/app_love_on_july/img12_06.png')
+                .now_ranking
+                    img.now_ranking_top(src='/static/imgs/mobile_activity/app_love_on_july/img12_08.png')
+                    .now_ranking_main
+                        .act_time 截止2016.07.16 11:30
+                        .box_wrap
+                            .box
+                                .name_text 王先生
+                                img(src='/static/imgs/mobile_activity/app_love_on_july/img13_13.png')
+                                .phone_num 123****7890
+                                .money_num.money_num1 166,203.00元
+                            .box
+                                .name_text 王先生
+                                img(src='/static/imgs/mobile_activity/app_love_on_july/img13_15.png')
+                                .phone_num 123****7890
+                                .money_num.money_num2 166,203.00元
+                            .box
+                                .name_text 王先生
+                                img(src='/static/imgs/mobile_activity/app_love_on_july/img13_17.png')
+                                .phone_num 123****7890
+                                .money_num.money_num3 166,203.00元
+                    img.now_ranking_bottom(src='/static/imgs/mobile_activity/app_love_on_july/img12_32.png')
+                .rule_wrap
+                    .title_text 温馨提示：
+                    dl
+                        dt 1、
+                        dd 工作人员会在3-5工作日内联系用户确认奖品等相关事宜，通过站内信和短信将奖品发放。
+                    dl
+                        dt 2、
+                        dd 小美到家兑换截止时间到2017年5月20日，兑换之日起30天有效；现已开通城市：北京、上海、成都、武汉、深圳，用户所在地不在奖品适用范围，可用80元红包替代；
+                    dl
+                        dt 3、
+                        dd 迅雷会员兑换的截止时间：2016年9月30日；活动奖励发放请关注站内信及短信通知。
+                    dl
+                        dt 4、
+                        dd 投资数据统计周期为每日0时至次日0时，每十分钟更新一次。
+                img.line(src='/static/imgs/mobile_activity/app_love_on_july/img10_02.png')
+                img.title_img.title_img3(src='/static/imgs/mobile_activity/app_love_on_july/img14_34.png')
+                .title_text.title_text2 投资满额送体验金
+                .investment_wrap
+                    .investmen_tline
+                    .box.first_box
+                        .div 投资门槛
+                        .div 投资加息福利
+                        .shu_line
+                    .investmen_tline
+                    .box
+                        .div 1000≤单笔投资﹤1万
+                        .div 1257元体验金
+                        .shu_line
+                    .investmen_tline
+                    .box
+                        .div 1万≤单笔投资﹤10万
+                        .div 2157元体验金
+                        .shu_line
+                    .investmen_tline
+                    .box
+                        .div 10万≤单笔投资﹤30万
+                        .div 5270元体验金
+                        .shu_line
+                    .investmen_tline
+                    .box
+                        .div 30万＋
+                        .div 9257元体验金
+                        .shu_line
+                    .investmen_tline
+                .rule_wrap
+                    .title_text 温馨提示：
+                    p.rule_text 红包和加息券有效期自领取的7日内，体验金有效期截止到2016年8月10日。
+                img.line.line1(src='/static/imgs/mobile_activity/app_love_on_july/img10_02.png')
+                a.href_link(href='#')
+                    img(src='/static/imgs/mobile_activity/app_love_on_july/img14_41.png')
+                p.last_rule 活动最终解释权归网利宝所有
+
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src='/static/js/lib/swiper_new_min.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_love_on_july.js?v=2016060211")
+
+        //script.
+        //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+        //        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+        //        ios = ipad || iphone;
+        //    if (ios) {
+        //        document.getElementById('ios-show').style.display = 'block';
+            }
