@@ -69,47 +69,49 @@
 
 
 	$.ajax({
-		url: '/api/activity/hmd_invest_ranks/',
-		type: 'get',
+		url: '/api/july_reward/fetch/',
+		type: 'post',
 		success: function (json) {
 			var rankingList = [];
 			var json_one;
-			if(json.hmd_ranks.length>0){
-				for(var i=0; i<json.hmd_ranks.length; i++) {
+			if(json.dayranks.length>0){
+				for(var i=0; i<json.dayranks.length; i++) {
 
-					json_one = json.hmd_ranks[i];
+					json_one = json.dayranks[i];
 					if (json_one != '') {
-						var number = fmoney(json_one.amount__sum, 0);
+						var number = fmoney(json_one.amount__sum, 1);
+
 						if (i < 3) {
 							if (i == 0) {
-								rankingList.push(['<li class="first"><div class="img"><img src="/static/imgs/mobile_activity/app_open_day_review/no_1.png"></div>'].join(''));
+								rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/mobile_activity/app_love_on_july/img13_13.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num money_num1">'+number+'</div></div>'].join(''));
 							} else if (i == 1) {
-								rankingList.push(['<li class="second"><div class="img"><img src="/static/imgs/mobile_activity/app_open_day_review/no_2.png"></div>'].join(''));
+								rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/mobile_activity/app_love_on_july/img13_15.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num money_num2">'+number+'</div></div>'].join(''));
 							} else if (i == 2) {
-								rankingList.push(['<li class="third"><div class="img"><img src="/static/imgs/mobile_activity/app_open_day_review/no_3.png"></div>'].join(''));
+								rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/mobile_activity/app_love_on_july/img13_17.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num money_num3">'+number+'</div></div>'].join(''));
 							}
-							rankingList.push(['<div class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</div><div class="money">'+number+'</div">'].join(''));
 
 						} else {
-							var i_num = i + 1;
-							rankingList.push(['<li><div class="img"><img class="yuan" src="/static/imgs/mobile_activity/app_open_day_review/yuan.png"></div><div class="phone">' + json_one.phone.substring(0, 3) + '****' + json_one.phone.substr(json_one.phone.length - 4) + '</div><div class="money">'+number+'</div"></li>'].join(''));
+
 						}
 					}
 				}
-				$('.ranking_list ul').html(rankingList.join(''));
+				$('.now_ranking_main .box_wrap').html(rankingList.join(''));
 			}
+
 		},error: function(data1){
 
 		}
 	})
 
-    var swiper = new Swiper('.swiper1', {
-		pagination : '.pagination1',
-		slidesPerView: 'auto',
-        centeredSlides: true,
-        paginationClickable: true,
-		autoHeight: false
-	});
+
+	//
+	//var swiper = new Swiper('.swiper1', {
+	//	pagination : '.pagination1',
+	//	slidesPerView: 'auto',
+     //   centeredSlides: true,
+     //   paginationClickable: true,
+	//	autoHeight: false
+	//});
 
 
 	var login = false;
@@ -149,11 +151,16 @@
                     connect(data)
 
                 }
+				$('.href_link').click(function(){
+					mixins.jumpToManageMoney();
+				})
             })
 
         },
         other: function(){
-
+			$('.href_link').click(function(){
+				window.location.href = '/weixin/list/'
+			})
         }
     })
 
@@ -168,78 +175,6 @@
 
 	});
 
-	var swiper = new Swiper('.swiper2', {
-		pagination: '.swiper-pagination2',
-        slidesPerView: 1,
-        //effect: 'coverflow',
-        grabCursor: true,
-        centeredSlides: true,
-        slidesPerView: 'auto'
-
-	});
-
-	var swiper = new Swiper('.swiper3', {
-		pagination: '.pagination3',
-		slidesPerView: 1,
-        centeredSlides: true,
-        paginationClickable: true
-
-	});
 	/*轮播图结束*/
-
-	/*指定范围倒计时*/
-	var time_intervalId;
-	var curShowTimeSeconds = 0;
-	//现在倒计时需要有多少秒
-	var endTime = new Date(2016,5,3,18,00,00);
-	//回头这里改成 2016,5,3,20,00,00
-
-	var timestamp = Date.parse(new Date());
-	//获得当前时间戳
-	var timerFunction = function () {
-		timestamp = Date.parse(new Date());
-		if(timestamp>='1464919200000'){
-		//2016年6月3日 10:00-18:00
-
-
-			curShowTimeSeconds = getCurrentShowTimeSeconds();
-			var hours = parseInt(curShowTimeSeconds/3600);
-			var minutes = parseInt((curShowTimeSeconds - hours * 3600)/60);
-			var seconds = curShowTimeSeconds % 60;
-
-			$('.countdown_wrap .time_one_1').text(parseInt(hours/10));
-			$('.countdown_wrap .time_one_2').text(parseInt(hours%10));
-
-			$('.countdown_wrap .time_two_1').text(parseInt(minutes/10));
-			$('.countdown_wrap .time_two_2').text(parseInt(minutes%10));
-
-			$('.countdown_wrap .time_three_1').text(parseInt(seconds/10));
-			$('.countdown_wrap .time_three_2').text(parseInt(seconds%10));
-			if(Date.parse(new Date())>'1464948000000'){
-				clearInterval(time_intervalId);
-			}
-
-		$('.countdown_wrap').show();
-
-		}else{
-			$('.countdown_wrap').hide();
-		}
-	}
-
-	time_intervalId = setInterval(timerFunction, 1000);
-
-
-	function getCurrentShowTimeSeconds(){
-		var curTime = new Date();
-		var ret = endTime.getTime() - curTime.getTime();
-		//结束的时间减去现在的时间
-		ret = Math.round(ret/1000);
-		//把毫秒转化成秒
-
-		return ret>=0 ? ret : 0;
-		//ret大于等于0的话返回ret，如果不是返回0
-		//如果倒计时结束，返回的结果是0
-	}
-	/*指定范围倒计时结束*/
 
 })(org);

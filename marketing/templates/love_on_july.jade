@@ -63,24 +63,24 @@ html.no-js(lang="en-gb")
                     .title_text 当前排名
                     .act_time 截止2016.07.16 11:30
                     .now_main
-                        .box
-                            .name_text 王先生
-                            img(src='/static/imgs/pc_activity/love_on_july/section_3_img10.png')
-                            .phone_num 123****7890
-                            .money_num
-                                span.money_num1 166,203.00元
-                        .box
-                            .name_text 王先生
-                            img(src='/static/imgs/pc_activity/love_on_july/section_3_img11.png')
-                            .phone_num 123****7890
-                            .money_num
-                                span.money_num2 166,203.00元
-                        .box
-                            .name_text 王先生
-                            img(src='/static/imgs/pc_activity/love_on_july/section_3_img12.png')
-                            .phone_num 123****7890
-                            .money_num
-                                span.money_num3 166,203.00元
+                        //.box
+                        //    .name_text 王先生
+                        //    img(src='/static/imgs/pc_activity/love_on_july/section_3_img10.png')
+                        //    .phone_num 123****7890
+                        //    .money_num
+                        //        span.money_num1 166,203.00元
+                        //.box
+                        //    .name_text 王先生
+                        //    img(src='/static/imgs/pc_activity/love_on_july/section_3_img11.png')
+                        //    .phone_num 123****7890
+                        //    .money_num
+                        //        span.money_num2 166,203.00元
+                        //.box
+                        //    .name_text 王先生
+                        //    img(src='/static/imgs/pc_activity/love_on_july/section_3_img12.png')
+                        //    .phone_num 123****7890
+                        //    .money_num
+                        //        span.money_num3 166,203.00元
                 .rule_wrap.rule_wrap2
                     .title_text 温馨提示：
                     dl
@@ -98,37 +98,40 @@ html.no-js(lang="en-gb")
                 .line
                 img.title_img.title_img3(src='/static/imgs/pc_activity/love_on_july/section_3_img16.png')
                 .section_3_text1.section_3_text2 投资满额送体验金
-                dl.investment_wrap
-                    dt
-                        span.left 投资门槛
-                        span 投资加息福利
-                    dd
-                        span.left 1000≤单笔投资﹤1万
-                        span 1257元体验金
-                    dd
-                        span.left 1万≤单笔投资﹤10万
-                        span 2157元体验金
-                    dd
-                        span.left 10万≤单笔投资﹤30万
-                        span 5270元体验金
-                    dd
-                        span.left 30万＋
-                        span 9257元体验金
+                .investment_wrap
+                    .investmen_tline
+                    .box.first_box
+                        .div 投资门槛
+                        .div 投资加息福利
+                        .shu_line
+                    .investmen_tline
+                    .box
+                        .div 1000≤单笔投资﹤1万
+                        .div 1257元体验金
+                        .shu_line
+                    .investmen_tline
+                    .box
+                        .div 1万≤单笔投资﹤10万
+                        .div 2157元体验金
+                        .shu_line
+                    .investmen_tline
+                    .box
+                        .div 10万≤单笔投资﹤30万
+                        .div 5270元体验金
+                        .shu_line
+                    .investmen_tline
+                    .box
+                        .div 30万＋
+                        .div 9257元体验金
+                        .shu_line
+                    .investmen_tline
                 .clear
                 .rule_wrap.rule_wrap3
                     .title_text 温馨提示：
                     .rule_text 红包和加息券有效期自领取的7日内，体验金有效期截止到2016年8月10日。
-                a.go_list(href='#') 马上投资
+                a.go_list(href='/p2p/list/') 马上投资
                 .rule_last 活动最终解释权归网利宝所有
-            .popup_wrap(style='display:none')
-                .popup_bg
-                .popup_box
-                    img.close_ico(src='/static/imgs/mobile_activity/app_car_house_loan/close.png')
-                    p.popup_text
-                    dl
-                        dt
-                        dd
-                    .popup_button 继续抽奖
+
         include global/g_footer
 script.
     require(['/static/js/love_on_july.js?v=2016062901'])
