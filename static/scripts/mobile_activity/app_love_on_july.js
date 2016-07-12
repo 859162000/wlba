@@ -286,6 +286,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		return s;
 	}
 
+
+
 	$.ajax({
 		url: '/api/july_reward/fetch/',
 		type: 'post',
@@ -384,5 +386,20 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 
 	/*轮播图结束*/
+
+	var oDate = new Date(); //实例一个时间对象；
+	var nian = oDate.getFullYear();   //获取系统的年；
+	var yue = oDate.getMonth()+1;   //获取系统月份，由于月份是从0开始计算，所以要加1
+	var ri = oDate.getDate(); // 获取系统日，
+	var shi = oDate.getHours(); //获取系统时，
+	var fen = oDate.getMinutes(); //分
+	oDate.getSeconds(); //秒
+
+	function bu_ling(s) {
+		return s < 10 ? '0' + s: s;
+	}
+
+	$('#act_time').text('截止 '+nian+'.'+bu_ling(yue)+'.'+bu_ling(ri)+' '+bu_ling(shi)+':'+bu_ling(fen)+'');
+
 
 })(org);
