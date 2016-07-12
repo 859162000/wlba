@@ -238,11 +238,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = location.protocol+"//"+location.host,
-			shareName = '亿路旅程，亿同见证',
+			shareName = '“爱妻悦”—爱无价 “妻”悦享',
 			shareImg = host + '/static/imgs/mobile/weChat_logo.png',
-			shareLink = host + '/activity/six_billion/app/',
-			shareMainTit = '亿路旅程，亿同见证',
-			shareBody = '深情不及久伴，厚爱无需多言';
+			shareLink = host + '/activity/app_love_on_july/',
+			shareMainTit = '“爱妻悦”—爱无价 “妻”悦享',
+			shareBody = '七月把最好的爱送给心爱的她，爱她就努力赚，爱她就让“她”乐开花！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -252,7 +252,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '亿路旅程，亿同见证',
+			title: '“爱妻悦”—爱无价 “妻”悦享',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -285,7 +285,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 		return s;
 	}
-
 
 	$.ajax({
 		url: '/api/july_reward/fetch/',
@@ -323,21 +322,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	})
 
 
-	//
-	//var swiper = new Swiper('.swiper1', {
-	//	pagination : '.pagination1',
-	//	slidesPerView: 'auto',
-     //   centeredSlides: true,
-     //   paginationClickable: true,
-	//	autoHeight: false
-	//});
-
-
 	var login = false;
     wlb.ready({
 
         app: function (mixins) {
-			mixins.shareData({title: '亿路旅程，亿同见证', content: '深情不及久伴，厚爱无需多言'});
+			mixins.shareData({title: '“爱妻悦”—爱无价 “妻”悦享'});
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
@@ -385,7 +374,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	/*轮播图*/
 	var swiper = new Swiper('.swiper1', {
-		pagination: '.swiper-pagination',
+		pagination: '.pagination1',
 		slidesPerView: 1,
         //effect: 'coverflow',
         grabCursor: true,
