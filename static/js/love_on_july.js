@@ -86,11 +86,11 @@
 
                                 if (i < 3) {
                                     if (i == 0) {
-                                        rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/pc_activity/love_on_july/section_3_img10.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num"><span class="money_num1">'+number+'</span></div></div>'].join(''));
+                                        rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/pc_activity/love_on_july/section_3_img10.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num"><span class="money_num1">'+number+'元</span></div></div>'].join(''));
                                     } else if (i == 1) {
-                                        rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/pc_activity/love_on_july/section_3_img11.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num"><span class="money_num2">'+number+'</span></div></div>'].join(''));
+                                        rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/pc_activity/love_on_july/section_3_img11.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num"><span class="money_num2">'+number+'元</span></div></div>'].join(''));
                                     } else if (i == 2) {
-                                        rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/pc_activity/love_on_july/section_3_img12.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num"><span class="money_num3">'+number+'</span></div></div>'].join(''));
+                                        rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/pc_activity/love_on_july/section_3_img12.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num"><span class="money_num3">'+number+'元</span></div></div>'].join(''));
                                     }
 
                                 } else {
@@ -105,6 +105,7 @@
 
                 }
             })
+
 
         var oDate = new Date(); //实例一个时间对象；
         var nian = oDate.getFullYear();   //获取系统的年；
