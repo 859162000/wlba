@@ -12,6 +12,7 @@ from experience_gold.backends import SendExperienceGold
 from wanglibao_redpack.backends import give_activity_redpack_for_hby, _send_message_for_hby, get_start_end_time
 from marketing.utils import local_to_utc
 from wanglibao_p2p.models import P2PRecord, P2PProduct
+from wanglibao_margin.models import MarginRecord
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.auth_backends import User
 from wanglibao_redis.backend import redis_backend
@@ -226,7 +227,7 @@ def updateRedisWeekTopRank():
 def getDayTop3Ranks():
     today = datetime.datetime.now()
     today_start = local_to_utc(today, 'min')
-    top_ranks = P2PRecord.objects.filter(catalog='申购', create_time__gte=today_start).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:3]
+    top_ranks = MarginRecord.objects.filter(catalog='交易冻结', create_time__gte=today_start).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:3]
     uids = [rank['user'] for rank in top_ranks]
     userprofiles = WanglibaoUserProfile.objects.filter(user__in=uids).all()
     for rank in top_ranks:
