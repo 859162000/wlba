@@ -303,11 +303,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 						if (i < 3) {
 							if (i == 0) {
-								rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/mobile_activity/app_love_on_july/img13_13.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num money_num1">'+number+'</div></div>'].join(''));
+								rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/mobile_activity/app_love_on_july/img13_13.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num money_num1">'+number+'元</div></div>'].join(''));
 							} else if (i == 1) {
-								rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/mobile_activity/app_love_on_july/img13_15.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num money_num2">'+number+'</div></div>'].join(''));
+								rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/mobile_activity/app_love_on_july/img13_15.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num money_num2">'+number+'元</div></div>'].join(''));
 							} else if (i == 2) {
-								rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/mobile_activity/app_love_on_july/img13_17.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num money_num3">'+number+'</div></div>'].join(''));
+								rankingList.push(['<div class="box"><div class="name_text">'+json_one.sex+'</div><img src="/static/imgs/mobile_activity/app_love_on_july/img13_17.png"><div class="phone_num">'+json_one.phone+'</div><div class="money_num money_num3">'+number+'元</div></div>'].join(''));
 							}
 
 						} else {
@@ -322,7 +322,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 		}
 	})
-
 
 	var login = false;
     wlb.ready({
