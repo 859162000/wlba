@@ -299,7 +299,7 @@ def updateRedisWeekSum():
         logger.error("====updateRedisWeekSum======="+e.message)
     return top_ranks
 
-def processMarchAwardAfterP2pBuy(user, product_id, order_id, amount):
+def processMarchAwardAfterP2pBuy():
     try:
         status = int(getMiscValue('april_reward').get('status',0))
         if status==1:

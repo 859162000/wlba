@@ -78,7 +78,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False,
         pass
     # 发送红包
     # send_lottery.apply_async((user_id,))
-    processMarchAwardAfterP2pBuy(user, product_id, order_id, amount)
+    processMarchAwardAfterP2pBuy()
     #八月照相馆活动
     try:
         processAugustAwardZhaoXiangGuan(user, product_id, order_id, amount)
