@@ -586,7 +586,7 @@ def bind_pay_dynnum(request):
 
     if not card:
         # res = {"ret_code": 20002, "message": "银行卡未绑定"}
-        channel = PayInfo.objects.get(order__id=order_id).channel
+        channel = pay_info.channel
     else:
         channel = card.bank.channel
 
@@ -605,6 +605,9 @@ def bind_pay_dynnum(request):
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 
+    if not card:
+        # 宝付这个时候卡才生产，在调用dynnum_bind_pay之前是没卡的
+        card = Card.objects.get(no=pay_info.card_no)
     if res.get('ret_code') == 0:
         if set_the_one_card:
             TheOneCard(request.user).set(card.id)
