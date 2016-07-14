@@ -85,7 +85,7 @@ class Bank(models.Model):
             elif bank.channel == 'yeepay' and bank.yee_bind_limit and bank.yee_bind_code:
                 obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
             elif bank.channel == 'baopay' and  bank.bao_bind_code:
-                pass
+                obj.update(util.handle_kuai_bank_limit(bank.bao_bind_limit))
             else:
                 # 只返回已经有渠道的银行
                 continue
