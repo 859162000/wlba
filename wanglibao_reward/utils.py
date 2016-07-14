@@ -12,6 +12,7 @@ from experience_gold.backends import SendExperienceGold
 from wanglibao_redpack.backends import give_activity_redpack_for_hby, _send_message_for_hby, get_start_end_time
 from marketing.utils import local_to_utc
 from wanglibao_p2p.models import P2PRecord, P2PProduct
+from wanglibao_margin.models import MarginRecord
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.auth_backends import User
 from wanglibao_redis.backend import redis_backend
@@ -223,6 +224,47 @@ def updateRedisWeekTopRank():
         logger.error("====updateRedisWeekTopRank======="+e.message)
     return top_ranks
 
+def getDayTop3Ranks():
+    today = datetime.datetime.now()
+    today_start = local_to_utc(today, 'min')
+    top_ranks = MarginRecord.objects.filter(catalog='交易冻结', create_time__gte=today_start).values('user').annotate(Sum('amount')).order_by('-amount__sum')[:3]
+    uids = [rank['user'] for rank in top_ranks]
+    userprofiles = WanglibaoUserProfile.objects.filter(user__in=uids).all()
+    for rank in top_ranks:
+        for userprofile in userprofiles:
+            if userprofile.user_id == rank['user']:
+                rank['phone'] = safe_phone_str(userprofile.phone)
+                rank['sex'] = userprofile.name[0] + getUserSex(userprofile)
+                break
+    return top_ranks
+
+#----------------------------------------------------------------------
+def getUserSex(userprofile):
+    """获取用户性别"""
+    n = 0
+    if len(userprofile.id_number) == 15:
+        n = int(userprofile.id_number[-1])
+    else:
+        n = int(userprofile.id_number[-2])
+    
+    if n % 2 == 0:
+        return '女士'
+    else:
+        return '先生'
+    
+
+def updateRedisDayTopRank():
+    top_ranks = []
+    try:
+        top_ranks = getDayTop3Ranks()
+        redis = redis_backend()
+        today = datetime.datetime.now()
+        day_top_ranks = 'day_top_ranks_' + today.strftime('%Y_%m_%d')
+        redis._set(day_top_ranks, pickle.dumps(top_ranks))
+    except Exception,e:
+        logger.error("====updateRedisDayTopRank======="+e.message)
+    return top_ranks
+
 def getWeekSum():
     amount_week_sum = 0
     try:
@@ -258,12 +300,13 @@ def updateRedisWeekSum():
         logger.error("====updateRedisWeekSum======="+e.message)
     return top_ranks
 
-def processMarchAwardAfterP2pBuy(user, product_id, order_id, amount):
+def processMarchAwardAfterP2pBuy():
     try:
         status = int(getMiscValue('april_reward').get('status',0))
         if status==1:
-            updateRedisWeekSum()
-            updateRedisWeekTopRank()
+            #updateRedisWeekSum()
+            #updateRedisWeekTopRank()
+            updateRedisDayTopRank()
     except Exception, e:
         logger.error("===========processMarchAwardAfterP2pBuy==================="+e.message)
 

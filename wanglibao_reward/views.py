@@ -51,7 +51,7 @@ import wanglibao_activity.backends as activity_backend
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str4
-from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank, updateRedisWeekTopRank, updateRedisWeekSum
+from wanglibao_reward.utils import getRewardsByActivity, sendWechatPhoneReward, updateRedisTopRank, updateRedisWeekTopRank, updateRedisWeekSum, updateRedisDayTopRank
 from weixin.models import WeixinAccounts
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.exceptions import  WeChatException
@@ -3698,6 +3698,29 @@ class AprilAwardApi(APIView):
             week_number = '第二周'
         return Response({"weekranks":weekranks,"week_sum_amount":week_sum_amount,
                          "week_frist_day":week_frist_day.strftime('%y年%m月%d日'),"week_number":week_number,})
+    
+class JulyAwardApi(APIView):
+    """
+    七月活动
+    """
+    permission_classes = (AllowAny, )
+
+    def post(self, request):
+        dayranks = []
+        today = datetime.datetime.now()
+        status = int(getMiscValue('april_reward').get('status',0))
+        if status==1:
+            try:
+                day_top_ranks = 'day_top_ranks_' + today.strftime('%Y_%m_%d')
+                dayranks = pickle.loads(redis_backend()._get(day_top_ranks))
+            except:
+                logger.debug("-------------------------------redis read dayranks error")
+            if not dayranks:
+                dayranks = updateRedisDayTopRank()
+            if dayranks:
+                for dr in dayranks:
+                    dr.pop('user')
+        return Response({"dayranks":dayranks,})
 
 class FetchMarchAwardAPI(APIView):
     permission_classes = (IsAuthenticated, )
