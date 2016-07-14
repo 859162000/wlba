@@ -1203,11 +1203,15 @@ ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 
 # 中国电信
 WLB_FOR_ZGDX_KEY = '2001'
-ZGDX_QUERY_URL = 'http://182.140.241.47:8080/fps/ESBFlowService.do'
+# Modify by hb on 2016-07-14
+#ZGDX_QUERY_URL = 'http://182.140.241.47:8080/fps/ESBFlowService.do'
+ZGDX_QUERY_URL = 'http://api.800.21cn.com/fps/ESBFlowService.do'
 # ZGDX_QUERY_KEY = 'hwDmXQLqdzJ4wozz'
 # ZGDX_QUERY_IV = '7988680669963722'
 if ENV == ENV_PRODUCTION:
-    ZGDX_CALL_BACK_URL = 'http://182.140.241.47:8080/fps/flowService.do'
+    # Modify by hb on 2016-07-14
+    # ZGDX_CALL_BACK_URL = 'http://182.140.241.47:8080/fps/flowService.do'
+    ZGDX_CALL_BACK_URL = 'http://api.800.21cn.com/fps/flowService.do'
     ZGDX_PARTNER_NO = '102139887'
     ZGDX_SERVICE_CODE = 'FS0001'
     ZGDX_CONTRACT_ID = '101062'
