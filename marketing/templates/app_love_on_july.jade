@@ -7,7 +7,7 @@ html(style="background: #fcf1e7")
         include include/app_head
         link(href="/static/styles/mobile/mobile.css?v=20150114", rel="stylesheet")
         link(href="/static/styles/mobile_activity/swiper.min.css?v=2015050502", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_love_on_july.css?v=2015053115", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_love_on_july.css?v=2016071401", rel="stylesheet")
         - csrf_token
     body
         input(type='hidden',value='{{user.is_authenticated}}')#authenticated
@@ -28,8 +28,9 @@ html(style="background: #fcf1e7")
                                 img.slide_img(src='/static/imgs/mobile_activity/app_love_on_july/img_8_18.png')
                                 .biao_text!='7月17日及7月27日，平台将随机为1至2个标的<span>加息1.7%或者2.7%</span>'
                             .swiper-slide
-                                img.slide_img(src='/static/imgs/mobile_activity/app_love_on_july/img_8_18.png')
+                                img.slide_img(src='/static/imgs/mobile_activity/app_love_on_july/img_9_23.png')
                                 .biao_text!='活动期间内，平台将不定期发布妻月鲜花标。单笔投资达2.7万元及以上，<span>送包月鲜花。</span>'
+                                img.wenhao(src='/static/imgs/mobile_activity/app_love_on_july/wenhao.png')
                     .pagination.pagination1
                 .rule_wrap
                     .title_text 温馨提示：
@@ -77,7 +78,10 @@ html(style="background: #fcf1e7")
                         dd 迅雷会员兑换的截止时间：2016年9月30日；活动奖励发放请关注站内信及短信通知。
                     dl
                         dt 4、
-                        dd 投资数据统计周期为每日0时至次日0时，每十分钟更新一次。
+                        dd 加息券限1月及以下标的使用，2万元起投；红包限3月及以上标的使用，1万元起投；红包和加息券有效期为7天。
+                    dl
+                        dt 5、
+                        dd 投资数据统计周期为每日0时至次日0时，投资转让标不纳入统计范围。
                 img.line(src='/static/imgs/mobile_activity/app_love_on_july/img10_02.png')
                 img.title_img.title_img3(src='/static/imgs/mobile_activity/app_love_on_july/img14_34.png')
                 .title_text.title_text2 投资满额送体验金
@@ -110,16 +114,42 @@ html(style="background: #fcf1e7")
                     .investmen_tline
                 .rule_wrap
                     .title_text 温馨提示：
-                    p.rule_text 红包和加息券有效期自领取的7日内，体验金有效期截止到2016年8月10日。
+                    p.rule_text 体验金有效期截止到2016年8月10日。
                 img.line.line1(src='/static/imgs/mobile_activity/app_love_on_july/img10_02.png')
                 .href_link
                     img(src='/static/imgs/mobile_activity/app_love_on_july/img14_41.png')
                 //p.last_rule 活动最终解释权归网利宝所有
-
+            .popup_wrap
+                .main
+                    .textairport
+                        p 温馨提示
+                        dl
+                            dt 1、
+                            dd 每个标的限前30名用户，先到先得。
+                        dl
+                            dt 2、
+                            dd 同一用户在同一标的只能获取一次，多笔投资以单笔投资最高金额为准，不可累加。
+                        dl
+                            dt 3、
+                            dd 标的不可使用其他加息券或者红包。
+                        dl
+                            dt 4、
+                            dd 满标之后工作人员会在2-3工作日内联系用户确认礼品配送相关事宜。
+                        dl
+                            dt 5、
+                            dd 如有问题请致电网利宝客服4008-588-066或者关注花+公众号：everose888
+                        dl
+                            dt 6、
+                            dd 鲜花配送范围：江苏 浙江 上海 合肥 广东 成都 天津（和平区 红桥区 南开区 河北区 河东区 河西区）河北（石家庄） 山东（青岛 济南）北京（朝阳 海淀 东城 西城 丰台 石景山 昌平 顺义 通州 大兴）其他地区暂时不支持配送。如果用户所在地不在配送范围内，将用50元红包替代。
+                        dl
+                            dt 7、
+                            dd 送达时间：周六或周一，总计4次。（送达时间为9:00—18:30）
+                    //.popup_button 知道了
+                    img.close_popup(src="/static/imgs/pc_activity/love_on_july/close_popup.png")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/swiper_new_min.js')
         script(src="/static/scripts/component/webview.js")
-        script(src="/static/scripts/mobile_activity/app_love_on_july.js?v=2016071301")
+        script(src="/static/scripts/mobile_activity/app_love_on_july.js?v=2016071401")
 
         //script.
         //    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,

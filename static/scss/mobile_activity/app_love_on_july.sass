@@ -63,7 +63,7 @@
       text-align: center
       font-size: 18px
       width: 90%
-      img
+      img.slide_img
         width: 100%
         display: block
       .biao_text
@@ -78,6 +78,14 @@
         text-align: left
         span
           font-weight: bold
+      img.wenhao
+        width: 1rem
+        height: 1rem
+        display: block
+        position: absolute
+        right: -0.1rem
+        bottom: 1rem
+        z-index: 2
     .swiper-pagination-bullet
       width: 0.4rem
       height: 0.4rem
@@ -261,3 +269,76 @@
       line-height: 0.75rem
       padding: 0.625rem
       max-height: 9999rem
+  .popup_wrap
+    position: fixed
+    left: 0
+    top: 0
+    width: 100%
+    height: 100%
+    z-index: 999
+    display: none
+    background: rgba(0,0,0,0.7)
+    .main
+      width: 90%
+      position: absolute
+      left: 50%
+      top: 50%
+      margin: -9rem 0 0 -45%
+      float: none
+      background: #fff
+      border-radius: 0.5rem
+      z-index: 99
+      .textairport
+        width: 100%
+        padding: 0.7rem 0.5rem
+        p
+          padding-bottom: 0.5rem
+          line-height: 1.2rem
+          font-size: 1rem
+          text-align: center
+          color: #e5574c
+
+        dl
+          width: 100%
+          position: relative
+          display: inline-block
+          dt
+            line-height: 0.9rem
+            font-size: 0.7rem
+            width: 1.5em
+            position: absolute
+            left: 0
+            top: 0
+            color: #e5574c
+          dd
+            line-height: 0.9rem
+            font-size: 0.7rem
+            padding-left: 1.5em
+            color: #e5574c
+            width: 100%
+
+      .popup_button
+        margin: 0 auto
+        width: 100px
+        height: 30px
+        line-height: 30px
+        text-align: center
+        display: block
+        background: #ff5252
+        border-radius: 10px
+        color: #fff
+        font-size: 18px
+        cursor: pointer
+      .popup_button:hover
+        opacity: 0.9
+      .close_popup
+        position: absolute
+        right: 0.3rem
+        top: 0.3rem
+        z-index: 999
+        width: 1rem
+        height: 1rem
+        display: block
+        cursor: pointer
+      .close_popup:hover
+        opacity: 0.9

@@ -112,7 +112,7 @@ class PayView(TemplateView):
             gate_id = request.POST.get('gate_id')
             request_ip = get_client_ip(request)
             device_type = split_ua(request)['device_type']
-            channel = PayOrder.get_bank_and_channel(gate_id, device_type)[1]
+            channel = PayOrder.get_bank_and_channel(gate_id)[1]
         except:
             logger.exception('third_pay_error')
             result = {'message': '参数错误'}
