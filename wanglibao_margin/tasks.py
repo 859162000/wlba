@@ -16,7 +16,8 @@ from wanglibao_account.cooperation import CoopRegister, XiaoMeiRegister, ZhongYi
 from wanglibao_margin.models import MonthProduct, AssignmentOfClaims
 from wanglibao_margin.php_utils import PhpMarginKeeper, php_redpack_consume
 from wanglibao_redpack.models import RedPackRecord
-
+from wanglibao_reward.views import RuiKeDistributer
+from wanglibao_reward.utils import processMarchAwardAfterP2pBuy
 
 logger = logging.getLogger('wanglibao_margin')
 
@@ -114,6 +115,22 @@ def buy_month_product(token=None, red_packet_id=None, amount_source=None, user=N
             CoopRegister(request).process_for_purchase_yuelibao(user, product.id)
         except Exception, e:
             logger.debug(u"=遍历渠道= CoopRegister.process_for_purchase Except:{}".format(e))
+
+        # ruike qudao
+        try:
+            kargs = {
+                'amount': amount_source,
+                'order_id': product.id,
+                'user': user,
+                'request': request,
+                'product': None,
+            }
+            ruike_obj = RuiKeDistributer(request, kargs)
+            ruike_obj.distribute()
+        except Exception, e:
+            logger.debug(u'ruike call failed with : {}'.format(e.message))
+        #七月活动
+        processMarchAwardAfterP2pBuy()
 
     # 写入 sqs
     args_data = dict()

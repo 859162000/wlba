@@ -33,6 +33,7 @@ from wanglibao_rest.utils import split_ua
 from wanglibao_pay.kuai_pay import KuaiPay, KuaiShortPay
 from wanglibao_pay.huifu_pay import HuifuShortPay
 from wanglibao_pay.yee_pay import YeePay, YeeShortPay
+from wanglibao_pay.baopay import BaoPayInterface
 
 logger = logging.getLogger(__name__)
 
@@ -287,6 +288,8 @@ def _need_validation_for_qpay(card):
     need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
     if need_sms and need_sms.value == '1' and card.bank.channel == 'kuaipay':
         need_validation_for_qpay = True
+    elif card.bank.channel == 'baopay':
+        need_validation_for_qpay = True
     else:
         need_validation_for_qpay = False
     return need_validation_for_qpay
@@ -305,7 +308,7 @@ def card_bind_list(request):
 
     try:
         card_list = []
-        cards = Card.objects .filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True))\
+        cards = Card.objects .filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)|~Q(bao_bind_id=''))\
             .select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
@@ -349,6 +352,12 @@ def card_bind_list(request):
                     tmp.update(base_dict)
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
+
+                elif channel == 'baopay':
+                    tmp.update(base_dict)
+                    if card.bank.bao_bind_limit:
+                        tmp.update(util.handle_kuai_bank_limit(card.bank.bao_bind_limit))
+                            
 
                 # bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
                 # bank_min_amount = bank_limit.get('bank_min_amount')
@@ -506,7 +515,10 @@ def bind_pay_deposit(request):
         result = YeeShortPay().pre_pay(request)
 
         return result
-
+    elif bank.channel == 'baopay':
+        res = BaoPayInterface(user, ip, device_type).pre_pay(
+                card_no, amount, input_phone, gate_id,request)
+        return res
     elif bank.channel == 'kuaipay':
         stop_no_sms_channel = Misc.objects.filter(
                 key='kuai_qpay_stop_no_sms_channel').first()  
@@ -573,18 +585,23 @@ def bind_pay_dynnum(request):
         card = Card.objects.filter(no=card_no, user=user).first()
 
     if not card:
-        res = {"ret_code": 20002, "message": "银行卡未绑定"}
+        # res = {"ret_code": 20002, "message": "银行卡未绑定"}
+        channel = PayInfo.objects.get(order__id=order_id).channel
+    else:
+        channel = card.bank.channel
 
-    if card.bank.channel == 'huifu':
+    if channel == 'huifu':
         res = {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
 
-    elif card.bank.channel == 'yeepay':
+    elif channel == 'yeepay':
         res = YeeShortPay().dynnum_bind_pay(request)
 
-    elif card.bank.channel == 'kuaipay':
+    elif channel == 'kuaipay':
         res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, 
                                             token, input_phone, device,
                                             ip, request, mode=mode)
+    elif channel == 'baopay':
+        res = BaoPayInterface(user, ip, device).dynnum_bind_pay(order_id, vcode, request)
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 

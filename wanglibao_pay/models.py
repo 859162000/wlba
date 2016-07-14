@@ -31,13 +31,16 @@ class Bank(models.Model):
     have_company_channel = models.BooleanField(u"是否对公", default=False)
     cards_info = models.TextField(max_length=10000, default='', blank=True, verbose_name=u'银行卡号识别码')
     bao_code = models.CharField(max_length=20, verbose_name=u'宝付网银支付银行代码', blank=True, default="")
+    bao_bind_code = models.CharField(max_length=20, verbose_name=u'宝付认证支付银行代码', blank=True, default="")
+    bao_bind_limit = models.CharField(max_length=500, blank=True, verbose_name=u"宝付快捷限额信息", default="")
 
     #last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
     channel = models.CharField(u'手机支付通道', max_length=20, blank=True, null=True, choices=(
         ("huifu", "Huifu"),
         ("yeepay", "Yeepay"),
-        ("kuaipay", "Kuaipay")
+        ("kuaipay", "Kuaipay"),
+        ("baopay", "Baopay"),
     ))
 
     pc_channel = models.CharField(u'pc支付通道', max_length=20, default='huifu', blank=False, null=False, choices=(
@@ -71,7 +74,7 @@ class Bank(models.Model):
     def get_bind_channel_banks(cls):
         banks = Bank.objects.all().exclude(channel__isnull=True)\
             .exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True)\
-            .exclude(yee_bind_code__isnull=True).select_related()
+            .exclude(yee_bind_code__isnull=True).exclude(bao_bind_code__isnull=True).select_related()
         rs = []
         for bank in banks:
             obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
@@ -81,6 +84,8 @@ class Bank(models.Model):
                 obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
             elif bank.channel == 'yeepay' and bank.yee_bind_limit and bank.yee_bind_code:
                 obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
+            elif bank.channel == 'baopay' and  bank.bao_bind_code:
+                obj.update(util.handle_kuai_bank_limit(bank.bao_bind_limit))
             else:
                 # 只返回已经有渠道的银行
                 continue
@@ -107,9 +112,11 @@ class Card(models.Model):
     is_bind_kuai = models.BooleanField(verbose_name=u"是否绑定快钱快捷", default=False)
     is_bind_yee = models.BooleanField(verbose_name=u"是否绑定易宝快捷", default=False)
     last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
-    yee_bind_id = models.CharField(max_length=50, verbose_name=u'易宝帮卡id', blank=True, default="")
+    yee_bind_id = models.CharField(max_length=50, verbose_name=u'易宝绑卡id', blank=True, default="")
+    bao_bind_id = models.CharField(max_length=50, verbose_name=u'宝付绑卡id', blank=True, default="")
     # 同卡进出
     is_the_one_card = models.BooleanField(verbose_name='是否为唯一进出卡片', default=False)
+
 
     class Meta:
         verbose_name_plural = "银行卡"
