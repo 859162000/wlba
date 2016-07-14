@@ -38,7 +38,8 @@ class Bank(models.Model):
     channel = models.CharField(u'手机支付通道', max_length=20, blank=True, null=True, choices=(
         ("huifu", "Huifu"),
         ("yeepay", "Yeepay"),
-        ("kuaipay", "Kuaipay")
+        ("kuaipay", "Kuaipay"),
+        ("baopay", "Baopay"),
     ))
 
     pc_channel = models.CharField(u'pc支付通道', max_length=20, default='huifu', blank=False, null=False, choices=(
@@ -72,7 +73,7 @@ class Bank(models.Model):
     def get_bind_channel_banks(cls):
         banks = Bank.objects.all().exclude(channel__isnull=True)\
             .exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True)\
-            .exclude(yee_bind_code__isnull=True).select_related()
+            .exclude(yee_bind_code__isnull=True).exclude(bao_bind_code__isnull=True).select_related()
         rs = []
         for bank in banks:
             obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
@@ -82,6 +83,8 @@ class Bank(models.Model):
                 obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
             elif bank.channel == 'yeepay' and bank.yee_bind_limit and bank.yee_bind_code:
                 obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
+            elif bank.channel == 'baopay' and  bank.bao_bind_code:
+                pass
             else:
                 # 只返回已经有渠道的银行
                 continue

@@ -577,20 +577,23 @@ def bind_pay_dynnum(request):
         card = Card.objects.filter(no=card_no, user=user).first()
 
     if not card:
-        res = {"ret_code": 20002, "message": "银行卡未绑定"}
+        # res = {"ret_code": 20002, "message": "银行卡未绑定"}
+        channel = PayInfo.objects.get(order__id=order_id).channel
+    else:
+        channel = card.bank.channel
 
-    if card.bank.channel == 'huifu':
+    if channel == 'huifu':
         res = {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
 
-    elif card.bank.channel == 'yeepay':
+    elif channel == 'yeepay':
         res = YeeShortPay().dynnum_bind_pay(request)
 
-    elif card.bank.channel == 'kuaipay':
+    elif channel == 'kuaipay':
         res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, 
                                             token, input_phone, device,
                                             ip, request, mode=mode)
-    elif card.bank.channel == 'baopay':
-        res = BaoPayInterface(user, ip, device).dynnum_bind_pay(oreder_id, vcode, request)
+    elif channel == 'baopay':
+        res = BaoPayInterface(user, ip, device).dynnum_bind_pay(order_id, vcode, request)
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 

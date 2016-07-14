@@ -11,20 +11,23 @@ import logging
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_pay.models import Bank, Card, PayInfo
 from wanglibao_pay.pay import PayOrder
+from wanglibao_pay.util import fmt_two_amount
 
 
 #  数据库需要记录宝付银行代码，绑定关系唯一标示(bind_id), business_no
 # TODO 1.暂时不使用短信验证码，business_no 暂时不用放入数据库
 # TODO 参数校验
 # TODO 等待状态异常处理
-BAO_PAY_URL = 'https://tgw.baofoo.com/cutpayment/api/backTransRequest'
-# BAO_PAY_URL = 'https://public.baofoo.com/cutpayment/api/backTransRequest'
-BAO_PAY_RSA_PUB_KEY_PATH = './certificate/baopay_test_pub_key.pem'
-BAO_PAY_RSA_PRIV_KEY_PATH = './certificate/baopay_test_pri_key.pem'
-BAO_PAY_MEMBER_ID = '100000178'
-BAO_PAY_TERMINAL_ID = '100000916'
+# BAO_PAY_URL = 'https://tgw.baofoo.com/cutpayment/api/backTransRequest'
+# BAO_PAY_RSA_PUB_KEY_PATH = './certificate/baopay_test_pub_key.pem'
+# BAO_PAY_RSA_PRIV_KEY_PATH = './certificate/baopay_test_pri_key.pem'
 # BAO_PAY_MEMBER_ID = '100000178'
-# BAO_PAY_TERMINAL_ID = '100000859'
+# BAO_PAY_TERMINAL_ID = '100000916'
+BAO_PAY_URL = 'https://public.baofoo.com/cutpayment/api/backTransRequest'
+BAO_PAY_RSA_PUB_KEY_PATH = './certificate/baopay_pub_key.pem'
+BAO_PAY_RSA_PRIV_KEY_PATH = './certificate/baopay_pri_key.pem'
+BAO_PAY_MEMBER_ID = '621513'
+BAO_PAY_TERMINAL_ID = '30293'
 BAO_PAY_ENCRYPT_BLOCK_SIZE = 117
 BAO_PAY_DECRYPT_BLOCK_SIZE = 128
 
@@ -43,6 +46,10 @@ class PayException(Exception):
 class PayParaException(PayException):
     def __init__(self,  message):
         super(PayParaException, self).__init__(300001, message)
+        
+class CardExistException(PayException):
+    def __init__(self,  message):
+        super(CardExistException, self).__init__(400001, message)
 
 class PayWaitingException(PayException):
     def __init__(self,  message):
@@ -59,13 +66,14 @@ class BaoPayInterface(object):
         self.baopay = BaoPay(user, request_ip, device_type)
 
     def pre_pay(self, card_no, amount, mobile=None, gate_id=None, request=None):
+        print card_no,'|', amount, '|', mobile, '|', gate_id, '|', request
         if len(card_no) == 10:
-            self._binded_pay_without_sms(card_no, amount, request)
+            return self._binded_pay_without_sms(card_no, amount, request)
         else:
-            self._first_pay_get_sms(card_no, mobile, gate_id, request)
+            return self._first_pay_get_sms(card_no, mobile, gate_id, amount)
 
     def dynnum_bind_pay(self, order_id, sms_code, request):
-        self._first_pay_confirm(order_id, sms_code, request)
+        return self._first_pay_confirm(order_id, sms_code, request)
 
     def _first_pay_get_sms(self, card_no, mobile, gate_id, amount):
         """
@@ -73,7 +81,7 @@ class BaoPayInterface(object):
         """
         resp = self.baopay.pre_bind(card_no, mobile, gate_id, amount)
         return {'ret_code':0, 'message': 'ok', 
-                    'order_id': resp['order_id'], 'token': ''}
+                    'order_id': resp['order_id'], 'token': 'wanglibao'}
 
     def _first_pay_confirm(self, order_id, sms_code, request):
         """
@@ -84,6 +92,7 @@ class BaoPayInterface(object):
         pre_pay_resp = self.baopay.pre_pay_by_order_id(order_id)
         resp = self.baopay.confirm_pay(order_id, 
                 pre_pay_resp['business_no'], request)
+        resp.update(amount=(fmt_two_amount(resp['amount']/100)))
         r = {'ret_code': 0, 'message': 'success'}
         update_by_keys(r, resp, 'amount', 'margin', 'order_id')
         return r
@@ -99,10 +108,10 @@ class BaoPayInterface(object):
         pre_pay_resp = self.baopay.pre_pay_by_card_id(card.id, amount)
         resp = self.baopay.confirm_pay(pre_pay_resp['order_id'], 
                 pre_pay_resp['business_no'], request)
+        resp.update(amount=(fmt_two_amount(resp['amount']/100)))
         r = {'ret_code': 0, 'message': 'success'}
         update_by_keys(r, resp, 'amount', 'margin', 'order_id')
         return r
-
 
 
 class BaoPay(object):
@@ -136,10 +145,11 @@ class BaoPay(object):
     def confirm_bind(self, order_id, sms_code):
         try:
             confirm_bind_para = ConfirmBindCardPara(order_id, sms_code)
-            confirm_bind_para.post()
+            resp = confirm_bind_para.post()
             pay_info = PayInfo.objects.get(order__id=order_id)
-            self.pay_order.add_card(pay_info.card_no, pay_info.bank, 
-                    pay_info.user, pay_info.channel)
+            if not self.pay_order.add_card(pay_info.card_no, pay_info.bank, 
+                    pay_info.user, bao_bind_id=resp['bind_id']):
+                raise CardExistException('银行卡已绑定')
         except PayException, err:
             self.pay_order.order_after_pay_error(err, order_id)
             raise
@@ -179,6 +189,7 @@ class BaoPay(object):
         pre_pay_para = PrePayPara(order_id, bind_id, amount)
         resp = pre_pay_para.post()
         resp.update(order_id=order_id)
+        return resp
 
     def confirm_pay(self, order_id, business_no, request):
         """
@@ -233,18 +244,19 @@ class BaoPayConn(object):
         logging.critical('Baopay_post: %s | %s' % (post_para, data_content))
         data_content=self._get_encrypt_content(data_content)
         post_para.update(data_content=data_content)
-        # logging.critical('Baopay_post_encypted: %s' %  post_para)
+        logging.critical('Baopay_post_encypted: %s' %  post_para)
         return post_para
 
     def post(self):
         resp = requests.post(self.url, self._get_post())
         resp_json = json.loads(self._decrypt_response(resp.text))
+        logging.critical('Baopay_response: %s' % resp_json)
         resp_code = resp_json['resp_code']
-        resp_message = resp_json['resp_message']
-        if resp_code != 0:
+        resp_message = resp_json['resp_msg']
+        if resp_code != '0000':
             if resp_code in BaoPayWaitingException.thirdpay_ret_code:
                 raise BaoPayWaitingException(resp_message)
-            raise PayException(resp_message)
+            raise PayException(resp_code, resp_message)
         resp_json.update(resp_content=resp.text)
         return resp_json
 
@@ -257,7 +269,6 @@ class BaoPayConn(object):
         resp_text = resp_text.decode('hex')
         r = ''
         for block in chunks(resp_text, BAO_PAY_DECRYPT_BLOCK_SIZE):
-            print block, '|', len(block)
             r += self.rsa_pub_key.public_decrypt(block, M2Crypto.RSA.pkcs1_padding)
         return r.decode('base64')
 
@@ -278,24 +289,41 @@ class CommmonContentPara(object):
     """
     宝付通用参数，会被json化之后加密放到data_content中
     """
-    def __init__(self):
+    def __init__(self, order_id):
+        """
+        内部包括和前端通讯使用order_id
+        和商户通讯使用商户流水号trans_serial_no和商户订单号trans_id
+        """
+        self.order_id = order_id
         self.para_txn_sub_type = ''  # 交易子类型
         self.para_biz_type = '0000'  # 接入类型
         self.para_member_id = BAO_PAY_MEMBER_ID
         self.para_terminal_id = BAO_PAY_TERMINAL_ID 
-        self.para_trans_serial_no = None # 商户流水编号，8-20
-        self.para_trans_id = None # 商户订单号，8-20
-        self.para_trade_date = datetime.datetime.now().strftime('%Y%m%d%H%M%S') # 订单日期，年年年年月月日日时时分分秒秒
+        # 商户流水编号，8-20, 商户订单号，8-20
+        self.para_trans_serial_no, self.para_trans_id = self._get_trans_ids() 
+        # 订单日期，年年年年月月日日时时分分秒秒
+        self.para_trade_date = datetime.datetime.now().strftime('%Y%m%d%H%M%S') 
         self.para_additional_info = '' # 附加字段
         self.para_req_reserved = '' # 请求方保留域
 
+    def _get_trans_ids(self):
+        """
+        在这分配商户流水号 和 工单号
+        """
+        ids_table = {
+                'PreBindCardPara':      ('000', '000'),
+                'ConfirmBindCardPara':  ('001', '000'),
+                'PrePayPara':           ('002', '001'),
+                'ConfirmPayPara':       ('003', '001'),
+                }
+        return [str(self.order_id) + i for i in ids_table.get(self.__class__.__name__)]
 
 class PreBindCardPara(CommmonContentPara, BaoPayConn):
     """
     预绑卡参数
     """
     def __init__(self, order_id, no, id_no, id_name, mobile, bank_code):
-        CommmonContentPara.__init__(self)
+        CommmonContentPara.__init__(self, order_id)
         BaoPayConn.__init__(self)
         self.para_txn_sub_type = '11'
         self.para_acc_no = no # 绑定卡号
@@ -312,7 +340,8 @@ class ConfirmBindCardPara(CommmonContentPara, BaoPayConn):
     确认绑卡参数 
     """
     def __init__(self, order_id, sms_code):
-        super(ConfirmBindCardPara, self).__init__()
+        CommmonContentPara.__init__(self, order_id)
+        BaoPayConn.__init__(self)
         self.para_txn_sub_type = '12'
         self.para_sms_code = sms_code # 确认绑定的短信验证码
 
@@ -321,25 +350,28 @@ class PrePayPara(CommmonContentPara, BaoPayConn):
     预支付参数，暂时不使用短信验证
     """
     def __init__(self, order_id, bind_id, amount):
-        super(PrePayPara, self).__init__()
+        CommmonContentPara.__init__(self, order_id)
+        BaoPayConn.__init__(self)
         # 14 预支付交易(不发送短信)
         # 15 预支付交易(不发送短信)
+        # 防止订单重复
         self.para_txn_sub_type = '15'
-        self.para_bind_id = None  # 用于绑定关系的唯一标示
-        self.para_txn_amt = None # 交易金额,分
+        self.para_bind_id = bind_id  # 用于绑定关系的唯一标示
+        self.para_txn_amt = int(amount * 100) # 交易金额,分
         # todo ? client_ip 
-        self.para_risk_content = '' # 风险控制参数
+        self.para_risk_content = {'client_ip': '182.92.167.178'} # 风险控制参数
 
 class ConfirmPayPara(CommmonContentPara, BaoPayConn):
     """
     确认支付参数 
     """
     def __init__(self, order_id, business_no, sms_code=''):
-        super(ConfirmPayPara, self).__init__()
+        CommmonContentPara.__init__(self, order_id)
+        BaoPayConn.__init__(self)
         # 确认支付不需要trans_id, 需要business_no
         # 为了保持一致性我们也可以把trans_id post 过去
         self.para_txn_sub_type = '16'
-        self.para_business_no =  None # 宝付业务流水号
+        self.para_business_no =  business_no # 宝付业务流水号
         self.para_sms_code = sms_code # 支付时的短信验证码
 
 

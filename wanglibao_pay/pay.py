@@ -36,7 +36,7 @@ class Pay(object):
 class PayOrder(object):
     """
     支付时，用于绑卡，支付请求和订单系统的交互
-    未绑卡时根据card_no 和gate_id可以知道银行卡，银行，支付渠道信息
+    未绑卡时根据card_no 和gate_id, is_bind_pay可以知道银行卡，银行，支付渠道信息
     绑卡后根据card_no 就可以知道银行卡，银行，支付渠道信息
     不再维护Card的last_update字段
     """
@@ -47,49 +47,56 @@ class PayOrder(object):
             'yeepay': ['yee_bind_code', 'is_bind_yee'],
             'kuaipay': ['kuai_code', 'is_bind_kuai'],
             'baopay': ['bao_code', None],
+            'baopay_bind': ['bao_bind_code', 'bao_bind_id'] 
         }
 
     @staticmethod
-    def get_bank_and_channel(gate_id, device_type):
+    def get_bank_and_channel(gate_id, is_bind_pay=False):
         """
-        channel: 'huifu', 'yeepay', 'kuaipay'
-        :param gate_id:
-        :param device_type: 'ios', 'android', 'pc'
-        :return: bank(Type Bank), channel(str), bind_code(str)
+        所有渠道相关的配置参数都放在channel_mapping 中，
+        所有对channel_mapping的访问都通过该方法
+        channel: 'huifu', 'yeepay', 'kuaipay', 'baopay'
+        channel不会加_bind，通过is_bind_pay 来区分是对应到哪一种
+        gate_id -- 银行代码（其实是huifu的网银支付代码，但大家都统一用这个做银行代码）
+        is_bind_pay -- 网银支付还是绑卡（认证）支付
+        return -- bank(Type Bank), channel(str), bank_bind_code(str), 
+                card_bind_code(str)
         """
         try:
+            def get_channel_info(channel):
+                channel_conf = PayOrder.channel_mapping.get(channel)
+                return channel_conf[0], channel_conf[1]
+
             bank = Bank.objects.get(gate_id=gate_id)
-            if device_type == 'pc':
+            if not is_bind_pay: 
                 channel = bank.pc_channel
+                bank_bind_code, card_bind_code = get_channel_info(channel)
             else:
                 channel = bank.channel
-            try:
-                bind_code = getattr(bank, PayOrder.channel_mapping.get(channel)[0])
-            except:
-                bind_code = None
-            return bank, channel, bind_code
+                bank_bind_code, card_bind_code = get_channel_info(channel+'_bind')
+            return bank, channel, bank_bind_code, card_bind_code
         except:
             logger.exception('third_pay_error')
             raise ThirdPayError(40011, '银行代码错误')
 
     @staticmethod
-    def get_card_no(card_no, user, gate_id, device_type):
+    def get_card_no(card_no, user, gate_id, is_bind_pay):
         """
         对于长卡直接返回card_no
         对于短卡(10位)会校验绑卡信息，若绑卡正确，则返回完整的长卡号
         :param card_no:
         :param gate_id:
-        :param device_type:
+        :param is_bind_pay:
         :return:
         """
         try:
             if len(card_no) != 10:
                 return card_no
 
-            bank, channel, bind_code = PayOrder.get_bank_and_channel(gate_id, device_type)
+            card_bind_code = PayOrder.get_bank_and_channel(gate_id, is_bind_pay)[-1]
             card = Card.objects.get(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:])
-            is_bind_channel = getattr(card, PayOrder.channel_mapping.get(channel)[1])
-            assert is_bind_channel is True
+            # is_bind_channel = getattr(card, PayOrder.channel_mapping.get(channel)[1])
+            assert getattr(card, card_bind_code)
             return card.no
         except:
             raise ThirdPayError(40012, '卡号错误')
@@ -114,7 +121,8 @@ class PayOrder(object):
         :return: order.id
         """
         # 处理必填信息
-        bank, channel, bind_code = self.get_bank_and_channel(gate_id, device_type)
+        is_bind_pay = True if card_no else False
+        bank, channel= self.get_bank_and_channel(gate_id, is_bind_pay)[:2]
 
         pay_info = PayInfo()
         pay_info.type = PayInfo.DEPOSIT
@@ -132,7 +140,7 @@ class PayOrder(object):
 
         # 处理可选的银行卡信息
         if card_no:
-            pay_info.card_no = self.get_card_no(card_no, user, gate_id, device_type)
+            pay_info.card_no = self.get_card_no(card_no, user, gate_id, is_bind_pay)
 
         if phone_for_card:
             pay_info.phone_for_card = phone_for_card
@@ -176,7 +184,7 @@ class PayOrder(object):
     #     else:
     #         raise ThirdPayError(77777, 'illegal condition within pay')
 
-    def add_card(self, card_no, bank, user, channel):
+    def add_card(self, card_no, bank, user, bao_bind_id=None):
         """
 
         :param card_no:
@@ -184,6 +192,7 @@ class PayOrder(object):
         :param user: instance
         :return: True/False
         """
+        # todo if exist raise error
         card = Card.objects.filter(no=card_no, user=user).first()
         if not card:
             card = Card()
@@ -191,8 +200,12 @@ class PayOrder(object):
             card.bank = bank
             card.user = user
             card.is_default = False
-            is_bind_channel = getattr(card, PayOrder.channel_mapping.get(channel)[1])
-            is_bind_channel = True
+            channel, bank_bind_code, card_bind_code = self.get_bank_and_channel(
+                    bank.gate_id, is_bind_pay=True)[1:]
+            if channel == 'baopay':
+                setattr(card, card_bind_code, bao_bind_id)
+            else:
+                setattr(card, card_bind_code, True)
             card.save()
             return True
         return False
