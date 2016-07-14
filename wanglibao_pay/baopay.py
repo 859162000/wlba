@@ -1,6 +1,6 @@
 # encoding=utf-8
 import json
-from common.tools import chunks, update_by_keys
+from wanglibao_common.tools import chunks, update_by_keys
 import datetime
 from Crypto.Cipher import PKCS1_v1_5, AES
 from Crypto.PublicKey import RSA
