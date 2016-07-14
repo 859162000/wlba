@@ -55,10 +55,6 @@ class PayWaitingException(PayException):
     def __init__(self,  message):
         super(PayWaitingException, self).__init__(222222, message)
 
-class FirstPayException(PayException):
-    def __init__(self):
-        super(FirstPayException, self).__init__(400002, '你已绑卡成功，但充值失败，请重新充值即可')
-
 class BaoPayWaitingException(PayWaitingException):
     thirdpay_ret_code = ['BF00115', 'BF00113', 'BF00144', 'BF00202', 'BF00238']
 
@@ -89,12 +85,12 @@ class BaoPayInterface(object):
 
     def _first_pay_confirm(self, order_id, sms_code, request):
         """
-        现阶段为了兼容前端首付只绑卡
+        现阶段为了兼容前端,首付只绑卡,然后返回出错信息给前端
         return -- {"ret_code": 0, "message": "success", 
                 "amount": amount, "margin":, "order_id": }
         """
         self.baopay.confirm_bind(order_id, sms_code)
-        raise FirstPayException()
+        return {"ret_code": 400002, "message": '你已绑卡成功，但充值失败，请重新充值即可'}
         # pre_pay_resp = self.baopay.pre_pay_by_order_id(order_id)
         # resp = self.baopay.confirm_pay(order_id, 
                 # pre_pay_resp['business_no'], request)
