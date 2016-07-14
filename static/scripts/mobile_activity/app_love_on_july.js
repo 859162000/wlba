@@ -400,5 +400,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	$('#act_time').text('截止 '+nian+'.'+bu_ling(yue)+'.'+bu_ling(ri)+' '+bu_ling(shi)+':'+bu_ling(fen)+'');
 
-
+	$('.wenhao').click(function(){
+		$('.popup_wrap').show();
+	});
+	$('.popup_wrap .main .close_popup').click(function(){
+		$('.popup_wrap').hide();
+	});
 })(org);
