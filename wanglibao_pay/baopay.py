@@ -55,6 +55,10 @@ class PayWaitingException(PayException):
     def __init__(self,  message):
         super(PayWaitingException, self).__init__(222222, message)
 
+class FirstPayException(PayException):
+    def __init__(self):
+        super(FirstPayException, self).__init__(400002, '你已绑卡成功，但充值失败，请重新充值即可')
+
 class BaoPayWaitingException(PayWaitingException):
     thirdpay_ret_code = ['BF00115', 'BF00113', 'BF00144', 'BF00202', 'BF00238']
 
@@ -85,17 +89,19 @@ class BaoPayInterface(object):
 
     def _first_pay_confirm(self, order_id, sms_code, request):
         """
+        现阶段为了兼容前端首付只绑卡
         return -- {"ret_code": 0, "message": "success", 
                 "amount": amount, "margin":, "order_id": }
         """
         self.baopay.confirm_bind(order_id, sms_code)
-        pre_pay_resp = self.baopay.pre_pay_by_order_id(order_id)
-        resp = self.baopay.confirm_pay(order_id, 
-                pre_pay_resp['business_no'], request)
-        resp.update(amount=(fmt_two_amount(resp['amount']/100)))
-        r = {'ret_code': 0, 'message': 'success'}
-        update_by_keys(r, resp, 'amount', 'margin', 'order_id')
-        return r
+        raise FirstPayException()
+        # pre_pay_resp = self.baopay.pre_pay_by_order_id(order_id)
+        # resp = self.baopay.confirm_pay(order_id, 
+                # pre_pay_resp['business_no'], request)
+        # resp.update(amount=(fmt_two_amount(resp['amount']/100)))
+        # r = {'ret_code': 0, 'message': 'success'}
+        # update_by_keys(r, resp, 'amount', 'margin', 'order_id')
+        # return r
 
     def _binded_pay_without_sms(self, card_no, amount, request):
         """
@@ -139,8 +145,7 @@ class BaoPay(object):
             pre_bind_para.post()
             return {'order_id': order_id}
         except PayException, err:
-            self.pay_order.order_after_pay_error(err, order_id)
-            raise
+            return self.pay_order.order_after_pay_error(err, order_id)
 
     def confirm_bind(self, order_id, sms_code):
         try:
@@ -166,8 +171,7 @@ class BaoPay(object):
             amount = pay_info.amount
             return self._pre_pay(order_id, bind_id, amount)
         except PayException, err:
-            self.pay_order.order_after_pay_error(err, order_id)
-            raise
+            return self.pay_order.order_after_pay_error(err, order_id)
 
     def pre_pay_by_card_id(self, card_id, amount):
         """
@@ -182,8 +186,7 @@ class BaoPay(object):
                     self.request_ip, self.device_type, no )
             return self._pre_pay(order_id, bind_id, amount)
         except PayException, err:
-            self.pay_order.order_after_pay_error(err, order_id)
-            raise
+            return self.pay_order.order_after_pay_error(err, order_id)
 
     def _pre_pay(self, order_id, bind_id, amount):
         pre_pay_para = PrePayPara(order_id, bind_id, amount)
@@ -204,8 +207,7 @@ class BaoPay(object):
             return self.pay_order.order_after_pay_succcess(amount, order_id,  
                     res_content=resp_content, request=request)
         except PayException, err:
-            self.pay_order.order_after_pay_error(err, order_id)
-            raise
+            return self.pay_order.order_after_pay_error(err, order_id)
     
 class BaoPayConn(object):
     """
