@@ -288,6 +288,8 @@ def _need_validation_for_qpay(card):
     need_sms = Misc.objects.filter(key='kuai_qpay_need_sms_validation').first()  
     if need_sms and need_sms.value == '1' and card.bank.channel == 'kuaipay':
         need_validation_for_qpay = True
+    elif card.bank.channel == 'baopay':
+        need_validation_for_qpay = True
     else:
         need_validation_for_qpay = False
     return need_validation_for_qpay
@@ -306,7 +308,7 @@ def card_bind_list(request):
 
     try:
         card_list = []
-        cards = Card.objects .filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True))\
+        cards = Card.objects .filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)|~Q(bao_bind_id=''))\
             .select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
@@ -350,6 +352,12 @@ def card_bind_list(request):
                     tmp.update(base_dict)
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
+
+                elif channel == 'baopay':
+                    tmp.update(base_dict)
+                    if card.bank.bao_bind_limit:
+                        tmp.update(util.handle_kuai_bank_limit(card.bank.bao_bind_limit))
+                            
 
                 # bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
                 # bank_min_amount = bank_limit.get('bank_min_amount')

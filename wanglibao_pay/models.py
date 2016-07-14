@@ -32,6 +32,7 @@ class Bank(models.Model):
     cards_info = models.TextField(max_length=10000, default='', blank=True, verbose_name=u'银行卡号识别码')
     bao_code = models.CharField(max_length=20, verbose_name=u'宝付网银支付银行代码', blank=True, default="")
     bao_bind_code = models.CharField(max_length=20, verbose_name=u'宝付认证支付银行代码', blank=True, default="")
+    bao_bind_limit = models.CharField(max_length=500, blank=True, verbose_name=u"宝付快捷限额信息", default="")
 
     #last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
