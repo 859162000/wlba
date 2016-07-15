@@ -85,6 +85,9 @@ class BaoPayInterface(object):
         return -- {"ret_code":0, "message":"ok", "order_id":, "token":}
         """
         resp = self.baopay.pre_bind(card_no, mobile, gate_id, amount)
+
+        if resp and resp.get('is_error'):
+            return resp
         return {'ret_code':0, 'message': 'ok', 
                     'order_id': resp['order_id'], 'token': self.DEFAULT_TOKEN}
 
@@ -94,7 +97,10 @@ class BaoPayInterface(object):
         return -- {"ret_code": 0, "message": "success", 
                 "amount": amount, "margin":, "order_id": }
         """
-        self.baopay.confirm_bind(order_id, sms_code)
+        resp = self.baopay.confirm_bind(order_id, sms_code)
+
+        if resp and resp.get('is_error'):
+            return resp
         return {"ret_code": 400002, "message": '你已绑卡成功，但充值失败，请重新充值即可'}
         # pre_pay_resp = self.baopay.pre_pay_by_order_id(order_id)
         # resp = self.baopay.confirm_pay(order_id, 
@@ -115,6 +121,9 @@ class BaoPayInterface(object):
         pre_pay_resp = self.baopay.pre_pay_by_card_id(card.id, amount)
         resp = self.baopay.confirm_pay(pre_pay_resp['order_id'], 
                 pre_pay_resp['business_no'], request)
+
+        if resp and resp.get('is_error'):
+            return resp
         r = {'ret_code': 0, 'message': 'success'}
         update_by_keys(r, resp, 'amount', 'margin', 'order_id')
         return r
@@ -123,12 +132,18 @@ class BaoPayInterface(object):
         card = Card.objects.filter(user=self.baopay.user, 
                 no__startswith=card_no[:6], no__endswith=card_no[-4:]).get()
         resp = self.baopay.pre_pay_by_card_id(card.id, amount)
+
+        if resp and resp.get('is_error'):
+            return resp
         return  {'ret_code': 0, 'message': 'ok', 'token': self.DEFAULT_TOKEN,
                 'order_id': resp['order_id']}
 
     def _binded_pay_confirm(self, order_id, sms_code, request):
         business_no = None
         resp = self.baopay.confirm_pay(order_id, business_no, sms_code, request)
+
+        if resp and resp.get('is_error'):
+            return resp
         r = {'ret_code': 0, 'message': 'success'}
         update_by_keys(r, resp, 'amount', 'margin', 'order_id')
         return r
@@ -172,7 +187,6 @@ class BaoPay(object):
                 raise CardExistException('银行卡已绑定')
         except PayException, err:
             self.pay_order.order_after_pay_error(err, order_id)
-            raise
 
 
     def pre_pay_by_order_id(self, order_id):
