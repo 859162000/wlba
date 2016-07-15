@@ -13,7 +13,7 @@ from wanglibao_margin.models import Margin
 from wanglibao_redpack.backends import give_activity_redpack
 from wanglibao_redpack.models import RedPackEvent
 from misc.views import MiscRecommendProduction
-
+from marketing.tools import processMarchAwardAfterP2pBuy
 
 logger = get_task_logger(__name__)
 
@@ -36,6 +36,11 @@ def generate_site_data():
     data.user_count = Margin.objects.all().count()
 
     data.save()
+
+
+@app.task
+def hand_top_rank_data():
+    processMarchAwardAfterP2pBuy()
 
 
 @app.task

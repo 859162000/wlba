@@ -754,6 +754,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_pay.tasks.sync_pay_result',
         'schedule': timedelta(minutes=10), 
     },
+    #七月排名活动
+    'hand_top_rank_data': {
+        'task': 'marketing.tasks.hand_top_rank_data',
+        'schedule': timedelta(minutes=20),
+    },    
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
