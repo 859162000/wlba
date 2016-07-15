@@ -220,7 +220,7 @@ class BaoPay(object):
                 business_no = PayInfo.objects.get(order__id=order_id).bao_business_no
             confirm_pay_para = ConfirmPayPara(order_id, business_no, sms_code)
             resp_json = confirm_pay_para.post()
-            amount = fmt_two_amount(int(resp_json['succ_amt']) / 100)
+            amount = fmt_two_amount(int(resp_json['succ_amt']) / 100.0)
             resp_content = resp_json['resp_content']
             return self.pay_order.order_after_pay_succcess(amount, order_id,  
                     res_content=resp_content, request=request)
