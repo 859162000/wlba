@@ -60,7 +60,7 @@
   .section_3
     width: 100%
     background: url("/static/imgs/pc_activity/love_on_july/section_3.jpg") no-repeat center top
-    padding-bottom: 20px
+    padding-bottom: 0
 
     .title_img
       width: 518px
@@ -195,7 +195,7 @@
           width: 158px
           position: absolute
           left: 206px
-          top: 55px
+          top: 62px
           font-size: 14px
           line-height: 20px
           text-align: center
@@ -313,6 +313,9 @@
           display: block
           height: 35px
           text-align: center
+          span
+            font-family: 'SimSun','SimHei'
+
         .shu_line
           position: absolute
           left: 50%
@@ -330,20 +333,37 @@
       width: 500px
       padding: 17px 0 26px 0
     .go_list
-      width: 204px
-      height: 62px
-      background: url("/static/imgs/pc_activity/love_on_july/section_3_img18.png") no-repeat center center
-      line-height: 60px
+      width: 100%
       display: block
-      margin: 0 auto 20px
+      position: fixed
+      left: 0
+      bottom: 0
+      z-index: 2
 
+      .go_list_bg
+        width: 100%
+        height: 72px
+        background: #000
+        opacity: 0.4
+        display: block
+      .go_list_img
+        display: block
+        margin: -31px 0 0 -102px
+        width: 204px
+        height: 62px
+        background: url("/static/imgs/pc_activity/love_on_july/section_3_img18.png") no-repeat center center
+        line-height: 60px
+        text-align: center
+        font-size: 21px
+        color: #fff
+        position: absolute
+        left: 50%
+        top: 50%
+        z-index: 2
+        letter-spacing: 2px
+      .go_list_img:hover
+        opacity: 0.8
 
-      text-align: center
-      font-size: 21px
-      color: #fff
-      text-space: 5px
-    .go_list:hover
-      opacity: 0.8
 
     .rule_last
       width: 100%

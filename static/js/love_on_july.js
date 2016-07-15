@@ -128,6 +128,12 @@
             $('.popup_wrap').hide();
         });
 
+        var body_height = $('.rule_wrap3').offset().top - $('.g-footer-warp').height()-72-98;
+        $(window).scrollTop() < body_height ? $(".body_wrap .go_list").css({bototm: "0",position:'fixed'}).prev().css('padding','17px 0 98px 0') : $(".body_wrap .go_list").css({bottom: "0",position:'relative'}).prev().css('padding','17px 0 26px 0')
+
+        $(window).bind("scroll", function () {
+            $(this).scrollTop() < body_height ? $(".body_wrap .go_list").css({bototm: "0",position:'fixed'}).prev().css('padding','17px 0 98px 0') : $(".body_wrap .go_list").css({bottom: "0",position:'relative'}).prev().css('padding','17px 0 26px 0')
+        });
 
         })
 

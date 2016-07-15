@@ -12,7 +12,8 @@
     line-height: 0.75rem
     color: #f26b6b
     font-size: 0.6rem
-    margin: 0.4rem auto 1.375rem
+    margin: 0.8rem auto 0.5rem
+
     display: block
     background: url("/static/imgs/mobile_activity/app_love_on_july/img_2_04.png") no-repeat center center
     background-size: 100%
@@ -253,12 +254,23 @@
       width: 100%
       line-height: 1.1rem
     .href_link
-      width: 52.4%
+      position: fixed
+      bottom: 0
+      left: 0
+      z-index: 2
+
+      width: 100%
       display: block
       margin: 0 auto
+      padding: 0.6rem 0
+      background: rgba(0,0,0,0.5)
       img
-        width: 100%
+        width: 52.4%
         display: block
+        margin: 0 auto
+
+
+
     .line1
       padding: 1.2rem 0 1.2rem
     .last_rule
@@ -288,9 +300,24 @@
       background: #fff
       border-radius: 0.5rem
       z-index: 99
+      @media screen and (max-device-height: 550px)
+        margin: -10rem 0 0 -45%
+      @media screen and (max-height: 550px)
+        margin: -10rem 0 0 -45%
+
       .textairport
         width: 100%
         padding: 0.7rem 0.5rem
+
+
+        @media screen and (max-device-height: 550px)
+          overflow: scroll
+          height: 15rem
+        @media screen and (max-height: 550px)
+          overflow: scroll
+          height: 15rem
+
+
         p
           padding-bottom: 0.5rem
           line-height: 1.2rem

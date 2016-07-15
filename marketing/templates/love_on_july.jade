@@ -6,7 +6,7 @@ html.no-js(lang="en-gb")
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/love_on_july.css?v=2016071401")
+        link(rel="stylesheet",href="/static/styles/pc_activity/love_on_july.css?v=2016071503")
         - csrf_token
     body(style="background:#fafafa")
         include global/g_nav
@@ -110,17 +110,17 @@ html.no-js(lang="en-gb")
                         .shu_line
                     .investmen_tline
                     .box
-                        .div 1000≤单笔投资﹤1万
+                        .div!='1000<span>≤</span>单笔投资<span>﹤</span>1万'
                         .div 1257元体验金
                         .shu_line
                     .investmen_tline
                     .box
-                        .div 1万≤单笔投资﹤10万
+                        .div!='1万<span>≤</span>单笔投资<span>﹤</span>10万'
                         .div 2157元体验金
                         .shu_line
                     .investmen_tline
                     .box
-                        .div 10万≤单笔投资﹤30万
+                        .div!='10万<span>≤</span>单笔投资<span>﹤</span>30万'
                         .div 5270元体验金
                         .shu_line
                     .investmen_tline
@@ -133,7 +133,9 @@ html.no-js(lang="en-gb")
                 .rule_wrap.rule_wrap3
                     .title_text 温馨提示：
                     .rule_text 体验金有效期截止到2016年8月10日。
-                a.go_list(href='/p2p/list/') 马上投资
+                .go_list
+                    .go_list_bg
+                    a.go_list_img(href='/p2p/list/') 给你宠爱
                 //.rule_last 活动最终解释权归网利宝所有
             .popup_wrap
                 .main
@@ -164,5 +166,5 @@ html.no-js(lang="en-gb")
                     img.close_popup(src="/static/imgs/pc_activity/love_on_july/close_popup.png")
         include global/g_footer
 script.
-    require(['/static/js/love_on_july.js?v=2016071401'])
+    require(['/static/js/love_on_july.js?v=2016071501'])
 
