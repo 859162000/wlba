@@ -39,6 +39,11 @@ def generate_site_data():
 
 
 @app.task
+def hand_top_rank_data():
+    processMarchAwardAfterP2pBuy()
+
+
+@app.task
 def send_redpack(day, desc, rtype='nil'):
     now = timezone.now()
     day = datetime.strptime(day, '%Y-%m-%d')
