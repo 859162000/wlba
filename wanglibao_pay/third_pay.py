@@ -601,7 +601,7 @@ def bind_pay_dynnum(request):
                                             token, input_phone, device,
                                             ip, request, mode=mode)
     elif channel == 'baopay':
-        res = BaoPayInterface(user, ip, device).dynnum_bind_pay(order_id, vcode, request)
+        res = BaoPayInterface(user, ip, device).dynnum_bind_pay(order_id, vcode, mode, request)
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 

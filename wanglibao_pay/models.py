@@ -179,6 +179,7 @@ class PayInfo(models.Model):
         ('android', 'android'),
         ('ios', 'ios')
     ))
+    bao_business_no = models.CharField(u'宝付业务流水号', max_length=50, blank=True, default='')
 
     def __unicode__(self):
         return u'%s' % self.pk
