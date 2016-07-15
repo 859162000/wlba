@@ -1,5 +1,6 @@
 # encoding=utf-8
 import json
+import time
 from wanglibao_common.tools import chunks, update_by_keys
 import datetime
 from Crypto.Cipher import PKCS1_v1_5, AES
@@ -260,16 +261,18 @@ class BaoPayConn(object):
         post_para.update(txn_sub_type=self.para_txn_sub_type)
         data_content = self._get_para(self)
         data_content.update(txn_sub_type=self.para_txn_sub_type)
-        logging.critical('Baopay_post: %s | %s' % (post_para, data_content))
+        logger.critical('Baopay_post: %s | %s' % (post_para, data_content))
         data_content=self._get_encrypt_content(data_content)
         post_para.update(data_content=data_content)
-        logging.critical('Baopay_post_encypted: %s' %  post_para)
+        logger.critical('Baopay_post_encypted: %s' %  post_para)
         return post_para
 
     def post(self):
+        pre_req = time.time()
         resp = requests.post(self.url, self._get_post())
+        req_time = time.time() - pre_req
         resp_json = json.loads(self._decrypt_response(resp.text))
-        logging.critical('Baopay_response: %s' % resp_json)
+        logger.critical('Baopay_response: %s|%s' % (resp_json, req_time))
         resp_code = resp_json['resp_code']
         resp_message = resp_json['resp_msg']
         if resp_code != '0000':
