@@ -108,7 +108,8 @@
     wlb.ready({
 
         app: function (mixins) {
-			mixins.shareData({title: '“爱妻悦”—爱无价 “妻”悦享'});
+			mixins.shareData({title: '“爱妻悦”—爱无价 “妻”悦享', content: '七月把最好的爱送给心爱的她，爱她就努力赚，爱她就让“她”乐开花！'});
+
             function connect(data) {
                 org.ajax({
                     url: '/accounts/token/login/ajax/',
