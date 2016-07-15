@@ -98,7 +98,7 @@ class BaoPayInterface(object):
         # pre_pay_resp = self.baopay.pre_pay_by_order_id(order_id)
         # resp = self.baopay.confirm_pay(order_id, 
                 # pre_pay_resp['business_no'], request)
-        # resp.update(amount=(fmt_two_amount(resp['succ_amt']/100)))
+        # resp.update(amount=(fmt_two_amount(int(resp['succ_amt'])/100)))
         # r = {'ret_code': 0, 'message': 'success'}
         # update_by_keys(r, resp, 'amount', 'margin', 'order_id')
         # return r
@@ -220,7 +220,7 @@ class BaoPay(object):
             confirm_pay_para = ConfirmPayPara(order_id, business_no, sms_code)
             resp_json = confirm_pay_para.post()
             order_id = resp_json['trans_id']
-            amount = fmt_two_amount(resp_json['succ_amt'] / 100)
+            amount = fmt_two_amount(int(resp_json['succ_amt']) / 100)
             resp_content = resp_json['resp_content']
             return self.pay_order.order_after_pay_succcess(amount, order_id,  
                     res_content=resp_content, request=request)
