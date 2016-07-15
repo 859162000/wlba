@@ -122,8 +122,9 @@ class BaoPayInterface(object):
     def _binded_pay_get_sms(self, card_no, amount):
         card = Card.objects.filter(user=self.baopay.user, 
                 no__startswith=card_no[:6], no__endswith=card_no[-4:]).get()
-        self.baopay.pre_pay_by_card_id(card.id, amount)
-        return  {'ret_code': 0, 'message': 'ok', 'token': self.DEFAULT_TOKEN}
+        resp = self.baopay.pre_pay_by_card_id(card.id, amount)
+        return  {'ret_code': 0, 'message': 'ok', 'token': self.DEFAULT_TOKEN,
+                'order_id': resp['order_id']}
 
     def _binded_pay_confirm(self, order_id, sms_code, request):
         resp = self.baopay.confirm_pay(order_id, None, request)
