@@ -98,7 +98,7 @@ class BaoPayInterface(object):
         # pre_pay_resp = self.baopay.pre_pay_by_order_id(order_id)
         # resp = self.baopay.confirm_pay(order_id, 
                 # pre_pay_resp['business_no'], request)
-        # resp.update(amount=(fmt_two_amount(resp['amount']/100)))
+        # resp.update(amount=(fmt_two_amount(resp['succ_amt']/100)))
         # r = {'ret_code': 0, 'message': 'success'}
         # update_by_keys(r, resp, 'amount', 'margin', 'order_id')
         # return r
@@ -114,7 +114,7 @@ class BaoPayInterface(object):
         pre_pay_resp = self.baopay.pre_pay_by_card_id(card.id, amount)
         resp = self.baopay.confirm_pay(pre_pay_resp['order_id'], 
                 pre_pay_resp['business_no'], request)
-        resp.update(amount=(fmt_two_amount(resp['amount']/100)))
+        resp.update(amount=(fmt_two_amount(resp['succ_amt']/100)))
         r = {'ret_code': 0, 'message': 'success'}
         update_by_keys(r, resp, 'amount', 'margin', 'order_id')
         return r
@@ -127,8 +127,9 @@ class BaoPayInterface(object):
                 'order_id': resp['order_id']}
 
     def _binded_pay_confirm(self, order_id, sms_code, request):
-        resp = self.baopay.confirm_pay(order_id, None, request)
-        resp.update(amount=(fmt_two_amount(resp['amount']/100)))
+        business_no = None
+        resp = self.baopay.confirm_pay(order_id, business_no, sms_code, request)
+        resp.update(amount=(fmt_two_amount(resp['succ_amt']/100)))
         r = {'ret_code': 0, 'message': 'success'}
         update_by_keys(r, resp, 'amount', 'margin', 'order_id')
         return r
@@ -211,14 +212,14 @@ class BaoPay(object):
         resp.update(order_id=order_id)
         return resp
 
-    def confirm_pay(self, order_id, business_no=None, request=None):
+    def confirm_pay(self, order_id, business_no=None, sms_code=None, request=None):
         """
         使用短信验证码，business_no放到数据库中
         """
         try:
             if not business_no:
                 business_no = PayInfo.objects.get(order__id=order_id).bao_business_no
-            confirm_pay_para = ConfirmPayPara(order_id, business_no)
+            confirm_pay_para = ConfirmPayPara(order_id, business_no, sms_code)
             resp_json = confirm_pay_para.post()
             order_id = resp_json['trans_id']
             amount = resp_json['txn_amt']
