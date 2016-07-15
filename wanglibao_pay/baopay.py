@@ -269,6 +269,7 @@ class BaoPayConn(object):
 
     def post(self):
         pre_req = time.time()
+        logger.critical('Baopay_request_before_response')
         resp = requests.post(self.url, self._get_post())
         req_time = time.time() - pre_req
         resp_json = json.loads(self._decrypt_response(resp.text))
