@@ -62,7 +62,7 @@ class BaoPayInterface(object):
     """
     组装宝付的底层支付接口，供前端调用
     """
-    DEFAULT_TOKEN = 'WANGLIBAO'
+    DEFAULT_TOKEN = '123456'
     def __init__(self, user, request_ip, device_type):
         self.baopay = BaoPay(user, request_ip, device_type)
 
