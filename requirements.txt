@@ -24,7 +24,7 @@ django-imagekit==3.2
 django-import-export==0.2.2
 django-mathfilters==0.2.1
 django-oauth2-provider==0.2.6.1
-django-registration==1.0
+django-registration==3.1.2
 django-registration-defaults==0.4.4
 django-rest-swagger==0.1.14
 django-reversion==1.8.1
