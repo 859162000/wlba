@@ -61,7 +61,7 @@ urllib3==1.7.1
 wsgiref==0.1.2
 httplib2==0.9
 suds==0.4
-eventlet==0.15.2
+eventlet==0.31.0
 gevent==1.0.1
 gunicorn==19.1.1
 BeautifulSoup==3.2.1
