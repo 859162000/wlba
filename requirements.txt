@@ -40,7 +40,7 @@ fabric-components==0.1.1
 ipython==2.1.0
 jsonfield==0.9.20
 kombu==3.0.19
-lxml==3.3.4
+lxml==4.6.5
 oauthlib==0.6.1
 paramiko==1.12.3
 pilkit==1.1.6
