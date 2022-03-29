@@ -42,7 +42,7 @@ jsonfield==0.9.20
 kombu==3.0.19
 lxml==3.3.4
 oauthlib==0.6.1
-paramiko==1.12.3
+paramiko==2.10.1
 pilkit==1.1.6
 pinyin==0.2.5
 pycrypto==2.6.1
